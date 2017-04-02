@@ -1,11 +1,19 @@
 package com.kodatos.cumulonimbus.datahelper;
 
 
+import android.net.Uri;
 import android.provider.BaseColumns;
 
 public class WeatherDBContract {
 
+    public static final String AUTHORITY = "com.koadtos.cumulonimbus";
+    public static final Uri BASE_URI = Uri.parse("content://"+AUTHORITY);
+    public static final String PATH_WEATHERDATA = "weatherdata";
+
     public static final class WeatherDBEntry implements BaseColumns{
+
+        public static final Uri CONTENT_URI = BASE_URI.buildUpon().appendPath(PATH_WEATHERDATA).build();
+
         public static final String TABLE_NAME = "weather_table";
         public static final String COLUMN_WEATHER_MAIN = "weather_main";
         public static final String COLUMN_WEATHER_DESC = "weather_desc";
