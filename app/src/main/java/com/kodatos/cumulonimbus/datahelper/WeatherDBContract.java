@@ -6,7 +6,8 @@ import android.provider.BaseColumns;
 
 public class WeatherDBContract {
 
-    public static final String AUTHORITY = "com.koadtos.cumulonimbus";
+    //Static strings for uri building
+    public static final String AUTHORITY = "com.kodatos.cumulonimbus";
     public static final Uri BASE_URI = Uri.parse("content://"+AUTHORITY);
     public static final String PATH_WEATHERDATA = "weatherdata";
 
