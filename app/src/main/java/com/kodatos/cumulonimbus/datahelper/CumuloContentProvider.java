@@ -6,18 +6,26 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.UriMatcher;
 import android.database.Cursor;
+import android.database.SQLException;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
+import static com.kodatos.cumulonimbus.datahelper.WeatherDBContract.*;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-public class CumuloContentProvider extends ContentProvider {
 
+public class CumuloContentProvider extends ContentProvider {
+    /* Only supports query, insert and update
+       any delete call or unsupported uri will lead to UnsupportedOperationException*/
+
+    //Codes for supported uris
     public static final int WEATHER_DATA = 100;
     public static final int WEATHER_WITH_ID = 101;
 
     private WeatherDBHelper mDBHelper;
     private static final UriMatcher sUriMatcher = buildMatcher();
 
+    //URIMatcher builder for two uris
     public static UriMatcher buildMatcher(){
         UriMatcher uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
         uriMatcher.addURI(WeatherDBContract.AUTHORITY, WeatherDBContract.PATH_WEATHERDATA, WEATHER_DATA);
@@ -35,7 +43,21 @@ public class CumuloContentProvider extends ContentProvider {
     @Nullable
     @Override
     public Cursor query(@NonNull Uri uri, @Nullable String[] projection, @Nullable String selection, @Nullable String[] selectionArgs, @Nullable String sortOrder) {
-        return null;
+        final SQLiteDatabase db = mDBHelper.getReadableDatabase();
+        int code = sUriMatcher.match(uri);
+        Cursor retCursor;
+        switch (code){
+            case WEATHER_DATA : retCursor = db.query(WeatherDBEntry.TABLE_NAME,projection,selection,selectionArgs,null,null,sortOrder);
+                                break;
+            case WEATHER_WITH_ID :  String id = uri.getPathSegments().get(1);
+                                    String mselection = "_id=?";
+                                    String[] margs = new String[]{id};
+                                    retCursor = db.query(WeatherDBEntry.TABLE_NAME,projection,mselection,margs,null,null,sortOrder);
+                                    break;
+            default: throw new UnsupportedOperationException("Unknown Uri "+uri.toString());
+        }
+        retCursor.setNotificationUri(getContext().getContentResolver(),uri);
+        return retCursor;
     }
 
     @Nullable
@@ -47,7 +69,22 @@ public class CumuloContentProvider extends ContentProvider {
     @Nullable
     @Override
     public Uri insert(@NonNull Uri uri, @Nullable ContentValues values) {
-        return null;
+        SQLiteDatabase db = mDBHelper.getWritableDatabase();
+        int code = sUriMatcher.match(uri);
+        Uri retUri;
+        switch (code){
+            case WEATHER_DATA : long id = db.insert(WeatherDBEntry.TABLE_NAME,null,values);
+                if (id>0) {
+                    retUri = WeatherDBEntry.CONTENT_URI.buildUpon().appendPath(String.valueOf(id)).build();
+                }
+                else {
+                    throw new SQLException("Insert Failed!");
+                }
+                break;
+            default: throw new UnsupportedOperationException("Unknown Uri "+uri.toString());
+        }
+        getContext().getContentResolver().notifyChange(uri,null);
+        return retUri;
     }
 
     @Override
@@ -57,6 +94,18 @@ public class CumuloContentProvider extends ContentProvider {
 
     @Override
     public int update(@NonNull Uri uri, @Nullable ContentValues values, @Nullable String selection, @Nullable String[] selectionArgs) {
-        return 0;
+        SQLiteDatabase db = mDBHelper.getWritableDatabase();
+        int code = sUriMatcher.match(uri);
+        int retno;
+        switch(code){
+            case WEATHER_DATA : retno = db.update(WeatherDBEntry.TABLE_NAME,values,selection,selectionArgs);
+                                if(retno<=0){
+                                    throw new SQLException("Update Failed!");
+                                }
+                                break;
+            default: throw new UnsupportedOperationException("Unknown Uri "+uri.toString());
+        }
+        getContext().getContentResolver().notifyChange(uri,null);
+        return retno;
     }
 }
