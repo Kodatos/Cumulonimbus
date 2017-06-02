@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <CheckBoxPreference
+        android:defaultValue="true"
+        android:key="@string/pref_curr_location_key"
+        android:summaryOff="Using Custom Location"
+        android:summaryOn="Using Current Location"
+        android:title="@string/pref_curr_location"/>
+    <EditTextPreference
+        android:defaultValue="@string/pref_curr_location_def"
+        android:key="@string/pref_custom_location_key"
+        android:title="@string/pref_custom_location"
+    />
+    <CheckBoxPreference
+        android:defaultValue="true"
+        android:key="@string/pref_metrics_key"
+        android:summaryOff="Using Fahrenheit/miles"
+        android:summaryOn="Using Celsius/metres"
+        android:title="@string/pref_metrics"/>
+</PreferenceScreen>
