@@ -26,11 +26,12 @@ public class ForecastWeatherModel {
     public ForecastWeatherModel() {
     }
 
+    // A helper method to get required data for database operations
     public DBModel getDBModel(long day){
         ForecastList fl = forecastList.get((int) (day*8));
         Weather w = fl.weather.get(0);
         Main m = fl.main;
-        return new DBModel(day,w.main,w.description,m.temp,m.tempMin,m.tempMax,m.pressure,m.humidity,fl.wind.getUsefulWind());
+        return new DBModel(day+1,w.main,w.description,m.temp,m.tempMin,m.tempMax,m.pressure,m.humidity,fl.wind.getUsefulWind());
 
     }
 }

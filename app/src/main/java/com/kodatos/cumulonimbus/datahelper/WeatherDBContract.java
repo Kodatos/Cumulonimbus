@@ -13,6 +13,7 @@ public class WeatherDBContract {
 
     public static final class WeatherDBEntry implements BaseColumns{
 
+        // A Uri that can be used in ContentResolver calls
         public static final Uri CONTENT_URI = BASE_URI.buildUpon().appendPath(PATH_WEATHERDATA).build();
 
         public static final String TABLE_NAME = "weather_table";

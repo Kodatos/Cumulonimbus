@@ -48,6 +48,7 @@ public class CurrentWeatherModel {
     public CurrentWeatherModel() {
     }
 
+    // A helper method to get required data for database operations
     public DBModel getDBModel(){
         // First row in database
         Weather w = weather.get(0);

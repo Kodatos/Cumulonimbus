@@ -35,6 +35,10 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.kodatos.cumulonimbus.MainActivity" />
         </activity>
+
+        <service
+            android:name=".apihelper.syncOWMService"
+            android:exported="false" />
     </application>
 
 </manifest>

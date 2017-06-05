@@ -28,6 +28,7 @@ public class DBModel {
         this.wind = wind;
     }
 
+    // This function builds and provides a ContentValues object required for the database's update and insert operations
     public ContentValues getEquivalentCV(){
         ContentValues cv = new ContentValues();
         cv.put(WeatherDBEntry._ID,this.id);

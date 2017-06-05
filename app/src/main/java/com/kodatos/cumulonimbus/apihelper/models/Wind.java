@@ -13,6 +13,7 @@ public class Wind {
     @Expose
     private float deg;
 
+    // A helper method to get a String for database usage
     public String getUsefulWind(){
         return String.valueOf(speed)+"/"+String.valueOf(deg);
     }
