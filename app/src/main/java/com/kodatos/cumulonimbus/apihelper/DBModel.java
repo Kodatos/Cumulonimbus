@@ -16,6 +16,42 @@ public class DBModel {
     private long humidity;
     private String wind;
 
+    public long getId() {
+        return id;
+    }
+
+    public String getWeather_main() {
+        return weather_main;
+    }
+
+    public String getWeather_desc() {
+        return weather_desc;
+    }
+
+    public float getTemp() {
+        return temp;
+    }
+
+    public float getTemp_min() {
+        return temp_min;
+    }
+
+    public float getTemp_max() {
+        return temp_max;
+    }
+
+    public float getPressure() {
+        return pressure;
+    }
+
+    public long getHumidity() {
+        return humidity;
+    }
+
+    public String getWind() {
+        return wind;
+    }
+
     public DBModel(long id, String weather_main, String weather_desc, float temp, float temp_min, float temp_max, float pressure, long humidity, String wind) {
         this.id = id;
         this.weather_main = weather_main;

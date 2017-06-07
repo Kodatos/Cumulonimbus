@@ -53,6 +53,6 @@ public class CurrentWeatherModel {
         // First row in database
         Weather w = weather.get(0);
         // Weather contains main and desc while MainCurrent contains the rest except wind
-        return new DBModel(1L,w.main,w.description,mainCurrent.temp,mainCurrent.tempMin,mainCurrent.tempMax,mainCurrent.pressure,mainCurrent.humidity,wind.getUsefulWind());
+        return new DBModel(1,w.main,w.description,mainCurrent.temp,mainCurrent.tempMin,mainCurrent.tempMax,mainCurrent.pressure,mainCurrent.humidity,wind.getUsefulWind());
     }
 }

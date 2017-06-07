@@ -29,19 +29,19 @@ import retrofit2.converter.gson.GsonConverterFactory;
  * An {@link IntentService} subclass for handling asynchronous task requests in
  * a service on a separate handler thread for getting weather data from OpenWeatherMap.
  */
-public class syncOWMService extends IntentService {
+public class SyncOWMService extends IntentService {
 
     private Intent mIntent;
 
     //TODO Insert own OpenWeatherMap API_KEY here
-    public static final String API_KEY = "xxxxxxxx";
-    public static final String BASE_URL = "api.openweathermap.org";
+    public static final String API_KEY = "ab4b1a6c101df70ffea59f967b26c673";
+    public static final String BASE_URL = "http://api.openweathermap.org/";
 
-    public static final String UPDATE_ACTION = "com.kodatos.cumulonimbus.apihelper.syncOWMService.ACTION_UPDATE_DB";
-    public static final String CREATE_ACTION = "com.kodatos.cumulonimbus.apihelper.syncOWMService.ACTION_NEW_DB";
+    public static final String UPDATE_ACTION = "com.kodatos.cumulonimbus.apihelper.SyncOWMService.ACTION_UPDATE_DB";
+    public static final String CREATE_ACTION = "com.kodatos.cumulonimbus.apihelper.SyncOWMService.ACTION_NEW_DB";
 
-    public syncOWMService() {
-        super("syncOWMService");
+    public SyncOWMService() {
+        super("SyncOWMService");
     }
 
     @Override
@@ -56,9 +56,11 @@ public class syncOWMService extends IntentService {
         ForecastWeatherCallback mForecastWeatherCallback = new ForecastWeatherCallback();
 
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
-        String custom_location = sp.getString(getString(R.string.pref_custom_location_key), null);
-
+        String custom_location = sp.getString(this.getString(R.string.pref_custom_location_key), this.getString(R.string.pref_custom_location_def));
+        Log.w(this.getClass().getName(), String.valueOf(sp.contains(this.getString(R.string.pref_custom_location_key))));
+        Log.w(this.getClass().getName(), custom_location);
         Call<CurrentWeatherModel> currentWeatherModelCall = weatherAPIService.getCurrentWeatherByString(custom_location,API_KEY);
+        Log.w(this.getClass().getName(), currentWeatherModelCall.request().url().toString());
         currentWeatherModelCall.enqueue(mCurrentWeatherCallback);
         Call<ForecastWeatherModel> forecastWeatherModelCall = weatherAPIService.getForecastWeatherByString(custom_location,API_KEY);
         forecastWeatherModelCall.enqueue(mForecastWeatherCallback);
@@ -73,7 +75,7 @@ public class syncOWMService extends IntentService {
             if(response.isSuccessful()){
                 CurrentWeatherModel currentWeatherModelResponse = response.body();
                 ContentValues cv = currentWeatherModelResponse.getDBModel().getEquivalentCV();
-                String where = "ID=?";
+                String where = "_ID=?";
                 String[] selectionArgs = new String[]{"1"};
                 if(UPDATE_ACTION.equals(mIntent.getAction())){
                     getContentResolver().update(WeatherDBContract.WeatherDBEntry.CONTENT_URI,cv,where,selectionArgs);
@@ -113,7 +115,7 @@ public class syncOWMService extends IntentService {
                 ForecastWeatherModel forecastWeatherModelResponse = response.body();
                 for(long i=1; i<=4; i++){
                     ContentValues cv = forecastWeatherModelResponse.getDBModel(i).getEquivalentCV();
-                    String where = "ID=?";
+                    String where = "_ID=?";
                     String[] selectionArgs = new String[]{String.valueOf(i+1)};
                     if(UPDATE_ACTION.equals(mIntent.getAction())){
                         getContentResolver().update(WeatherDBContract.WeatherDBEntry.CONTENT_URI,cv,where,selectionArgs);

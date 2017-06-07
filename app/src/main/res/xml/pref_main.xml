@@ -7,7 +7,7 @@
         android:summaryOn="Using Current Location"
         android:title="@string/pref_curr_location"/>
     <EditTextPreference
-        android:defaultValue="@string/pref_curr_location_def"
+        android:defaultValue="@string/pref_custom_location_def"
         android:key="@string/pref_custom_location_key"
         android:title="@string/pref_custom_location"
     />

@@ -29,6 +29,6 @@ public class Main {
     public long humidity;
     @SerializedName("temp_kf")
     @Expose
-    public long tempKf;
+    public float tempKf;
 
 }

@@ -4,7 +4,7 @@
     <string name="title_activity_settings">Settings</string>
     <string name="pref_curr_location_key">bool_current_location</string>
     <string name="pref_curr_location">Use your current location</string>
-    <string name="pref_curr_location_def">Delhi,IN</string>
+    <string name="pref_custom_location_def">Delhi,IN</string>
     <string name="pref_custom_location_key">custom_location</string>
     <string name="pref_custom_location">Use a custom location</string>
     <string name="pref_metrics_key">bool_use_metrics</string>
