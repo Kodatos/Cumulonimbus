@@ -34,7 +34,7 @@ public class SyncOWMService extends IntentService {
     private Intent mIntent;
 
     //TODO Insert own OpenWeatherMap API_KEY here
-    public static final String API_KEY = "ab4b1a6c101df70ffea59f967b26c673";
+    public static final String API_KEY = "xxxxx";
     public static final String BASE_URL = "http://api.openweathermap.org/";
 
     public static final String UPDATE_ACTION = "com.kodatos.cumulonimbus.apihelper.SyncOWMService.ACTION_UPDATE_DB";
