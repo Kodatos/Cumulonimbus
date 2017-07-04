@@ -40,6 +40,8 @@ public class SyncOWMService extends IntentService {
     public static final String UPDATE_ACTION = "com.kodatos.cumulonimbus.apihelper.SyncOWMService.ACTION_UPDATE_DB";
     public static final String CREATE_ACTION = "com.kodatos.cumulonimbus.apihelper.SyncOWMService.ACTION_NEW_DB";
 
+    private final String LOG_TAG = "SyncOWMService ";
+
     public SyncOWMService() {
         super("SyncOWMService");
     }
@@ -57,10 +59,9 @@ public class SyncOWMService extends IntentService {
 
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
         String custom_location = sp.getString(this.getString(R.string.pref_custom_location_key), this.getString(R.string.pref_custom_location_def));
-        Log.w(this.getClass().getName(), String.valueOf(sp.contains(this.getString(R.string.pref_custom_location_key))));
-        Log.w(this.getClass().getName(), custom_location);
+        Log.w(LOG_TAG, custom_location);
         Call<CurrentWeatherModel> currentWeatherModelCall = weatherAPIService.getCurrentWeatherByString(custom_location,API_KEY);
-        Log.w(this.getClass().getName(), currentWeatherModelCall.request().url().toString());
+        Log.w(LOG_TAG, currentWeatherModelCall.request().url().toString());
         currentWeatherModelCall.enqueue(mCurrentWeatherCallback);
         Call<ForecastWeatherModel> forecastWeatherModelCall = weatherAPIService.getForecastWeatherByString(custom_location,API_KEY);
         forecastWeatherModelCall.enqueue(mForecastWeatherCallback);
@@ -92,7 +93,7 @@ public class SyncOWMService extends IntentService {
                     String errorCode = String.valueOf(jsonError.getInt("cod"));
                     String errorMessage = jsonError.getString("message");
                     String errorLog = errorCode+":"+errorMessage;
-                    Log.w(this.getClass().getName(), errorLog);
+                    Log.w(LOG_TAG, errorLog);
                 } catch (JSONException | IOException e) {
                     e.printStackTrace();
                 }
@@ -102,7 +103,7 @@ public class SyncOWMService extends IntentService {
         @Override
         public void onFailure(@NonNull Call<CurrentWeatherModel> call, @NonNull Throwable t) {
             t.printStackTrace();
-            Log.w(this.getClass().getName(), "Couldn't access API. Check connection or call.");
+            Log.w(LOG_TAG, "Couldn't access API. Check connection or call.");
         }
     }
 
@@ -132,7 +133,7 @@ public class SyncOWMService extends IntentService {
                     String errorCode = String.valueOf(jsonError.getInt("cod"));
                     String errorMessage = jsonError.getString("message");
                     String errorLog = errorCode+":"+errorMessage;
-                    Log.w(this.getClass().getName(), errorLog);
+                    Log.w(LOG_TAG, errorLog);
                 } catch (JSONException | IOException e) {
                     e.printStackTrace();
                 }
@@ -142,7 +143,7 @@ public class SyncOWMService extends IntentService {
         @Override
         public void onFailure(@NonNull Call<ForecastWeatherModel> call, @NonNull Throwable t) {
             t.printStackTrace();
-            Log.w(this.getClass().getName(), "Couldn't access API. Check connection or call.");
+            Log.w(LOG_TAG, "Couldn't access API. Check connection or call.");
         }
     }
 }

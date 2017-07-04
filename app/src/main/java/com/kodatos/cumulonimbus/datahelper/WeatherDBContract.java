@@ -25,6 +25,7 @@ public class WeatherDBContract {
         public static final String COLUMN_PRESSURE = "pressure";
         public static final String COLUMN_WIND = "wind";
         public static final String COLUMN_HUMIDITY = "humidity";
+        public static final String COLUMN_CLOUDS = "clouds";
 
     }
 }

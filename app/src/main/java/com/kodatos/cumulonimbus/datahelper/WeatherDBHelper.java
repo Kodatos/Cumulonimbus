@@ -17,7 +17,8 @@ public class WeatherDBHelper extends SQLiteOpenHelper {
             WeatherDBEntry.COLUMN_WEATHER_DESC+" TEXT NOT NULL, "+WeatherDBEntry.COLUMN_TEMP+" REAL NOT NULL, "+
             WeatherDBEntry.COLUMN_TEMP_MIN+" REAL NOT NULL, "+WeatherDBEntry.COLUMN_TEMP_MAX+" REAL NOT NULL, "+
             WeatherDBEntry.COLUMN_PRESSURE+" REAL NOT NULL, "+WeatherDBEntry.COLUMN_WIND+" TEXT NOT NULL, "+
-            WeatherDBEntry.COLUMN_HUMIDITY+" INTEGER NOT NULL);";
+            WeatherDBEntry.COLUMN_HUMIDITY+" INTEGER NOT NULL, "+
+            WeatherDBEntry.COLUMN_CLOUDS+" INTEGER NOT NULL);";
     public WeatherDBHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }

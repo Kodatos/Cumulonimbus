@@ -31,7 +31,8 @@ public class ForecastWeatherModel {
         ForecastList fl = forecastList.get((int) (day*8));
         Weather w = fl.weather.get(0);
         Main m = fl.main;
-        return new DBModel(day+1,w.main,w.description,m.temp,m.tempMin,m.tempMax,m.pressure,m.humidity,fl.wind.getUsefulWind());
+        return new DBModel(day+1,w.main,w.description,m.temp,m.tempMin,
+                m.tempMax,m.pressure,m.humidity,fl.wind.getUsefulWind(),fl.clouds.all);
 
     }
 }

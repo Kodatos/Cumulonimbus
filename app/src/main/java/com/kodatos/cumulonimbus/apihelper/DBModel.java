@@ -15,6 +15,11 @@ public class DBModel {
     private float pressure;
     private long humidity;
     private String wind;
+    private long clouds;
+
+    public long getClouds() {
+        return clouds;
+    }
 
     public long getId() {
         return id;
@@ -52,7 +57,7 @@ public class DBModel {
         return wind;
     }
 
-    public DBModel(long id, String weather_main, String weather_desc, float temp, float temp_min, float temp_max, float pressure, long humidity, String wind) {
+    public DBModel(long id, String weather_main, String weather_desc, float temp, float temp_min, float temp_max, float pressure, long humidity, String wind, long clouds) {
         this.id = id;
         this.weather_main = weather_main;
         this.weather_desc = weather_desc;
@@ -62,6 +67,7 @@ public class DBModel {
         this.pressure = pressure;
         this.humidity = humidity;
         this.wind = wind;
+        this.clouds = clouds;
     }
 
     // This function builds and provides a ContentValues object required for the database's update and insert operations
@@ -76,6 +82,7 @@ public class DBModel {
         cv.put(WeatherDBEntry.COLUMN_PRESSURE,this.pressure);
         cv.put(WeatherDBEntry.COLUMN_HUMIDITY,this.humidity);
         cv.put(WeatherDBEntry.COLUMN_WIND,this.wind);
+        cv.put(WeatherDBEntry.COLUMN_CLOUDS, this.clouds);
         return cv;
     }
 }
