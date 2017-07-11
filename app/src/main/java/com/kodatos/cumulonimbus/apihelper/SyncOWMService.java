@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
+import android.util.Base64;
 import android.util.Log;
 
 import com.kodatos.cumulonimbus.R;
@@ -34,7 +35,7 @@ public class SyncOWMService extends IntentService {
     private Intent mIntent;
 
     //TODO Insert own OpenWeatherMap API_KEY here
-    public static final String API_KEY = "xxxxx";
+    private static String API_KEY;
     public static final String BASE_URL = "http://api.openweathermap.org/";
 
     public static final String UPDATE_ACTION = "com.kodatos.cumulonimbus.apihelper.SyncOWMService.ACTION_UPDATE_DB";
@@ -48,6 +49,8 @@ public class SyncOWMService extends IntentService {
 
     @Override
     protected void onHandleIntent(final Intent intent) {
+        API_KEY = new String(Base64.decode(getString(R.string.owm_api_key), Base64.DEFAULT));
+        Log.w(LOG_TAG, API_KEY);
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())

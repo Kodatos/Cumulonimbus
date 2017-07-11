@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.databinding.DataBindingUtil;
+import android.graphics.Typeface;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -32,7 +33,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     private ActivityMainBinding mBinding;
     private MainRecyclerViewAdapter mAdapter = null;
-    private RecyclerView mRecyclerView;
     private SharedPreferences mSharedPreferences;
     private static final int LOADER_ID = 301;
 
@@ -40,8 +40,10 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_main);
-        Toolbar toolbar = mBinding.toolbar;
-        setSupportActionBar(toolbar);
+        setSupportActionBar(mBinding.toolbar);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        Typeface tf = Typeface.createFromAsset(getAssets(), "fonts/Pacifico-Regular.ttf");
+        mBinding.toolbarTitle.setTypeface(tf);
 
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         mSharedPreferences.registerOnSharedPreferenceChangeListener(this);
@@ -77,11 +79,10 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 builder.create().show();
             }
         }*/
-        mRecyclerView = mBinding.testMainRecyclerview;
         LinearLayoutManager lm = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
-        mRecyclerView.setLayoutManager(lm);
+        mBinding.testMainRecyclerview.setLayoutManager(lm);
         mAdapter = new MainRecyclerViewAdapter();
-        mRecyclerView.setAdapter(mAdapter);
+        mBinding.testMainRecyclerview.setAdapter(mAdapter);
         getSupportLoaderManager().initLoader(LOADER_ID,null,this);
     }
 

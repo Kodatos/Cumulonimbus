@@ -32,7 +32,7 @@ public class ForecastWeatherModel {
         Weather w = fl.weather.get(0);
         Main m = fl.main;
         return new DBModel(day+1,w.main,w.description,m.temp,m.tempMin,
-                m.tempMax,m.pressure,m.humidity,fl.wind.getUsefulWind(),fl.clouds.all);
+                m.tempMax,m.pressure,m.humidity,fl.wind.getUsefulWind(),fl.clouds.all, w.icon);
 
     }
 }
