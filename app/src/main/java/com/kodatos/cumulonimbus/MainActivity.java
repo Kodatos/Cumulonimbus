@@ -81,7 +81,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         }*/
         LinearLayoutManager lm = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         mBinding.testMainRecyclerview.setLayoutManager(lm);
-        mAdapter = new MainRecyclerViewAdapter();
+        mAdapter = new MainRecyclerViewAdapter(this);
         mBinding.testMainRecyclerview.setAdapter(mAdapter);
         getSupportLoaderManager().initLoader(LOADER_ID,null,this);
     }

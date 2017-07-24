@@ -2,6 +2,10 @@ package com.kodatos.cumulonimbus.apihelper;
 
 
 import android.content.ContentValues;
+import android.text.Spanned;
+
+import com.kodatos.cumulonimbus.utils.MiscUtils;
+
 import static com.kodatos.cumulonimbus.datahelper.WeatherDBContract.*;
 
 public class DBModel {
@@ -17,6 +21,9 @@ public class DBModel {
     private String wind;
     private long clouds;
     private String icon_id;
+
+    public static int UNIT_METRIC = 273;
+    public static int UNIT_IMPERIAL = 915;
 
     public String getIcon_id() {
         return icon_id;
@@ -92,4 +99,14 @@ public class DBModel {
         cv.put(WeatherDBEntry.COLUMN_ICON_ID, this.icon_id);
         return cv;
     }
+
+    public Spanned getUsefulTemp (boolean metric){
+        int tempInC = (int) (temp - 273.15);
+        int tempInF = (int) ((tempInC*1.8)+32);
+        if(metric)
+            return MiscUtils.fromHtml(String.valueOf(tempInC)+"<sup>o</sup>");
+        else
+            return MiscUtils.fromHtml(String.valueOf(tempInF)+"<sup>o</sup>");
+    }
+
 }

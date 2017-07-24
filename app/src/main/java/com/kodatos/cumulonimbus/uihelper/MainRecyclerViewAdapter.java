@@ -1,40 +1,65 @@
 package com.kodatos.cumulonimbus.uihelper;
 
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.graphics.drawable.Drawable;
+import android.preference.PreferenceManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.Calendar;
+import java.util.Locale;
+
+import com.kodatos.cumulonimbus.R;
 import com.kodatos.cumulonimbus.apihelper.DBModel;
-import com.kodatos.cumulonimbus.databinding.TestRecycleItemBinding;
+import com.kodatos.cumulonimbus.databinding.ForecastRecyclerviewItemBinding;
 import com.kodatos.cumulonimbus.datahelper.WeatherDBContract;
 
 public class MainRecyclerViewAdapter extends RecyclerView.Adapter<MainRecyclerViewAdapter.MainRecyclerViewHolder>{
 
     private Cursor mCursor = null;
+    private Context mContext;
 
     public class MainRecyclerViewHolder extends RecyclerView.ViewHolder {
 
-        private final TestRecycleItemBinding binding;
+        private final ForecastRecyclerviewItemBinding binding;
 
-        public MainRecyclerViewHolder(TestRecycleItemBinding testRecycleItemBinding) {
-            super(testRecycleItemBinding.getRoot());
-            this.binding = testRecycleItemBinding;
+        public MainRecyclerViewHolder(ForecastRecyclerviewItemBinding recycleItemBinding) {
+            super(recycleItemBinding.getRoot());
+            this.binding = recycleItemBinding;
         }
 
         public void bind(DBModel dbModel){
             binding.setDbmodel(dbModel);
+            int offset = getAdapterPosition()+1;
+            Calendar calendar = new GregorianCalendar();
+            calendar.setTime(new Date());
+            calendar.add(Calendar.DAY_OF_WEEK, offset);
+            binding.dayTextview.setText(calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.SHORT, Locale.getDefault()));
+            SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(mContext);
+            boolean metric = sp.getBoolean(mContext.getString(R.string.pref_metrics_key), true);
+            binding.forecastTempTextview.setText(dbModel.getUsefulTemp(metric));
+            int imageid = mContext.getResources().getIdentifier("_"+dbModel.getIcon_id(),"drawable",mContext.getPackageName());
+            binding.forecastImage.setImageDrawable(mContext.getDrawable(imageid));
             binding.executePendingBindings();
         }
+    }
+
+    public MainRecyclerViewAdapter (Context context){
+        mContext = context;
     }
 
     @Override
     public MainRecyclerViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         LayoutInflater layoutInflater = LayoutInflater.from(parent.getContext());
-        TestRecycleItemBinding testRecycleItemBinding = TestRecycleItemBinding.inflate(layoutInflater, parent, false);
-        return new MainRecyclerViewHolder(testRecycleItemBinding);
+        ForecastRecyclerviewItemBinding recycleItemBinding = ForecastRecyclerviewItemBinding.inflate(layoutInflater, parent, false);
+        return new MainRecyclerViewHolder(recycleItemBinding);
     }
 
     @Override
