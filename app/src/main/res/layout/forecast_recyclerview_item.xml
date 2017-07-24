@@ -6,6 +6,10 @@
         <variable
             name="dbmodel"
             type="com.kodatos.cumulonimbus.apihelper.DBModel"/>
+
+        <variable
+            name="calculateddata"
+            type="com.kodatos.cumulonimbus.uihelper.DBModelCalculatedData" />
     </data>
 <android.support.constraint.ConstraintLayout
     android:layout_width="match_parent"
@@ -19,6 +23,7 @@
         android:layout_marginStart="32dp"
         android:layout_marginTop="8dp"
         tools:text="Dat"
+        android:text="@{calculateddata.calculatedDay}"
         android:textAppearance="@android:style/TextAppearance.Material"
         android:textSize="14sp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -32,6 +37,7 @@
         android:layout_width="55dp"
         android:layout_height="55dp"
         tools:src="@drawable/ic_cloud_sample"
+        app:drawableResource="@{calculateddata.drawable_resource_id}"
         android:adjustViewBounds="true"
         android:layout_marginStart="40dp"
         android:layout_marginLeft="8dp"
@@ -89,7 +95,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:text="30"
+        tools:text="30"
+        android:text="@{calculateddata.calculatedTemp}"
         android:textAppearance="@android:style/TextAppearance.Material"
         android:textSize="20sp"
         app:layout_constraintRight_toRightOf="parent"

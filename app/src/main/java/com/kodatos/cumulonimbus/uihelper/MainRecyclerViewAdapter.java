@@ -41,12 +41,14 @@ public class MainRecyclerViewAdapter extends RecyclerView.Adapter<MainRecyclerVi
             Calendar calendar = new GregorianCalendar();
             calendar.setTime(new Date());
             calendar.add(Calendar.DAY_OF_WEEK, offset);
-            binding.dayTextview.setText(calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.SHORT, Locale.getDefault()));
+            String displayDay = calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.SHORT, Locale.getDefault());
             SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(mContext);
             boolean metric = sp.getBoolean(mContext.getString(R.string.pref_metrics_key), true);
-            binding.forecastTempTextview.setText(dbModel.getUsefulTemp(metric));
-            int imageid = mContext.getResources().getIdentifier("_"+dbModel.getIcon_id(),"drawable",mContext.getPackageName());
-            binding.forecastImage.setImageDrawable(mContext.getDrawable(imageid));
+            //binding.forecastTempTextview.setText(dbModel.getUsefulTemp(metric));
+            int imageid = mContext.getResources().getIdentifier("ic_"+dbModel.getIcon_id(),"drawable",mContext.getPackageName());
+            DBModelCalculatedData calculatedData = new DBModelCalculatedData(imageid, dbModel.getUsefulTemp(metric), displayDay);
+            binding.setCalculateddata(calculatedData);
+            //binding.forecastImage.setImageDrawable(mContext.getDrawable(imageid));
             binding.executePendingBindings();
         }
     }
@@ -64,7 +66,7 @@ public class MainRecyclerViewAdapter extends RecyclerView.Adapter<MainRecyclerVi
 
     @Override
     public void onBindViewHolder(MainRecyclerViewHolder holder, int position) {
-        DBModel dbModel = getDBModelFromCursor(position);
+        DBModel dbModel = getDBModelFromCursor(position+1);
         holder.bind(dbModel);
     }
 
@@ -72,7 +74,7 @@ public class MainRecyclerViewAdapter extends RecyclerView.Adapter<MainRecyclerVi
     public int getItemCount() {
         if(null==mCursor)
             return 0;
-        return mCursor.getCount();
+        return mCursor.getCount()-1;
     }
 
     @Override

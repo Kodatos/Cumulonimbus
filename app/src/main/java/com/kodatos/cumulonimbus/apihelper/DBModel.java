@@ -22,9 +22,6 @@ public class DBModel {
     private long clouds;
     private String icon_id;
 
-    public static int UNIT_METRIC = 273;
-    public static int UNIT_IMPERIAL = 915;
-
     public String getIcon_id() {
         return icon_id;
     }
