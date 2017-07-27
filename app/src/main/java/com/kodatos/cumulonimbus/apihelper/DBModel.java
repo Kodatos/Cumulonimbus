@@ -8,6 +8,10 @@ import com.kodatos.cumulonimbus.utils.MiscUtils;
 
 import static com.kodatos.cumulonimbus.datahelper.WeatherDBContract.*;
 
+/*
+    A model class that contains data for transactions with the database. This class holds all the columns in the database.
+    The object will be populated with data from Cursors.
+ */
 public class DBModel {
 
     private long id;
@@ -69,6 +73,8 @@ public class DBModel {
     public DBModel(long id, String weather_main, String weather_desc, float temp, float temp_min, float temp_max, float pressure, long humidity, String wind, long clouds, String icon_id) {
         this.id = id;
         this.weather_main = weather_main;
+        //Capitalize first word of description
+        weather_desc = weather_desc.substring(0,1).toUpperCase()+weather_desc.substring(1);
         this.weather_desc = weather_desc;
         this.temp = temp;
         this.temp_min = temp_min;
@@ -80,7 +86,10 @@ public class DBModel {
         this.icon_id = icon_id;
     }
 
-    // This function builds and provides a ContentValues object required for the database's update and insert operations
+    /**
+     *
+     * @return A ContentValues object representing model data for database transactions
+     */
     public ContentValues getEquivalentCV(){
         ContentValues cv = new ContentValues();
         cv.put(WeatherDBEntry._ID,this.id);
@@ -95,15 +104,6 @@ public class DBModel {
         cv.put(WeatherDBEntry.COLUMN_CLOUDS, this.clouds);
         cv.put(WeatherDBEntry.COLUMN_ICON_ID, this.icon_id);
         return cv;
-    }
-
-    public Spanned getUsefulTemp (boolean metric){
-        int tempInC = (int) (temp - 273.15);
-        int tempInF = (int) ((tempInC*1.8)+32);
-        if(metric)
-            return MiscUtils.fromHtml(String.valueOf(tempInC)+"<sup>o</sup>");
-        else
-            return MiscUtils.fromHtml(String.valueOf(tempInF)+"<sup>o</sup>");
     }
 
 }

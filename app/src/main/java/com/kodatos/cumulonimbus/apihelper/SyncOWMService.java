@@ -34,13 +34,15 @@ public class SyncOWMService extends IntentService {
 
     private Intent mIntent;
 
-    //TODO Insert own OpenWeatherMap API_KEY here
+    //TODO Insert own OpenWeatherMap API_KEY here or make user enter one
     private static String API_KEY;
     public static final String BASE_URL = "http://api.openweathermap.org/";
 
+    //Action strings for use in caller function
     public static final String UPDATE_ACTION = "com.kodatos.cumulonimbus.apihelper.SyncOWMService.ACTION_UPDATE_DB";
     public static final String CREATE_ACTION = "com.kodatos.cumulonimbus.apihelper.SyncOWMService.ACTION_NEW_DB";
 
+    //Tag for logging
     private final String LOG_TAG = "SyncOWMService ";
 
     public SyncOWMService() {
@@ -49,6 +51,7 @@ public class SyncOWMService extends IntentService {
 
     @Override
     protected void onHandleIntent(final Intent intent) {
+        //TODO Remove Base64 decode
         API_KEY = new String(Base64.decode(getString(R.string.owm_api_key), Base64.DEFAULT));
         Log.w(LOG_TAG, API_KEY);
         Retrofit retrofit = new Retrofit.Builder()

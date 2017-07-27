@@ -20,6 +20,7 @@ import com.kodatos.cumulonimbus.R;
 import com.kodatos.cumulonimbus.apihelper.DBModel;
 import com.kodatos.cumulonimbus.databinding.ForecastRecyclerviewItemBinding;
 import com.kodatos.cumulonimbus.datahelper.WeatherDBContract;
+import com.kodatos.cumulonimbus.utils.MiscUtils;
 
 public class MainRecyclerViewAdapter extends RecyclerView.Adapter<MainRecyclerViewAdapter.MainRecyclerViewHolder>{
 
@@ -35,6 +36,7 @@ public class MainRecyclerViewAdapter extends RecyclerView.Adapter<MainRecyclerVi
             this.binding = recycleItemBinding;
         }
 
+        // Method to create a calculated data model and bind it and given model to the layout
         public void bind(DBModel dbModel){
             binding.setDbmodel(dbModel);
             int offset = getAdapterPosition()+1;
@@ -45,8 +47,8 @@ public class MainRecyclerViewAdapter extends RecyclerView.Adapter<MainRecyclerVi
             SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(mContext);
             boolean metric = sp.getBoolean(mContext.getString(R.string.pref_metrics_key), true);
             //binding.forecastTempTextview.setText(dbModel.getUsefulTemp(metric));
-            int imageid = mContext.getResources().getIdentifier("ic_"+dbModel.getIcon_id(),"drawable",mContext.getPackageName());
-            DBModelCalculatedData calculatedData = new DBModelCalculatedData(imageid, dbModel.getUsefulTemp(metric), displayDay);
+            int imageId = mContext.getResources().getIdentifier("ic_"+dbModel.getIcon_id(),"drawable",mContext.getPackageName());
+            DBModelCalculatedData calculatedData = new DBModelCalculatedData(imageId, MiscUtils.tempFromHtml(dbModel.getTemp(), metric), displayDay);
             binding.setCalculateddata(calculatedData);
             //binding.forecastImage.setImageDrawable(mContext.getDrawable(imageid));
             binding.executePendingBindings();
@@ -66,7 +68,7 @@ public class MainRecyclerViewAdapter extends RecyclerView.Adapter<MainRecyclerVi
 
     @Override
     public void onBindViewHolder(MainRecyclerViewHolder holder, int position) {
-        DBModel dbModel = getDBModelFromCursor(position+1);
+        DBModel dbModel = getDBModelFromCursor(position+1);         //Since current weather is excluded, the first row of cursor is skipped
         holder.bind(dbModel);
     }
 
@@ -83,6 +85,11 @@ public class MainRecyclerViewAdapter extends RecyclerView.Adapter<MainRecyclerVi
         return mCursor.getLong(0);
     }
 
+    /**
+     * Creates and returns a model object from the member Cursor to send to binding.
+     * @param position Position for which data is required
+     * @return A DBModel object containing required display data
+     */
     private DBModel getDBModelFromCursor(int position) {
         mCursor.moveToPosition(position);
         long id = mCursor.getLong(mCursor.getColumnIndex(WeatherDBContract.WeatherDBEntry._ID));

@@ -2,6 +2,9 @@ package com.kodatos.cumulonimbus.uihelper;
 
 import android.text.Spanned;
 
+/*
+    A model class that contains calculated data from code for binding in the layout so that the original DBModel object is not touched
+ */
 public class DBModelCalculatedData {
 
     private int drawable_resource_id;
@@ -23,6 +26,6 @@ public class DBModelCalculatedData {
     public DBModelCalculatedData(int drawable_resource_id, Spanned calculatedTemp, String calculatedDay) {
         this.drawable_resource_id = drawable_resource_id;
         this.calculatedTemp = calculatedTemp;
-        this.calculatedDay = calculatedDay;
+        this.calculatedDay = calculatedDay.toUpperCase();
     }
 }
