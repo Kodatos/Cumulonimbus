@@ -1,9 +1,11 @@
 package com.kodatos.cumulonimbus;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.databinding.DataBindingUtil;
 import android.graphics.Typeface;
@@ -12,7 +14,10 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.LoaderManager;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AlertDialog;
@@ -29,6 +34,8 @@ import com.kodatos.cumulonimbus.databinding.ActivityMainBinding;
 import com.kodatos.cumulonimbus.datahelper.WeatherDBContract;
 import com.kodatos.cumulonimbus.uihelper.MainRecyclerViewAdapter;
 
+import java.security.Permission;
+
 public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>, SharedPreferences.OnSharedPreferenceChangeListener{
 
     private ActivityMainBinding mBinding;
@@ -44,7 +51,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         getSupportActionBar().setDisplayShowTitleEnabled(false);
         Typeface tf = Typeface.createFromAsset(getAssets(), "fonts/Pacifico-Regular.ttf");
         mBinding.toolbarTitle.setTypeface(tf);
-
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         mSharedPreferences.registerOnSharedPreferenceChangeListener(this);
         /*if(sharedPreferences.getBoolean("first_run", true)){
@@ -83,7 +89,11 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         mBinding.testMainRecyclerview.setLayoutManager(lm);
         mAdapter = new MainRecyclerViewAdapter(this);
         mBinding.testMainRecyclerview.setAdapter(mAdapter);
-        getSupportLoaderManager().initLoader(LOADER_ID,null,this);
+        if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)!= PackageManager.PERMISSION_GRANTED){
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 140);
+        }
+        else
+            getSupportLoaderManager().initLoader(LOADER_ID,null,this);
     }
 
     @Override
@@ -132,7 +142,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     public void startSync(final int action){
         if(!getConnectionStatus()){
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+           /* AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle("No Internet Connection Available")
                     .setMessage("An internet connection is needed for updating. Try again later")
                     .setPositiveButton("OK", new DialogInterface.OnClickListener() {
@@ -143,7 +153,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                                 finish();
                         }
                     });
-            builder.create().show();
+            builder.create().show(); */
+            displayDialogMessage("No Internet Connection Available", "An internet connection is needed for updating. Try again later", action);
             return;
         }
         Intent intent = new Intent(this, SyncOWMService.class);
@@ -183,5 +194,31 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             startSync(1);
             Toast.makeText(this, "Updated location to "+sharedPreferences.getString(key, "NULL"), Toast.LENGTH_SHORT).show();
         }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if(requestCode==140){
+            if(grantResults.length>0 && grantResults[0]==PackageManager.PERMISSION_GRANTED){
+                getSupportLoaderManager().initLoader(LOADER_ID,null,this);
+            }
+            else
+                displayDialogMessage("Location Required", "This app cannot run without location permissions", 0);
+        }
+    }
+
+    public void displayDialogMessage(String title, String message, final int kill){
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(title)
+                .setMessage(message)
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                        if(kill==0)
+                            finish();
+                    }
+                });
+        builder.create().show();
     }
 }

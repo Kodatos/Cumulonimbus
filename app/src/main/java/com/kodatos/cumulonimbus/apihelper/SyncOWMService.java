@@ -1,18 +1,26 @@
 package com.kodatos.cumulonimbus.apihelper;
 
+import android.Manifest;
 import android.app.IntentService;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.location.Location;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.util.Base64;
 import android.util.Log;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.kodatos.cumulonimbus.R;
 import com.kodatos.cumulonimbus.apihelper.models.CurrentWeatherModel;
 import com.kodatos.cumulonimbus.apihelper.models.ForecastWeatherModel;
 import com.kodatos.cumulonimbus.datahelper.WeatherDBContract;
+import com.kodatos.cumulonimbus.utils.MiscUtils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -33,6 +41,11 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class SyncOWMService extends IntentService {
 
     private Intent mIntent;
+    private FusedLocationProviderClient mFusedClient;
+    private WeatherAPIService weatherAPIService;
+    private CurrentWeatherCallback mCurrentWeatherCallback;
+    private ForecastWeatherCallback mForecastWeatherCallback;
+    private LocationSuccessListener mLocationSuccessListener;
 
     //TODO Insert own OpenWeatherMap API_KEY here or make user enter one
     private static String API_KEY;
@@ -58,21 +71,34 @@ public class SyncOWMService extends IntentService {
                 .baseUrl(BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
-        WeatherAPIService weatherAPIService = retrofit.create(WeatherAPIService.class);
-        mIntent=intent;
-        CurrentWeatherCallback mCurrentWeatherCallback = new CurrentWeatherCallback();
-        ForecastWeatherCallback mForecastWeatherCallback = new ForecastWeatherCallback();
+        weatherAPIService = retrofit.create(WeatherAPIService.class);
+        mIntent = intent;
+        mCurrentWeatherCallback = new CurrentWeatherCallback();
+        mForecastWeatherCallback = new ForecastWeatherCallback();
+        mLocationSuccessListener = new LocationSuccessListener();
 
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
-        String custom_location = sp.getString(this.getString(R.string.pref_custom_location_key), this.getString(R.string.pref_custom_location_def));
-        Log.w(LOG_TAG, custom_location);
-        Call<CurrentWeatherModel> currentWeatherModelCall = weatherAPIService.getCurrentWeatherByString(custom_location,API_KEY);
-        Log.w(LOG_TAG, currentWeatherModelCall.request().url().toString());
-        currentWeatherModelCall.enqueue(mCurrentWeatherCallback);
-        Call<ForecastWeatherModel> forecastWeatherModelCall = weatherAPIService.getForecastWeatherByString(custom_location,API_KEY);
-        forecastWeatherModelCall.enqueue(mForecastWeatherCallback);
+        if (sp.getBoolean(this.getString(R.string.pref_curr_location_key), false)) {
+            mFusedClient = LocationServices.getFusedLocationProviderClient(this);
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                mFusedClient.getLastLocation().addOnSuccessListener(mLocationSuccessListener);
+            }
+        }
+        else{
+            String custom_location = sp.getString(this.getString(R.string.pref_custom_location_key), this.getString(R.string.pref_custom_location_def));
+            Log.w(LOG_TAG, custom_location);
+            Call<CurrentWeatherModel> currentWeatherModelCall = weatherAPIService.getCurrentWeatherByString(custom_location, API_KEY);
+            Log.w(LOG_TAG, currentWeatherModelCall.request().url().toString());
+            Call<ForecastWeatherModel> forecastWeatherModelCall = weatherAPIService.getForecastWeatherByString(custom_location, API_KEY);
+            currentWeatherModelCall.enqueue(mCurrentWeatherCallback);
+            forecastWeatherModelCall.enqueue(mForecastWeatherCallback);
+        }
 
         //TODO Add current location requests
+    }
+
+    protected void confirmLocation(double lat, double lon){
+        MiscUtils.displayAddressFromLatLong(lat,lon,this);
     }
 
     private class CurrentWeatherCallback implements Callback<CurrentWeatherModel>{
@@ -150,6 +176,22 @@ public class SyncOWMService extends IntentService {
         public void onFailure(@NonNull Call<ForecastWeatherModel> call, @NonNull Throwable t) {
             t.printStackTrace();
             Log.w(LOG_TAG, "Couldn't access API. Check connection or call.");
+        }
+    }
+
+    private class LocationSuccessListener implements OnSuccessListener<Location>{
+
+        @Override
+        public void onSuccess(Location location) {
+            double lat = location.getLatitude();
+            double lon = location.getLongitude();
+            Log.w(LOG_TAG, String.valueOf(lat)+String.valueOf(lon));
+            Call<CurrentWeatherModel> currentWeatherModelCall = weatherAPIService.getCurrentWeatherByCoords(lat,lon,API_KEY);
+            Log.w(LOG_TAG, currentWeatherModelCall.request().url().toString());
+            Call<ForecastWeatherModel> forecastWeatherModelCall = weatherAPIService.getForecastWeatherByCoords(lat,lon,API_KEY);
+            currentWeatherModelCall.enqueue(mCurrentWeatherCallback);
+            forecastWeatherModelCall.enqueue(mForecastWeatherCallback);
+            confirmLocation(lat,lon);
         }
     }
 }

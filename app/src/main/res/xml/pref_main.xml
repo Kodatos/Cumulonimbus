@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <CheckBoxPreference
-        android:defaultValue="true"
+        android:defaultValue="false"
         android:key="@string/pref_curr_location_key"
         android:summaryOff="Using Custom Location"
         android:summaryOn="Using Current Location"

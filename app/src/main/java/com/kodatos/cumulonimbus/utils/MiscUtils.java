@@ -1,7 +1,15 @@
 package com.kodatos.cumulonimbus.utils;
 
+import android.content.Context;
+import android.location.Address;
+import android.location.Geocoder;
 import android.text.Html;
 import android.text.Spanned;
+import android.widget.Toast;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.Locale;
 
 /*
     A utility class containing miscellaneous functions that may be used in other functions.
@@ -26,5 +34,17 @@ public class MiscUtils {
             result = Html.fromHtml(String.valueOf(usefulTemp)+"<sup>o</sup>");
         }
         return result;
+    }
+
+    public static void displayAddressFromLatLong(double lat, double lon, Context context){
+        Geocoder geocoder = new Geocoder(context, Locale.getDefault());
+        try {
+            List<Address> addresses = geocoder.getFromLocation(lat,lon,1);
+            String toastMessage = addresses.get(0).getLocality()+", "+addresses.get(0).getCountryName();
+            Toast.makeText(context,toastMessage,Toast.LENGTH_LONG).show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 }
