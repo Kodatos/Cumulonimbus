@@ -28,8 +28,8 @@ public class CumuloContentProvider extends ContentProvider {
     //URIMatcher builder for two uris
     public static UriMatcher buildMatcher(){
         UriMatcher uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
-        uriMatcher.addURI(WeatherDBContract.AUTHORITY, WeatherDBContract.PATH_WEATHERDATA, WEATHER_DATA);
-        uriMatcher.addURI(WeatherDBContract.AUTHORITY, WeatherDBContract.PATH_WEATHERDATA+"/#", WEATHER_WITH_ID);
+        uriMatcher.addURI(WeatherDBContract.AUTHORITY, WeatherDBContract.PATH_WEATHER_DATA, WEATHER_DATA);
+        uriMatcher.addURI(WeatherDBContract.AUTHORITY, WeatherDBContract.PATH_WEATHER_DATA +"/#", WEATHER_WITH_ID);
         return uriMatcher;
     }
 

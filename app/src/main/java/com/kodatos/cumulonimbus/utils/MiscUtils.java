@@ -5,6 +5,7 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.text.Html;
 import android.text.Spanned;
+import android.util.Log;
 import android.widget.Toast;
 
 import java.io.IOException;
@@ -36,12 +37,12 @@ public class MiscUtils {
         return result;
     }
 
-    public static void displayAddressFromLatLong(double lat, double lon, Context context){
+    public static void getAddressFromLatLong(double lat, double lon, Context context){
         Geocoder geocoder = new Geocoder(context, Locale.getDefault());
         try {
             List<Address> addresses = geocoder.getFromLocation(lat,lon,1);
             String toastMessage = addresses.get(0).getLocality()+", "+addresses.get(0).getCountryName();
-            Toast.makeText(context,toastMessage,Toast.LENGTH_LONG).show();
+            Log.d("Location geocoded", toastMessage);
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -9,12 +9,12 @@ public class WeatherDBContract {
     //Static strings for uri building
     public static final String AUTHORITY = "com.kodatos.cumulonimbus";
     public static final Uri BASE_URI = Uri.parse("content://"+AUTHORITY);
-    public static final String PATH_WEATHERDATA = "weatherdata";
+    public static final String PATH_WEATHER_DATA = "weatherdata";
 
     public static final class WeatherDBEntry implements BaseColumns{
 
         // A Uri that can be used in ContentResolver calls
-        public static final Uri CONTENT_URI = BASE_URI.buildUpon().appendPath(PATH_WEATHERDATA).build();
+        public static final Uri CONTENT_URI = BASE_URI.buildUpon().appendPath(PATH_WEATHER_DATA).build();
 
         public static final String TABLE_NAME = "weather_table";
         public static final String COLUMN_WEATHER_MAIN = "weather_main";

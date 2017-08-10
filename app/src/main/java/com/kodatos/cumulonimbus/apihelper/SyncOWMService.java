@@ -38,14 +38,13 @@ import retrofit2.converter.gson.GsonConverterFactory;
  * An {@link IntentService} subclass for handling asynchronous task requests in
  * a service on a separate handler thread for getting weather data from OpenWeatherMap.
  */
-public class SyncOWMService extends IntentService {
+public class SyncOWMService extends IntentService implements OnSuccessListener<Location>{
 
     private Intent mIntent;
     private FusedLocationProviderClient mFusedClient;
     private WeatherAPIService weatherAPIService;
     private CurrentWeatherCallback mCurrentWeatherCallback;
     private ForecastWeatherCallback mForecastWeatherCallback;
-    private LocationSuccessListener mLocationSuccessListener;
 
     //TODO Insert own OpenWeatherMap API_KEY here or make user enter one
     private static String API_KEY;
@@ -75,20 +74,19 @@ public class SyncOWMService extends IntentService {
         mIntent = intent;
         mCurrentWeatherCallback = new CurrentWeatherCallback();
         mForecastWeatherCallback = new ForecastWeatherCallback();
-        mLocationSuccessListener = new LocationSuccessListener();
 
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
         if (sp.getBoolean(this.getString(R.string.pref_curr_location_key), false)) {
             mFusedClient = LocationServices.getFusedLocationProviderClient(this);
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                mFusedClient.getLastLocation().addOnSuccessListener(mLocationSuccessListener);
+                mFusedClient.getLastLocation().addOnSuccessListener(this);
             }
         }
         else{
             String custom_location = sp.getString(this.getString(R.string.pref_custom_location_key), this.getString(R.string.pref_custom_location_def));
-            Log.w(LOG_TAG, custom_location);
+            Log.d(LOG_TAG, custom_location);
             Call<CurrentWeatherModel> currentWeatherModelCall = weatherAPIService.getCurrentWeatherByString(custom_location, API_KEY);
-            Log.w(LOG_TAG, currentWeatherModelCall.request().url().toString());
+            Log.d(LOG_TAG, currentWeatherModelCall.request().url().toString());
             Call<ForecastWeatherModel> forecastWeatherModelCall = weatherAPIService.getForecastWeatherByString(custom_location, API_KEY);
             currentWeatherModelCall.enqueue(mCurrentWeatherCallback);
             forecastWeatherModelCall.enqueue(mForecastWeatherCallback);
@@ -97,10 +95,32 @@ public class SyncOWMService extends IntentService {
         //TODO Add current location requests
     }
 
-    protected void confirmLocation(double lat, double lon){
-        MiscUtils.displayAddressFromLatLong(lat,lon,this);
+    /*
+        onSuccess() apparently runs on the main UI thread and has been confirmed. Also, the workaround
+        for calling this in a new thread is too intricate for me and it would be a mess to shift the code below to the main activity.
+        Hence, a new thread is used for the Geocoder and call executions are also enqueued.
+     */
+    @Override
+    public void onSuccess(Location location) {
+        final double lat = location.getLatitude();
+        final double lon = location.getLongitude();
+        Call<CurrentWeatherModel> currentWeatherModelCall = weatherAPIService.getCurrentWeatherByCoords(lat,lon,API_KEY);
+        Log.w(LOG_TAG, currentWeatherModelCall.request().url().toString());
+        Call<ForecastWeatherModel> forecastWeatherModelCall = weatherAPIService.getForecastWeatherByCoords(lat,lon,API_KEY);
+        currentWeatherModelCall.enqueue(mCurrentWeatherCallback);
+        forecastWeatherModelCall.enqueue(mForecastWeatherCallback);
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                MiscUtils.getAddressFromLatLong(lat,lon,SyncOWMService.this);
+            }
+        }).start();
     }
 
+    /*
+        The only reason API request calls are executed asynchronously in the service is because the location based calls are running
+        on the main UI thread due to onSuccessListener, even though string based calls are not.
+    */
     private class CurrentWeatherCallback implements Callback<CurrentWeatherModel>{
 
         @Override
@@ -179,19 +199,5 @@ public class SyncOWMService extends IntentService {
         }
     }
 
-    private class LocationSuccessListener implements OnSuccessListener<Location>{
 
-        @Override
-        public void onSuccess(Location location) {
-            double lat = location.getLatitude();
-            double lon = location.getLongitude();
-            Log.w(LOG_TAG, String.valueOf(lat)+String.valueOf(lon));
-            Call<CurrentWeatherModel> currentWeatherModelCall = weatherAPIService.getCurrentWeatherByCoords(lat,lon,API_KEY);
-            Log.w(LOG_TAG, currentWeatherModelCall.request().url().toString());
-            Call<ForecastWeatherModel> forecastWeatherModelCall = weatherAPIService.getForecastWeatherByCoords(lat,lon,API_KEY);
-            currentWeatherModelCall.enqueue(mCurrentWeatherCallback);
-            forecastWeatherModelCall.enqueue(mForecastWeatherCallback);
-            confirmLocation(lat,lon);
-        }
-    }
 }
