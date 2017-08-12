@@ -18,21 +18,18 @@ import java.util.Locale;
 public class MiscUtils {
 
     /**
-     * Converts given temperature in Kelvin to Celsius or Fahrenheit.
-     * @param temp Temperature in Kelvin to convert
-     * @param metric Boolean representing choice of metric or imperial umits
-     * @return A Spanned object with converted temperature and degree symbol in superscript
+     * Converts given temperature for display purpose.
+     * @param usefulTemp Temperature in Kelvin to convert
+     * @return A Spanned object with temperature and degree symbol in superscript
      */
     @SuppressWarnings("deprecation")
-    public static Spanned tempFromHtml(float temp, boolean metric){
-        int tempInC = (int) (temp - 273.15);
-        int tempInF = (int) ((tempInC*1.8)+32);
-        int usefulTemp = metric? tempInC : tempInF;
+    public static Spanned tempFromHtml(float usefulTemp){
+        int usefulTempinInt = (int) usefulTemp;
         Spanned result;
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-            result = Html.fromHtml(String.valueOf(usefulTemp)+"<sup>o</sup>",Html.FROM_HTML_MODE_LEGACY);
+            result = Html.fromHtml(String.valueOf(usefulTempinInt)+"<sup>o</sup>",Html.FROM_HTML_MODE_LEGACY);
         } else {
-            result = Html.fromHtml(String.valueOf(usefulTemp)+"<sup>o</sup>");
+            result = Html.fromHtml(String.valueOf(usefulTempinInt)+"<sup>o</sup>");
         }
         return result;
     }

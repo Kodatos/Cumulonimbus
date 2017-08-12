@@ -25,6 +25,7 @@ public class DBModel {
     private String wind;
     private long clouds;
     private String icon_id;
+    private double uvIndex;
 
     public String getIcon_id() {
         return icon_id;
@@ -106,4 +107,12 @@ public class DBModel {
         return cv;
     }
 
+    public double getUvIndex() {
+        return uvIndex;
+    }
+
+    public DBModel setUvIndex(double uvIndex) {
+        this.uvIndex = uvIndex;
+        return this;
+    }
 }

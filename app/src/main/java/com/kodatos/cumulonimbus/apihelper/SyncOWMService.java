@@ -6,6 +6,8 @@ import android.content.ContentValues;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
@@ -19,6 +21,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.kodatos.cumulonimbus.R;
 import com.kodatos.cumulonimbus.apihelper.models.CurrentWeatherModel;
 import com.kodatos.cumulonimbus.apihelper.models.ForecastWeatherModel;
+import com.kodatos.cumulonimbus.apihelper.models.UVIndexModel;
 import com.kodatos.cumulonimbus.datahelper.WeatherDBContract;
 import com.kodatos.cumulonimbus.utils.MiscUtils;
 
@@ -26,6 +29,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.Locale;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -41,10 +46,10 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class SyncOWMService extends IntentService implements OnSuccessListener<Location>{
 
     private Intent mIntent;
-    private FusedLocationProviderClient mFusedClient;
     private WeatherAPIService weatherAPIService;
     private CurrentWeatherCallback mCurrentWeatherCallback;
     private ForecastWeatherCallback mForecastWeatherCallback;
+    private String units;
 
     //TODO Insert own OpenWeatherMap API_KEY here or make user enter one
     private static String API_KEY;
@@ -76,8 +81,9 @@ public class SyncOWMService extends IntentService implements OnSuccessListener<L
         mForecastWeatherCallback = new ForecastWeatherCallback();
 
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
+        units = sp.getBoolean(getString(R.string.pref_metrics_key), true) ? "metric" : "imperial";
         if (sp.getBoolean(this.getString(R.string.pref_curr_location_key), false)) {
-            mFusedClient = LocationServices.getFusedLocationProviderClient(this);
+            FusedLocationProviderClient mFusedClient = LocationServices.getFusedLocationProviderClient(this);
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                 mFusedClient.getLastLocation().addOnSuccessListener(this);
             }
@@ -85,11 +91,18 @@ public class SyncOWMService extends IntentService implements OnSuccessListener<L
         else{
             String custom_location = sp.getString(this.getString(R.string.pref_custom_location_key), this.getString(R.string.pref_custom_location_def));
             Log.d(LOG_TAG, custom_location);
-            Call<CurrentWeatherModel> currentWeatherModelCall = weatherAPIService.getCurrentWeatherByString(custom_location, API_KEY);
+            Call<CurrentWeatherModel> currentWeatherModelCall = weatherAPIService.getCurrentWeatherByString(custom_location, API_KEY, units);
             Log.d(LOG_TAG, currentWeatherModelCall.request().url().toString());
-            Call<ForecastWeatherModel> forecastWeatherModelCall = weatherAPIService.getForecastWeatherByString(custom_location, API_KEY);
+            Call<ForecastWeatherModel> forecastWeatherModelCall = weatherAPIService.getForecastWeatherByString(custom_location, API_KEY, units);
             currentWeatherModelCall.enqueue(mCurrentWeatherCallback);
             forecastWeatherModelCall.enqueue(mForecastWeatherCallback);
+            Geocoder geocoder = new Geocoder(this, Locale.getDefault());
+            try {
+                List<Address> addresses = geocoder.getFromLocationName(custom_location, 1);
+                getUVIndex(addresses.get(0).getLatitude(), addresses.get(0).getLongitude());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
 
         //TODO Add current location requests
@@ -104,17 +117,66 @@ public class SyncOWMService extends IntentService implements OnSuccessListener<L
     public void onSuccess(Location location) {
         final double lat = location.getLatitude();
         final double lon = location.getLongitude();
-        Call<CurrentWeatherModel> currentWeatherModelCall = weatherAPIService.getCurrentWeatherByCoords(lat,lon,API_KEY);
-        Log.w(LOG_TAG, currentWeatherModelCall.request().url().toString());
-        Call<ForecastWeatherModel> forecastWeatherModelCall = weatherAPIService.getForecastWeatherByCoords(lat,lon,API_KEY);
+        Call<CurrentWeatherModel> currentWeatherModelCall = weatherAPIService.getCurrentWeatherByCoords(lat,lon,API_KEY, units);
+        Log.d(LOG_TAG, currentWeatherModelCall.request().url().toString());
+        Call<ForecastWeatherModel> forecastWeatherModelCall = weatherAPIService.getForecastWeatherByCoords(lat,lon,API_KEY, units);
         currentWeatherModelCall.enqueue(mCurrentWeatherCallback);
         forecastWeatherModelCall.enqueue(mForecastWeatherCallback);
         new Thread(new Runnable() {
             @Override
             public void run() {
                 MiscUtils.getAddressFromLatLong(lat,lon,SyncOWMService.this);
+                getUVIndex(lat, lon);
             }
         }).start();
+    }
+
+    private void getUVIndex(double lat, double lon){
+        Call<UVIndexModel> uvIndexModelCall = weatherAPIService.getCurrentUVIndex(lat, lon, API_KEY);
+        Call<List<UVIndexModel>> uvIndexModelsCall = weatherAPIService.getForecastUVIndex(lat,lon,API_KEY,4);
+        //uvIndexModelCall.enqueue(new CurrentUVIndexCallback());
+        //uvIndexModelsCall.enqueue(new ForecastUVIndexCallback());
+        try {
+            Response<UVIndexModel> uvIndexModelResponse = uvIndexModelCall.execute();
+            Response<List<UVIndexModel>> uvIndexModelsResponse = uvIndexModelsCall.execute();
+            if(uvIndexModelResponse.isSuccessful()){
+                UVIndexModel uvIndexModel = uvIndexModelResponse.body();
+                ContentValues cv = new ContentValues();
+                cv.put(WeatherDBContract.WeatherDBEntry.COLUMN_UV_INDEX, uvIndexModel.value);
+                String where = "_ID=?";
+                String[] selectionArgs = new String[]{"1"};
+                getContentResolver().update(WeatherDBContract.WeatherDBEntry.CONTENT_URI,cv,where,selectionArgs);
+            }
+            else {
+                JSONObject jsonError;
+                jsonError = new JSONObject(uvIndexModelResponse.errorBody().string());
+                String errorCode = String.valueOf(jsonError.getInt("cod"));
+                String errorMessage = jsonError.getString("message");
+                String errorLog = errorCode+":"+errorMessage;
+                Log.w(LOG_TAG, errorLog);
+            }
+            if(uvIndexModelsResponse.isSuccessful()){
+                List<UVIndexModel> uvIndexModels = uvIndexModelsResponse.body();
+                for(int i=1; i<=4; i++){
+                    ContentValues cv = new ContentValues();
+                    cv.put(WeatherDBContract.WeatherDBEntry.COLUMN_UV_INDEX,uvIndexModels.get(i).value);
+                    String where = "_ID=?";
+                    String[] selectionArgs = new String[]{String.valueOf(i+1)};
+                    getContentResolver().update(WeatherDBContract.WeatherDBEntry.CONTENT_URI,cv,where,selectionArgs);
+                }
+            }
+            else {
+                JSONObject jsonError;
+                jsonError = new JSONObject(uvIndexModelsResponse.errorBody().string());
+                String errorCode = String.valueOf(jsonError.getInt("cod"));
+                String errorMessage = jsonError.getString("message");
+                String errorLog = errorCode+":"+errorMessage;
+                Log.w(LOG_TAG, errorLog);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /*
@@ -134,6 +196,7 @@ public class SyncOWMService extends IntentService implements OnSuccessListener<L
                     getContentResolver().update(WeatherDBContract.WeatherDBEntry.CONTENT_URI,cv,where,selectionArgs);
                 }
                 else if(CREATE_ACTION.equals(mIntent.getAction())){
+                    cv.put(WeatherDBContract.WeatherDBEntry.COLUMN_UV_INDEX, 0.0);
                     getContentResolver().insert(WeatherDBContract.WeatherDBEntry.CONTENT_URI,cv);
                 }
 
@@ -174,6 +237,7 @@ public class SyncOWMService extends IntentService implements OnSuccessListener<L
                         getContentResolver().update(WeatherDBContract.WeatherDBEntry.CONTENT_URI,cv,where,selectionArgs);
                     }
                     else if(CREATE_ACTION.equals(mIntent.getAction())){
+                        cv.put(WeatherDBContract.WeatherDBEntry.COLUMN_UV_INDEX, 0.0);
                         getContentResolver().insert(WeatherDBContract.WeatherDBEntry.CONTENT_URI,cv);
                     }
                 }
@@ -198,6 +262,4 @@ public class SyncOWMService extends IntentService implements OnSuccessListener<L
             Log.w(LOG_TAG, "Couldn't access API. Check connection or call.");
         }
     }
-
-
 }
