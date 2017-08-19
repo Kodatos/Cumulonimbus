@@ -46,6 +46,7 @@
 
         <android.support.v7.widget.CardView
             android:id="@+id/forecast_card"
+            android:transitionName="@string/cardview_transition_name"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             app:layout_constraintLeft_toLeftOf="parent"

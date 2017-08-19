@@ -9,6 +9,7 @@
     <string name="pref_custom_location">Use a custom location</string>
     <string name="pref_metrics_key">bool_use_metrics</string>
     <string name="pref_metrics">Metric units</string>
+    <string name="cardview_transition_name">BackCardView</string>
 
 
 </resources>
