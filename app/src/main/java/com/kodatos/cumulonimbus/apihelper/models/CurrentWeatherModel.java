@@ -1,9 +1,12 @@
 package com.kodatos.cumulonimbus.apihelper.models;
 
 
+import android.content.ContentValues;
+
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import com.kodatos.cumulonimbus.apihelper.DBModel;
+import com.kodatos.cumulonimbus.datahelper.WeatherDBContract;
 
 import java.util.List;
 
@@ -48,12 +51,24 @@ public class CurrentWeatherModel {
     public CurrentWeatherModel() {
     }
 
-    // A helper method to get required data for database operations
-    public DBModel getDBModel(){
-        // First row in database
+    /**
+     *
+     * @return A ContentValues object representing model data for database transactions
+     */
+    public ContentValues getEquivalentCV(){
+        ContentValues cv = new ContentValues();
         Weather w = weather.get(0);
-        // Weather contains main and desc while MainCurrent contains the rest except wind
-        return new DBModel(1,w.main,w.description,mainCurrent.temp,mainCurrent.tempMin,mainCurrent.tempMax,
-                mainCurrent.pressure,mainCurrent.humidity,wind.getUsefulWind(),clouds.all, w.icon);
+        cv.put(WeatherDBContract.WeatherDBEntry._ID, 1);
+        cv.put(WeatherDBContract.WeatherDBEntry.COLUMN_WEATHER_MAIN,w.main);
+        cv.put(WeatherDBContract.WeatherDBEntry.COLUMN_WEATHER_DESC,w.description);
+        cv.put(WeatherDBContract.WeatherDBEntry.COLUMN_TEMP,mainCurrent.temp);
+        cv.put(WeatherDBContract.WeatherDBEntry.COLUMN_TEMP_MIN,mainCurrent.tempMin);
+        cv.put(WeatherDBContract.WeatherDBEntry.COLUMN_TEMP_MAX,mainCurrent.tempMax);
+        cv.put(WeatherDBContract.WeatherDBEntry.COLUMN_PRESSURE,mainCurrent.pressure);
+        cv.put(WeatherDBContract.WeatherDBEntry.COLUMN_HUMIDITY,mainCurrent.humidity);
+        cv.put(WeatherDBContract.WeatherDBEntry.COLUMN_WIND,wind.getUsefulWind());
+        cv.put(WeatherDBContract.WeatherDBEntry.COLUMN_CLOUDS, clouds.all);
+        cv.put(WeatherDBContract.WeatherDBEntry.COLUMN_ICON_ID, w.icon);
+        return cv;
     }
 }

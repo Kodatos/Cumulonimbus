@@ -23,7 +23,7 @@ public class MiscUtils {
      * @return A Spanned object with temperature and degree symbol in superscript
      */
     @SuppressWarnings("deprecation")
-    public static Spanned tempFromHtml(float usefulTemp){
+    public static Spanned makeTemperaturePretty(float usefulTemp){
         int usefulTempinInt = (int) usefulTemp;
         Spanned result;
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {

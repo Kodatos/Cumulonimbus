@@ -23,8 +23,6 @@ import android.support.v4.content.Loader;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -33,8 +31,6 @@ import com.kodatos.cumulonimbus.apihelper.SyncOWMService;
 import com.kodatos.cumulonimbus.databinding.ActivityMainBinding;
 import com.kodatos.cumulonimbus.datahelper.WeatherDBContract;
 import com.kodatos.cumulonimbus.uihelper.MainRecyclerViewAdapter;
-
-import java.security.Permission;
 
 public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>, SharedPreferences.OnSharedPreferenceChangeListener{
 
@@ -53,38 +49,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         mBinding.toolbarTitle.setTypeface(tf);
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         mSharedPreferences.registerOnSharedPreferenceChangeListener(this);
-        /*if(sharedPreferences.getBoolean("first_run", true)){
-            boolean connectionresult = startSync(0);
-            if(!connectionresult){
-                AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                builder.setTitle("No Internet Connection Available")
-                        .setMessage("An internet connection is needed before starting the app for the first time. Try opening it with internet")
-                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.dismiss();
-                                MainActivity.this.finish();
-                            }
-                        });
-                builder.create().show();
-            }
-            sharedPreferences.edit().putBoolean("First_run", false).apply();
-        }
-        else {
-            boolean b = startSync(1);
-            if(!b){
-                AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                builder.setTitle("No Internet Connection Available")
-                        .setMessage("An internet connection is needed for updating. Try again later")
-                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.dismiss();
-                            }
-                        });
-                builder.create().show();
-            }
-        }*/
         LinearLayoutManager lm = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         mBinding.testMainRecyclerview.setLayoutManager(lm);
         mAdapter = new MainRecyclerViewAdapter(this);
@@ -129,9 +93,9 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     }
 
     @Override
-    protected void onDestroy() {
+    protected void onStop() {
         mSharedPreferences.unregisterOnSharedPreferenceChangeListener(this);
-        super.onDestroy();
+        super.onStop();
     }
 
     public boolean getConnectionStatus(){
@@ -142,18 +106,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     public void startSync(final int action){
         if(!getConnectionStatus()){
-           /* AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle("No Internet Connection Available")
-                    .setMessage("An internet connection is needed for updating. Try again later")
-                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();
-                            if(action==0)
-                                finish();
-                        }
-                    });
-            builder.create().show(); */
             displayDialogMessage("No Internet Connection Available", "An internet connection is needed for updating. Try again later", action);
             return;
         }

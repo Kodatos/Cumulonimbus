@@ -47,8 +47,6 @@ public class SyncOWMService extends IntentService implements OnSuccessListener<L
 
     private Intent mIntent;
     private WeatherAPIService weatherAPIService;
-    private CurrentWeatherCallback mCurrentWeatherCallback;
-    private ForecastWeatherCallback mForecastWeatherCallback;
     private String units;
 
     //TODO Insert own OpenWeatherMap API_KEY here or make user enter one
@@ -60,7 +58,7 @@ public class SyncOWMService extends IntentService implements OnSuccessListener<L
     public static final String CREATE_ACTION = "com.kodatos.cumulonimbus.apihelper.SyncOWMService.ACTION_NEW_DB";
 
     //Tag for logging
-    private final String LOG_TAG = "SyncOWMService ";
+    private final String LOG_TAG = getClass().getName();
 
     public SyncOWMService() {
         super("SyncOWMService");
@@ -69,7 +67,7 @@ public class SyncOWMService extends IntentService implements OnSuccessListener<L
     @Override
     protected void onHandleIntent(final Intent intent) {
         //TODO Remove Base64 decode
-        API_KEY = new String(Base64.decode(getString(R.string.owm_api_key), Base64.DEFAULT));
+        API_KEY = getString(R.string.owm_api_key);
         Log.w(LOG_TAG, API_KEY);
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(BASE_URL)
@@ -77,8 +75,6 @@ public class SyncOWMService extends IntentService implements OnSuccessListener<L
                 .build();
         weatherAPIService = retrofit.create(WeatherAPIService.class);
         mIntent = intent;
-        mCurrentWeatherCallback = new CurrentWeatherCallback();
-        mForecastWeatherCallback = new ForecastWeatherCallback();
 
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
         units = sp.getBoolean(getString(R.string.pref_metrics_key), true) ? "metric" : "imperial";
@@ -94,18 +90,18 @@ public class SyncOWMService extends IntentService implements OnSuccessListener<L
             Call<CurrentWeatherModel> currentWeatherModelCall = weatherAPIService.getCurrentWeatherByString(custom_location, API_KEY, units);
             Log.d(LOG_TAG, currentWeatherModelCall.request().url().toString());
             Call<ForecastWeatherModel> forecastWeatherModelCall = weatherAPIService.getForecastWeatherByString(custom_location, API_KEY, units);
-            currentWeatherModelCall.enqueue(mCurrentWeatherCallback);
-            forecastWeatherModelCall.enqueue(mForecastWeatherCallback);
+            //currentWeatherModelCall.enqueue(mCurrentWeatherCallback);
+            //forecastWeatherModelCall.enqueue(mForecastWeatherCallback);
             Geocoder geocoder = new Geocoder(this, Locale.getDefault());
             try {
+                handleCurrentWeatherResponse(currentWeatherModelCall);
+                handleForecastWeatherResponse(forecastWeatherModelCall);
                 List<Address> addresses = geocoder.getFromLocationName(custom_location, 1);
                 getUVIndex(addresses.get(0).getLatitude(), addresses.get(0).getLongitude());
-            } catch (IOException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
-
-        //TODO Add current location requests
     }
 
     /*
@@ -117,14 +113,18 @@ public class SyncOWMService extends IntentService implements OnSuccessListener<L
     public void onSuccess(Location location) {
         final double lat = location.getLatitude();
         final double lon = location.getLongitude();
-        Call<CurrentWeatherModel> currentWeatherModelCall = weatherAPIService.getCurrentWeatherByCoords(lat,lon,API_KEY, units);
+        final Call<CurrentWeatherModel> currentWeatherModelCall = weatherAPIService.getCurrentWeatherByCoords(lat,lon,API_KEY, units);
         Log.d(LOG_TAG, currentWeatherModelCall.request().url().toString());
-        Call<ForecastWeatherModel> forecastWeatherModelCall = weatherAPIService.getForecastWeatherByCoords(lat,lon,API_KEY, units);
-        currentWeatherModelCall.enqueue(mCurrentWeatherCallback);
-        forecastWeatherModelCall.enqueue(mForecastWeatherCallback);
+        final Call<ForecastWeatherModel> forecastWeatherModelCall = weatherAPIService.getForecastWeatherByCoords(lat,lon,API_KEY, units);
         new Thread(new Runnable() {
             @Override
             public void run() {
+                try {
+                    handleCurrentWeatherResponse(currentWeatherModelCall);
+                    handleForecastWeatherResponse(forecastWeatherModelCall);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
                 MiscUtils.getAddressFromLatLong(lat,lon,SyncOWMService.this);
                 getUVIndex(lat, lon);
             }
@@ -179,19 +179,48 @@ public class SyncOWMService extends IntentService implements OnSuccessListener<L
         }
     }
 
-    /*
-        The only reason API request calls are executed asynchronously in the service is because the location based calls are running
-        on the main UI thread due to onSuccessListener, even though string based calls are not.
-    */
-    private class CurrentWeatherCallback implements Callback<CurrentWeatherModel>{
+    private void handleCurrentWeatherResponse(Call<CurrentWeatherModel> call) throws IOException {
+        Response<CurrentWeatherModel> response = call.execute();
+        if(response.isSuccessful()){
+            CurrentWeatherModel currentWeatherModelResponse = response.body();
+            ContentValues cv = currentWeatherModelResponse.getEquivalentCV();
+            SharedPreferences weatherSP = getSharedPreferences("weather_display_pref", MODE_PRIVATE);
+            weatherSP.edit().putLong("sunrise_current", currentWeatherModelResponse.sysCurrent.sunrise).
+                    putLong("sunset_current", currentWeatherModelResponse.sysCurrent.sunset).
+                    putString("icon_id", currentWeatherModelResponse.weather.get(0).icon).apply();
+            String where = "_ID=?";
+            String[] selectionArgs = new String[]{"1"};
+            if(UPDATE_ACTION.equals(mIntent.getAction())){
+                getContentResolver().update(WeatherDBContract.WeatherDBEntry.CONTENT_URI,cv,where,selectionArgs);
+            }
+            else if(CREATE_ACTION.equals(mIntent.getAction())){
+                cv.put(WeatherDBContract.WeatherDBEntry.COLUMN_UV_INDEX, 0.0);
+                getContentResolver().insert(WeatherDBContract.WeatherDBEntry.CONTENT_URI,cv);
+            }
 
-        @Override
-        public void onResponse(@NonNull Call<CurrentWeatherModel> call, @NonNull Response<CurrentWeatherModel> response) {
-            if(response.isSuccessful()){
-                CurrentWeatherModel currentWeatherModelResponse = response.body();
-                ContentValues cv = currentWeatherModelResponse.getDBModel().getEquivalentCV();
+        }
+        else {
+            JSONObject jsonError;
+            try {
+                jsonError = new JSONObject(response.errorBody().string());
+                String errorCode = String.valueOf(jsonError.getInt("cod"));
+                String errorMessage = jsonError.getString("message");
+                String errorLog = errorCode+":"+errorMessage;
+                Log.w(LOG_TAG, errorLog);
+            } catch (JSONException | IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void handleForecastWeatherResponse(Call<ForecastWeatherModel> call) throws IOException {
+        Response<ForecastWeatherModel> response = call.execute();
+        if (response.isSuccessful()) {
+            ForecastWeatherModel forecastWeatherModelResponse = response.body();
+            for(long i=1; i<=4; i++){
+                ContentValues cv = forecastWeatherModelResponse.getEquivalentCV(i*8);
                 String where = "_ID=?";
-                String[] selectionArgs = new String[]{"1"};
+                String[] selectionArgs = new String[]{String.valueOf(i+1)};
                 if(UPDATE_ACTION.equals(mIntent.getAction())){
                     getContentResolver().update(WeatherDBContract.WeatherDBEntry.CONTENT_URI,cv,where,selectionArgs);
                 }
@@ -199,67 +228,19 @@ public class SyncOWMService extends IntentService implements OnSuccessListener<L
                     cv.put(WeatherDBContract.WeatherDBEntry.COLUMN_UV_INDEX, 0.0);
                     getContentResolver().insert(WeatherDBContract.WeatherDBEntry.CONTENT_URI,cv);
                 }
-
-            }
-            else {
-                JSONObject jsonError;
-                try {
-                    jsonError = new JSONObject(response.errorBody().string());
-                    String errorCode = String.valueOf(jsonError.getInt("cod"));
-                    String errorMessage = jsonError.getString("message");
-                    String errorLog = errorCode+":"+errorMessage;
-                    Log.w(LOG_TAG, errorLog);
-                } catch (JSONException | IOException e) {
-                    e.printStackTrace();
-                }
             }
         }
-
-        @Override
-        public void onFailure(@NonNull Call<CurrentWeatherModel> call, @NonNull Throwable t) {
-            t.printStackTrace();
-            Log.w(LOG_TAG, "Couldn't access API. Check connection or call.");
-        }
-    }
-
-    private class ForecastWeatherCallback implements Callback<ForecastWeatherModel>{
-
-        @Override
-        public void onResponse(@NonNull Call<ForecastWeatherModel> call, @NonNull Response<ForecastWeatherModel> response) {
-
-            if (response.isSuccessful()) {
-                ForecastWeatherModel forecastWeatherModelResponse = response.body();
-                for(long i=1; i<=4; i++){
-                    ContentValues cv = forecastWeatherModelResponse.getDBModel(i).getEquivalentCV();
-                    String where = "_ID=?";
-                    String[] selectionArgs = new String[]{String.valueOf(i+1)};
-                    if(UPDATE_ACTION.equals(mIntent.getAction())){
-                        getContentResolver().update(WeatherDBContract.WeatherDBEntry.CONTENT_URI,cv,where,selectionArgs);
-                    }
-                    else if(CREATE_ACTION.equals(mIntent.getAction())){
-                        cv.put(WeatherDBContract.WeatherDBEntry.COLUMN_UV_INDEX, 0.0);
-                        getContentResolver().insert(WeatherDBContract.WeatherDBEntry.CONTENT_URI,cv);
-                    }
-                }
+        else {
+            JSONObject jsonError;
+            try {
+                jsonError = new JSONObject(response.errorBody().string());
+                String errorCode = String.valueOf(jsonError.getInt("cod"));
+                String errorMessage = jsonError.getString("message");
+                String errorLog = errorCode+":"+errorMessage;
+                Log.w(LOG_TAG, errorLog);
+            } catch (JSONException | IOException e) {
+                e.printStackTrace();
             }
-            else {
-                JSONObject jsonError;
-                try {
-                    jsonError = new JSONObject(response.errorBody().string());
-                    String errorCode = String.valueOf(jsonError.getInt("cod"));
-                    String errorMessage = jsonError.getString("message");
-                    String errorLog = errorCode+":"+errorMessage;
-                    Log.w(LOG_TAG, errorLog);
-                } catch (JSONException | IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-
-        @Override
-        public void onFailure(@NonNull Call<ForecastWeatherModel> call, @NonNull Throwable t) {
-            t.printStackTrace();
-            Log.w(LOG_TAG, "Couldn't access API. Check connection or call.");
         }
     }
 }

@@ -1,9 +1,12 @@
 
 package com.kodatos.cumulonimbus.apihelper.models;
 
+import android.content.ContentValues;
+
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import com.kodatos.cumulonimbus.apihelper.DBModel;
+import com.kodatos.cumulonimbus.datahelper.WeatherDBContract;
 
 public class ForecastWeatherModel {
 
@@ -26,13 +29,26 @@ public class ForecastWeatherModel {
     public ForecastWeatherModel() {
     }
 
-    // A helper method to get required data for database operations
-    public DBModel getDBModel(long day){
-        ForecastList fl = forecastList.get((int) (day*8));
+    /**
+     * @param day The day for which weather is accessed
+     * @return A ContentValues object representing model data for database transactions
+     */
+    public ContentValues getEquivalentCV(long day){
+        ContentValues cv = new ContentValues();
+        ForecastList fl = forecastList.get((int) day);
         Weather w = fl.weather.get(0);
         Main m = fl.main;
-        return new DBModel(day+1,w.main,w.description,m.temp,m.tempMin,
-                m.tempMax,m.pressure,m.humidity,fl.wind.getUsefulWind(),fl.clouds.all, w.icon);
-
+        cv.put(WeatherDBContract.WeatherDBEntry._ID, (day/8)+1);
+        cv.put(WeatherDBContract.WeatherDBEntry.COLUMN_WEATHER_MAIN,w.main);
+        cv.put(WeatherDBContract.WeatherDBEntry.COLUMN_WEATHER_DESC,w.description);
+        cv.put(WeatherDBContract.WeatherDBEntry.COLUMN_TEMP,m.temp);
+        cv.put(WeatherDBContract.WeatherDBEntry.COLUMN_TEMP_MIN,m.tempMin);
+        cv.put(WeatherDBContract.WeatherDBEntry.COLUMN_TEMP_MAX,m.tempMax);
+        cv.put(WeatherDBContract.WeatherDBEntry.COLUMN_PRESSURE,m.pressure);
+        cv.put(WeatherDBContract.WeatherDBEntry.COLUMN_HUMIDITY,m.humidity);
+        cv.put(WeatherDBContract.WeatherDBEntry.COLUMN_WIND,fl.wind.getUsefulWind());
+        cv.put(WeatherDBContract.WeatherDBEntry.COLUMN_CLOUDS, fl.clouds.all);
+        cv.put(WeatherDBContract.WeatherDBEntry.COLUMN_ICON_ID, w.icon);
+        return cv;
     }
 }
