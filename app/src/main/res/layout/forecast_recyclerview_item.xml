@@ -4,10 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools">
     <data>
         <variable
-            name="dbmodel"
-            type="com.kodatos.cumulonimbus.apihelper.DBModel"/>
-
-        <variable
             name="calculateddata"
             type="com.kodatos.cumulonimbus.uihelper.DBModelCalculatedData" />
     </data>
@@ -51,7 +47,7 @@
         android:id="@+id/forecast_main_textview"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@{dbmodel.weather_main}"
+        android:text="@{calculateddata.weatherMain}"
         tools:text="Main"
         android:textAppearance="@android:style/TextAppearance.Material"
         android:textSize="16sp"
@@ -69,7 +65,7 @@
         android:textAlignment="textStart"
         android:maxLines="1"
         android:maxLength="16"
-        android:text="@{dbmodel.weather_desc}"
+        android:text="@{calculateddata.weatherDesc}"
         android:textAppearance="@android:style/TextAppearance.Material.Medium"
         tools:text="Description"
         android:layout_marginLeft="0dp"

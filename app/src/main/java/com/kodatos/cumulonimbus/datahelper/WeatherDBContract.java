@@ -28,6 +28,7 @@ public class WeatherDBContract {
         public static final String COLUMN_CLOUDS = "clouds";
         public static final String COLUMN_ICON_ID = "icon_id";
         public static final String COLUMN_UV_INDEX = "uv_index";
+        public static final String COLUMN_RAIN_3H = "rain_3h";
 
     }
 }

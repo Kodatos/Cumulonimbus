@@ -69,6 +69,8 @@ public class CurrentWeatherModel {
         cv.put(WeatherDBContract.WeatherDBEntry.COLUMN_WIND,wind.getUsefulWind());
         cv.put(WeatherDBContract.WeatherDBEntry.COLUMN_CLOUDS, clouds.all);
         cv.put(WeatherDBContract.WeatherDBEntry.COLUMN_ICON_ID, w.icon);
+        // OpenWeatherMap doesn't provide last 3 hr rain data for current weather most of the times
+        cv.put(WeatherDBContract.WeatherDBEntry.COLUMN_RAIN_3H, -1);
         return cv;
     }
 }

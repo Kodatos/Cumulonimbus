@@ -10,6 +10,8 @@ public class DBModelCalculatedData {
     private int drawable_resource_id;
     private Spanned calculatedTemp;
     private String calculatedDay;
+    private String weatherMain;
+    private String weatherDesc;
 
     public int getDrawable_resource_id() {
         return drawable_resource_id;
@@ -23,9 +25,20 @@ public class DBModelCalculatedData {
         return calculatedTemp;
     }
 
-    public DBModelCalculatedData(int drawable_resource_id, Spanned calculatedTemp, String calculatedDay) {
+
+    public String getWeatherMain() {
+        return weatherMain;
+    }
+
+    public String getWeatherDesc() {
+        return weatherDesc;
+    }
+
+    public DBModelCalculatedData(int drawable_resource_id, Spanned calculatedTemp, String calculatedDay,String weatherMain, String weatherDesc) {
         this.drawable_resource_id = drawable_resource_id;
         this.calculatedTemp = calculatedTemp;
         this.calculatedDay = calculatedDay.toUpperCase();
+        this.weatherMain = weatherMain;
+        this.weatherDesc = weatherDesc;
     }
 }

@@ -2,6 +2,7 @@
 package com.kodatos.cumulonimbus.apihelper.models;
 
 import android.content.ContentValues;
+import android.util.Log;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
@@ -38,6 +39,16 @@ public class ForecastWeatherModel {
         ForecastList fl = forecastList.get((int) day);
         Weather w = fl.weather.get(0);
         Main m = fl.main;
+        float netRain3h=0,i=0;
+        for(ForecastList flist : forecastList){
+            if(i<8){
+                i++;
+            }
+            else {
+                if (flist.rain != null)
+                    netRain3h += flist.rain._3h;
+            }
+        }
         cv.put(WeatherDBContract.WeatherDBEntry._ID, (day/8)+1);
         cv.put(WeatherDBContract.WeatherDBEntry.COLUMN_WEATHER_MAIN,w.main);
         cv.put(WeatherDBContract.WeatherDBEntry.COLUMN_WEATHER_DESC,w.description);
@@ -49,6 +60,7 @@ public class ForecastWeatherModel {
         cv.put(WeatherDBContract.WeatherDBEntry.COLUMN_WIND,fl.wind.getUsefulWind());
         cv.put(WeatherDBContract.WeatherDBEntry.COLUMN_CLOUDS, fl.clouds.all);
         cv.put(WeatherDBContract.WeatherDBEntry.COLUMN_ICON_ID, w.icon);
+        cv.put(WeatherDBContract.WeatherDBEntry.COLUMN_RAIN_3H, netRain3h);
         return cv;
     }
 }

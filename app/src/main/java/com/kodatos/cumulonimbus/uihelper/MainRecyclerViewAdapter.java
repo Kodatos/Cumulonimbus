@@ -34,9 +34,8 @@ public class MainRecyclerViewAdapter extends RecyclerView.Adapter<MainRecyclerVi
             this.binding = recycleItemBinding;
         }
 
-        // Method to create a calculated data model and bind it and given model to the layout
+        // Method to create a calculated data model and bind it to the layout
         public void bind(DBModel dbModel){
-            binding.setDbmodel(dbModel);
             int offset = getAdapterPosition()+1;
             Calendar calendar = new GregorianCalendar();
             calendar.setTime(new Date());
@@ -45,7 +44,7 @@ public class MainRecyclerViewAdapter extends RecyclerView.Adapter<MainRecyclerVi
             SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(mContext);
             boolean metric = sp.getBoolean(mContext.getString(R.string.pref_metrics_key), true);
             int imageId = mContext.getResources().getIdentifier("ic_"+dbModel.getIcon_id(),"drawable",mContext.getPackageName());
-            DBModelCalculatedData calculatedData = new DBModelCalculatedData(imageId, MiscUtils.makeTemperaturePretty(dbModel.getTemp()), displayDay);
+            DBModelCalculatedData calculatedData = new DBModelCalculatedData(imageId, MiscUtils.makeTemperaturePretty(dbModel.getTemp()), displayDay, dbModel.getWeather_main(), dbModel.getWeather_desc());
             binding.setCalculateddata(calculatedData);
             binding.executePendingBindings();
         }
@@ -100,7 +99,8 @@ public class MainRecyclerViewAdapter extends RecyclerView.Adapter<MainRecyclerVi
         long clouds = mCursor.getLong(mCursor.getColumnIndex(WeatherDBContract.WeatherDBEntry.COLUMN_CLOUDS));
         String icon_id = mCursor.getString(mCursor.getColumnIndex(WeatherDBContract.WeatherDBEntry.COLUMN_ICON_ID));
         double uvIndex = mCursor.getDouble(mCursor.getColumnIndex(WeatherDBContract.WeatherDBEntry.COLUMN_UV_INDEX));
-        return new DBModel(id,main,desc,temp,temp_min,temp_max,pressure,humidity,wind,clouds,icon_id,uvIndex);
+        double rain_3h = mCursor.getDouble(mCursor.getColumnIndex(WeatherDBContract.WeatherDBEntry.COLUMN_RAIN_3H));
+        return new DBModel(id,main,desc,temp,temp_min,temp_max,pressure,humidity,wind,clouds,icon_id,uvIndex,rain_3h);
     }
 
     public void swapCursor(Cursor newCursor){

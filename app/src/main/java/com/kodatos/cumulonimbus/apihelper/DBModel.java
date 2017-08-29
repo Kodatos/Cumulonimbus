@@ -30,11 +30,12 @@ public class DBModel {
     private long clouds;
     private String icon_id;
     private double uvIndex;
+    private double rain_3h;
 
     public DBModel() {}
 
     @ParcelConstructor
-    public DBModel(long id, String weather_main, String weather_desc, float temp, float temp_min, float temp_max, float pressure, long humidity, String wind, long clouds, String icon_id, double uvIndex) {
+    public DBModel(long id, String weather_main, String weather_desc, float temp, float temp_min, float temp_max, float pressure, long humidity, String wind, long clouds, String icon_id, double uvIndex, double rain_3h) {
         this.id = id;
         this.weather_main = weather_main;
         //Capitalize first word of description
@@ -49,6 +50,7 @@ public class DBModel {
         this.clouds = clouds;
         this.icon_id = icon_id;
         this.uvIndex = uvIndex;
+        this.rain_3h = rain_3h;
     }
 
     public long getId() {
@@ -145,6 +147,15 @@ public class DBModel {
 
     public void setUvIndex(double uvIndex) {
         this.uvIndex = uvIndex;
+    }
+
+
+    public double getRain_3h() {
+        return rain_3h;
+    }
+
+    public void setRain_3h(double rain_3h) {
+        this.rain_3h = rain_3h;
     }
 
 }
