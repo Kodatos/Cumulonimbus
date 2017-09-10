@@ -18,4 +18,9 @@ public class BindingAdapterUtils {
     public static void setDrawableResource(ImageView imageView, int resource){
         imageView.setImageResource(resource);
     }
+
+    @BindingAdapter("integerTint")
+    public static void setintegerTint(ImageView imageView, int color){
+        imageView.getDrawable().setTint(color);
+    }
 }

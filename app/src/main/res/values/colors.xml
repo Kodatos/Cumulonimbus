@@ -3,4 +3,15 @@
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303f9f</color>
     <color name="colorAccent">#FF4081</color>
+    <color name="textColorSecondaryAlt">#A0000000</color>
+
+    <color name="_01d_icon_tint">#FFD600</color>
+    <color name="_01n_icon_tint">#cccccc</color>
+    <color name="_02d_icon_tint">#bdbdbd</color>
+    <color name="_03d_icon_tint">#9E9E9E</color>
+    <color name="_04d_icon_tint">#757575</color>
+    <color name="_09d_icon_tint">#00B0FF</color>
+    <color name="_11d_icon_tint">#2962FF</color>
+    <color name="_13d_icon_tint">#4fc3f7</color>
+    <color name="_50d_icon_tint">#e0e0e0</color>
 </resources>

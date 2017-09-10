@@ -8,6 +8,7 @@
             type="com.kodatos.cumulonimbus.uihelper.DBModelCalculatedData" />
     </data>
 <android.support.constraint.ConstraintLayout
+    android:id="@+id/itemConstraintLayout"
     android:layout_width="match_parent"
     android:layout_height="88dp"
     tools:layout_editor_absoluteY="0dp"

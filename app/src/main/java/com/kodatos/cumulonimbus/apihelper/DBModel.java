@@ -39,7 +39,12 @@ public class DBModel {
         this.id = id;
         this.weather_main = weather_main;
         //Capitalize first word of description
-        weather_desc = weather_desc.substring(0,1).toUpperCase()+weather_desc.substring(1);
+        String[] split = weather_desc.split(" ");
+        StringBuilder sb = new StringBuilder();
+        for(String s : split){
+            sb.append(s.substring(0, 1).toUpperCase()).append(s.substring(1)).append(" ");
+        }
+        weather_desc = sb.toString();
         this.weather_desc = weather_desc;
         this.temp = temp;
         this.temp_min = temp_min;

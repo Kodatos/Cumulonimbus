@@ -8,7 +8,7 @@ import android.text.Spanned;
 public class DBModelCalculatedData {
 
     private int drawable_resource_id;
-    private Spanned calculatedTemp;
+    private String calculatedTemp;
     private String calculatedDay;
     private String weatherMain;
     private String weatherDesc;
@@ -21,7 +21,7 @@ public class DBModelCalculatedData {
         return calculatedDay;
     }
 
-    public Spanned getCalculatedTemp() {
+    public String getCalculatedTemp() {
         return calculatedTemp;
     }
 
@@ -34,7 +34,7 @@ public class DBModelCalculatedData {
         return weatherDesc;
     }
 
-    public DBModelCalculatedData(int drawable_resource_id, Spanned calculatedTemp, String calculatedDay,String weatherMain, String weatherDesc) {
+    public DBModelCalculatedData(int drawable_resource_id, String calculatedTemp, String calculatedDay,String weatherMain, String weatherDesc) {
         this.drawable_resource_id = drawable_resource_id;
         this.calculatedTemp = calculatedTemp;
         this.calculatedDay = calculatedDay.toUpperCase();

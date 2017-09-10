@@ -11,5 +11,8 @@
     <string name="pref_metrics">Metric units</string>
     <string name="cardview_transition_name">BackCardView</string>
 
-
+    <string name="weather_detail_parcel_name">data_model</string>
+    <string name="weather_detail_day_name">day</string>
+    <string name="pressure">Pressure</string>
+    <string name="humidity">Humidity</string>
 </resources>

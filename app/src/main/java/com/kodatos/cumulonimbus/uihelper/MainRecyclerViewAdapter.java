@@ -2,36 +2,43 @@ package com.kodatos.cumulonimbus.uihelper;
 
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.preference.PreferenceManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 
 import com.kodatos.cumulonimbus.R;
+import com.kodatos.cumulonimbus.WeatherDetailActivity;
 import com.kodatos.cumulonimbus.apihelper.DBModel;
 import com.kodatos.cumulonimbus.databinding.ForecastRecyclerviewItemBinding;
 import com.kodatos.cumulonimbus.datahelper.WeatherDBContract;
 import com.kodatos.cumulonimbus.utils.MiscUtils;
+
+import org.parceler.Parcels;
 
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Locale;
 
-public class MainRecyclerViewAdapter extends RecyclerView.Adapter<MainRecyclerViewAdapter.MainRecyclerViewHolder>{
+public class MainRecyclerViewAdapter extends RecyclerView.Adapter<MainRecyclerViewAdapter.MainRecyclerViewHolder> implements View.OnClickListener{
 
     private Cursor mCursor = null;
     private Context mContext;
 
-    public class MainRecyclerViewHolder extends RecyclerView.ViewHolder {
+
+    public class MainRecyclerViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
 
         private final ForecastRecyclerviewItemBinding binding;
 
         public MainRecyclerViewHolder(ForecastRecyclerviewItemBinding recycleItemBinding) {
             super(recycleItemBinding.getRoot());
             this.binding = recycleItemBinding;
+            binding.getRoot().setOnClickListener(this);
         }
 
         // Method to create a calculated data model and bind it to the layout
@@ -44,9 +51,18 @@ public class MainRecyclerViewAdapter extends RecyclerView.Adapter<MainRecyclerVi
             SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(mContext);
             boolean metric = sp.getBoolean(mContext.getString(R.string.pref_metrics_key), true);
             int imageId = mContext.getResources().getIdentifier("ic_"+dbModel.getIcon_id(),"drawable",mContext.getPackageName());
-            DBModelCalculatedData calculatedData = new DBModelCalculatedData(imageId, MiscUtils.makeTemperaturePretty(dbModel.getTemp()), displayDay, dbModel.getWeather_main(), dbModel.getWeather_desc());
+            DBModelCalculatedData calculatedData = new DBModelCalculatedData(imageId, MiscUtils.makeTemperaturePretty(dbModel.getTemp(), metric), displayDay, dbModel.getWeather_main(), dbModel.getWeather_desc());
             binding.setCalculateddata(calculatedData);
             binding.executePendingBindings();
+        }
+
+        @Override
+        public void onClick(View view) {
+            DBModel intentModel = getDBModelFromCursor(getAdapterPosition()+1);
+            Intent intent = new Intent(mContext, WeatherDetailActivity.class);
+            intent.putExtra(mContext.getString(R.string.weather_detail_parcel_name), Parcels.wrap(intentModel));
+            intent.putExtra(mContext.getString(R.string.weather_detail_day_name), getAdapterPosition()+1);
+            mContext.startActivity(intent);
         }
     }
 
@@ -58,6 +74,7 @@ public class MainRecyclerViewAdapter extends RecyclerView.Adapter<MainRecyclerVi
     public MainRecyclerViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         LayoutInflater layoutInflater = LayoutInflater.from(parent.getContext());
         ForecastRecyclerviewItemBinding recycleItemBinding = ForecastRecyclerviewItemBinding.inflate(layoutInflater, parent, false);
+        recycleItemBinding.itemConstraintLayout.setOnClickListener(this);
         return new MainRecyclerViewHolder(recycleItemBinding);
     }
 
@@ -78,6 +95,11 @@ public class MainRecyclerViewAdapter extends RecyclerView.Adapter<MainRecyclerVi
     public long getItemId(int position) {
         mCursor.moveToPosition(position);
         return mCursor.getLong(0);
+    }
+
+    @Override
+    public void onClick(View view) {
+
     }
 
     /**
