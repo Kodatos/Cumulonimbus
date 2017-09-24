@@ -159,7 +159,7 @@ public class SyncOWMService extends IntentService implements OnSuccessListener<L
                 List<UVIndexModel> uvIndexModels = uvIndexModelsResponse.body();
                 for(int i=1; i<=4; i++){
                     ContentValues cv = new ContentValues();
-                    cv.put(WeatherDBContract.WeatherDBEntry.COLUMN_UV_INDEX,uvIndexModels.get(i).value);
+                    cv.put(WeatherDBContract.WeatherDBEntry.COLUMN_UV_INDEX,uvIndexModels.get(i-1).value);
                     String where = "_ID=?";
                     String[] selectionArgs = new String[]{String.valueOf(i+1)};
                     getContentResolver().update(WeatherDBContract.WeatherDBEntry.CONTENT_URI,cv,where,selectionArgs);
@@ -217,11 +217,11 @@ public class SyncOWMService extends IntentService implements OnSuccessListener<L
         Response<ForecastWeatherModel> response = call.execute();
         if (response.isSuccessful()) {
             ForecastWeatherModel forecastWeatherModelResponse = response.body();
-            for(long i=1; i<=4; i++){
-                ContentValues cv = forecastWeatherModelResponse.getEquivalentCV(i*8);
+            for(int i=0; i<=4; i++){
+                ContentValues cv = forecastWeatherModelResponse.getEquivalentCV(i);
                 String where = "_ID=?";
                 String[] selectionArgs = new String[]{String.valueOf(i+1)};
-                if(UPDATE_ACTION.equals(mIntent.getAction())){
+                if(UPDATE_ACTION.equals(mIntent.getAction()) || i==0){
                     getContentResolver().update(WeatherDBContract.WeatherDBEntry.CONTENT_URI,cv,where,selectionArgs);
                 }
                 else if(CREATE_ACTION.equals(mIntent.getAction())){
@@ -229,6 +229,7 @@ public class SyncOWMService extends IntentService implements OnSuccessListener<L
                     getContentResolver().insert(WeatherDBContract.WeatherDBEntry.CONTENT_URI,cv);
                 }
             }
+            Log.d(LOG_TAG, "forecast done");
         }
         else {
             JSONObject jsonError;

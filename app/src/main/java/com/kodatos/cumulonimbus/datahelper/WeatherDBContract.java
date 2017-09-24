@@ -19,14 +19,14 @@ public class WeatherDBContract {
         public static final String TABLE_NAME = "weather_table";
         public static final String COLUMN_WEATHER_MAIN = "weather_main";
         public static final String COLUMN_WEATHER_DESC = "weather_desc";
-        public static final String COLUMN_TEMP = "temp";
+        public static final String COLUMN_TEMP = "temperatures";
         public static final String COLUMN_TEMP_MIN = "temp_min";
         public static final String COLUMN_TEMP_MAX = "temp_max";
         public static final String COLUMN_PRESSURE = "pressure";
         public static final String COLUMN_WIND = "wind";
         public static final String COLUMN_HUMIDITY = "humidity";
         public static final String COLUMN_CLOUDS = "clouds";
-        public static final String COLUMN_ICON_ID = "icon_id";
+        public static final String COLUMN_ICON_ID = "icon_ids";
         public static final String COLUMN_UV_INDEX = "uv_index";
         public static final String COLUMN_RAIN_3H = "rain_3h";
 

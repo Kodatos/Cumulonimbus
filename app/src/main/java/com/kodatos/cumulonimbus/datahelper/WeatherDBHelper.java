@@ -14,7 +14,7 @@ public class WeatherDBHelper extends SQLiteOpenHelper {
     //Static string for SQL create statement
     private static final String CREATE_WEATHER_TABLE = "CREATE TABLE "+WeatherDBEntry.TABLE_NAME+" (" +
             WeatherDBEntry._ID+" INTEGER PRIMARY KEY, "+WeatherDBEntry.COLUMN_WEATHER_MAIN+" TEXT NOT NULL, "+
-            WeatherDBEntry.COLUMN_WEATHER_DESC+" TEXT NOT NULL, "+WeatherDBEntry.COLUMN_TEMP+" REAL NOT NULL, "+
+            WeatherDBEntry.COLUMN_WEATHER_DESC+" TEXT NOT NULL, "+WeatherDBEntry.COLUMN_TEMP+" TEXT NOT NULL, "+
             WeatherDBEntry.COLUMN_TEMP_MIN+" REAL NOT NULL, "+WeatherDBEntry.COLUMN_TEMP_MAX+" REAL NOT NULL, "+
             WeatherDBEntry.COLUMN_PRESSURE+" REAL NOT NULL, "+WeatherDBEntry.COLUMN_WIND+" TEXT NOT NULL, "+
             WeatherDBEntry.COLUMN_HUMIDITY+" INTEGER NOT NULL, "+
