@@ -10,7 +10,7 @@
 <android.support.constraint.ConstraintLayout
     android:id="@+id/itemConstraintLayout"
     android:layout_width="match_parent"
-    android:layout_height="88dp"
+    android:layout_height="80dp"
     tools:layout_editor_absoluteY="0dp"
     tools:layout_editor_absoluteX="0dp">
 
@@ -54,8 +54,8 @@
         android:textSize="16sp"
         android:textAlignment="textStart"
         app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginTop="24dp"
-        android:layout_marginLeft="104dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="96dp"
         app:layout_constraintLeft_toLeftOf="parent" />
 
     <TextView

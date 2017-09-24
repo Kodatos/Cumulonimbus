@@ -8,6 +8,12 @@
         <item name="colorAccent">@color/colorAccent</item>
         <item name="android:navigationBarColor">@color/colorPrimaryDark</item>
         <item name="android:statusBarColor">@color/colorPrimaryDark</item>
+
+        <item name="android:windowContentTransitions">true</item>
+        <item name="android:windowSharedElementsUseOverlay">false</item>
+
+        <item name="android:windowSharedElementEnterTransition">@transition/detail_shared_transition</item>
+        <item name="android:windowSharedElementExitTransition">@transition/detail_shared_transition</item>
     </style>
 
     <style name="AppTheme.NoActionBar">

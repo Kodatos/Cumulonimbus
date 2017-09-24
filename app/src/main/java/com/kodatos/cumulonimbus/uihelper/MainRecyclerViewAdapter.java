@@ -6,10 +6,13 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.preference.PreferenceManager;
+import android.support.v4.app.ActivityOptionsCompat;
+import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 
 import com.kodatos.cumulonimbus.R;
 import com.kodatos.cumulonimbus.WeatherDetailActivity;
@@ -29,6 +32,7 @@ public class MainRecyclerViewAdapter extends RecyclerView.Adapter<MainRecyclerVi
 
     private Cursor mCursor = null;
     private Context mContext;
+    private ForecastItemClickListener itemClickListner;
 
 
     public class MainRecyclerViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
@@ -50,24 +54,26 @@ public class MainRecyclerViewAdapter extends RecyclerView.Adapter<MainRecyclerVi
             String displayDay = calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.SHORT, Locale.getDefault());
             SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(mContext);
             boolean metric = sp.getBoolean(mContext.getString(R.string.pref_metrics_key), true);
-            int imageId = mContext.getResources().getIdentifier("ic_"+dbModel.getIcon_id(),"drawable",mContext.getPackageName());
-            DBModelCalculatedData calculatedData = new DBModelCalculatedData(imageId, MiscUtils.makeTemperaturePretty(dbModel.getTemp(), metric), displayDay, dbModel.getWeather_main(), dbModel.getWeather_desc());
+            int currentIndex = MiscUtils.getIndexforMainForecast();
+            int imageId = mContext.getResources().getIdentifier("ic_"+dbModel.getIcon_id().split("/")[currentIndex],"drawable",mContext.getPackageName());
+            DBModelCalculatedData calculatedData = new DBModelCalculatedData(imageId, MiscUtils.makeTemperaturePretty(dbModel.getTempList().split("/")[currentIndex], metric), displayDay, dbModel.getWeather_main(), dbModel.getWeather_desc());
             binding.setCalculateddata(calculatedData);
             binding.executePendingBindings();
         }
 
         @Override
         public void onClick(View view) {
-            DBModel intentModel = getDBModelFromCursor(getAdapterPosition()+1);
-            Intent intent = new Intent(mContext, WeatherDetailActivity.class);
-            intent.putExtra(mContext.getString(R.string.weather_detail_parcel_name), Parcels.wrap(intentModel));
-            intent.putExtra(mContext.getString(R.string.weather_detail_day_name), getAdapterPosition()+1);
-            mContext.startActivity(intent);
+            itemClickListner.onForecastItemClick(getDBModelFromCursor(getAdapterPosition()+1), getAdapterPosition()+1, binding.forecastImage);
         }
     }
 
     public MainRecyclerViewAdapter (Context context){
         mContext = context;
+        try {
+            itemClickListner = (ForecastItemClickListener)context;
+        } catch (ClassCastException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -112,7 +118,7 @@ public class MainRecyclerViewAdapter extends RecyclerView.Adapter<MainRecyclerVi
         long id = mCursor.getLong(mCursor.getColumnIndex(WeatherDBContract.WeatherDBEntry._ID));
         String main = mCursor.getString(mCursor.getColumnIndex(WeatherDBContract.WeatherDBEntry.COLUMN_WEATHER_MAIN));
         String desc = mCursor.getString(mCursor.getColumnIndex(WeatherDBContract.WeatherDBEntry.COLUMN_WEATHER_DESC));
-        float temp = mCursor.getFloat(mCursor.getColumnIndex(WeatherDBContract.WeatherDBEntry.COLUMN_TEMP));
+        String temp = mCursor.getString(mCursor.getColumnIndex(WeatherDBContract.WeatherDBEntry.COLUMN_TEMP));
         float temp_min = mCursor.getFloat(mCursor.getColumnIndex(WeatherDBContract.WeatherDBEntry.COLUMN_TEMP_MIN));
         float temp_max = mCursor.getFloat(mCursor.getColumnIndex(WeatherDBContract.WeatherDBEntry.COLUMN_TEMP_MAX));
         float pressure = mCursor.getFloat(mCursor.getColumnIndex(WeatherDBContract.WeatherDBEntry.COLUMN_PRESSURE));
@@ -128,5 +134,9 @@ public class MainRecyclerViewAdapter extends RecyclerView.Adapter<MainRecyclerVi
     public void swapCursor(Cursor newCursor){
         mCursor = newCursor;
         notifyDataSetChanged();
+    }
+
+    public interface ForecastItemClickListener{
+        void onForecastItemClick(DBModel intentModel, int position, ImageView forecastImageView);
     }
 }

@@ -1,6 +1,7 @@
 package com.kodatos.cumulonimbus.utils;
 
 import android.content.Context;
+import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
 import android.text.Html;
@@ -20,6 +21,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
+import java.util.TimeZone;
 
 /*
     A utility class containing miscellaneous functions that may be used in other functions.
@@ -28,16 +30,11 @@ public class MiscUtils {
 
     /**
      * Converts given temperature for display purpose.
-     * @param usefulTemp Temperature in Kelvin to convert
+     * @param usefulTempinString Temperature in Kelvin to convert
      * @return A Spanned object with temperature and degree symbol in superscript
      */
     @SuppressWarnings("deprecation")
-    public static String makeTemperaturePretty(float usefulTemp, boolean metric){
-        String usefulTempinString;
-        if(usefulTemp==-1)
-            usefulTempinString="";
-        else
-            usefulTempinString =  String.valueOf(Math.round(usefulTemp))+" ";
+    public static String makeTemperaturePretty(String usefulTempinString, boolean metric){
         String unit = metric ? "\u2103" : "\u2109";
         return usefulTempinString + unit;
     }
@@ -59,8 +56,8 @@ public class MiscUtils {
         calendar.add(Calendar.DATE, day);
         SimpleDateFormat sf = new SimpleDateFormat("EEE, d MMM", Locale.getDefault());
         String date = sf.format(calendar.getTime());
-        String tempMain = String.valueOf((int) dbModel.getTemp());
-        String unit = makeTemperaturePretty(-1, metric);
+        String tempMain = dbModel.getTempList().split("/")[getIndexforMainForecast()];
+        String unit = makeTemperaturePretty("", metric);
         String tempMin = String.valueOf(Math.round(dbModel.getTemp_min()));
         String tempMax = String.valueOf(Math.round(dbModel.getTemp_max()));
         String[] windData = dbModel.getWind().split("/");
@@ -80,41 +77,41 @@ public class MiscUtils {
         double speedInKPH = (18.0/5.0)*speed;
         if(speedInKPH<2)
             return "Calm";
-        else if(isBetween(speedInKPH,2.0,6.0))
+        else if(isBetween(speedInKPH,2.0,6.99))
             return "Light Air";
-        else if (isBetween(speedInKPH,7.0,11.0))
+        else if (isBetween(speedInKPH,7.0,11.99))
             return "Light Breeze";
-        else if(isBetween(speedInKPH,12.0,19.0))
+        else if(isBetween(speedInKPH,12.0,19.99))
             return "Gentle Breeze";
-        else if(isBetween(speedInKPH,20.0,30.0))
+        else if(isBetween(speedInKPH,20.0,30.99))
             return "Moderate Breeze";
-        else if(isBetween(speedInKPH,31.0,39.0))
+        else if(isBetween(speedInKPH,31.0,39.99))
             return "Fresh Breeze";
-        else if(isBetween(speedInKPH,40.0,50.0))
+        else if(isBetween(speedInKPH,40.0,50.99))
             return "Strong Breeze";
-        else if(isBetween(speedInKPH,51.0,61.0))
+        else if(isBetween(speedInKPH,51.0,61.99))
             return "Moderate Gale";
-        else if(isBetween(speedInKPH,62.0,74.0))
+        else if(isBetween(speedInKPH,62.0,74.99))
             return "Fresh Gale";
-        else if(isBetween(speedInKPH,75.0,87.0))
+        else if(isBetween(speedInKPH,75.0,87.99))
             return "Strong Gale";
-        else if(isBetween(speedInKPH,88.0,102.0))
+        else if(isBetween(speedInKPH,88.0,102.99))
             return "Whole Gale";
-        else if(isBetween(speedInKPH,103.0,117.0))
+        else if(isBetween(speedInKPH,103.0,117.99))
             return "Storm";
-        else if(speedInKPH>=119.0)
+        else if(speedInKPH>=118.0)
             return "Hurricane";
         return "N/A";
     }
 
     public static String UVClassifier(double index){
-        if(isBetween(index,0.0,2.9))
+        if(isBetween(index,0.0,2.99))
             return "Low";
-        else if(isBetween(index,3.0,5.9))
+        else if(isBetween(index,3.0,5.99))
             return "Moderate";
-        else if(isBetween(index,6.0,7.9))
+        else if(isBetween(index,6.0,7.99))
             return "High";
-        else if(isBetween(index,8.0,12.9))
+        else if(isBetween(index,8.0,12.99))
             return "Very High";
         else if(index>=13.0)
             return "Extreme";
@@ -123,6 +120,17 @@ public class MiscUtils {
 
     public static boolean isBetween(double number, double lower, double upper){
         return number>=lower && number<=upper;
+    }
+
+    /***
+     * Provides an index which corresponds to forecast for the current time today
+     * @return The index calculated
+     */
+    public static int getIndexforMainForecast(){
+        Calendar calendar = new GregorianCalendar();
+        calendar.setTime(new Date());
+        calendar.setTimeZone(TimeZone.getTimeZone("UTC"));
+        return (calendar.get(Calendar.HOUR_OF_DAY)/3)+1;
     }
 
 }

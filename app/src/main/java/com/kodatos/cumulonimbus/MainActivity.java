@@ -1,6 +1,7 @@
 package com.kodatos.cumulonimbus;
 
 import android.Manifest;
+import android.app.ActivityOptions;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -20,19 +21,30 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v4.view.ViewCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
+import android.transition.Fade;
+import android.util.Log;
+import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.Window;
+import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.kodatos.cumulonimbus.apihelper.DBModel;
 import com.kodatos.cumulonimbus.apihelper.SyncOWMService;
 import com.kodatos.cumulonimbus.databinding.ActivityMainBinding;
 import com.kodatos.cumulonimbus.datahelper.WeatherDBContract;
 import com.kodatos.cumulonimbus.uihelper.MainRecyclerViewAdapter;
 
-public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>, SharedPreferences.OnSharedPreferenceChangeListener{
+import org.parceler.Parcels;
+
+public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>
+        , SharedPreferences.OnSharedPreferenceChangeListener, MainRecyclerViewAdapter.ForecastItemClickListener {
 
     private ActivityMainBinding mBinding;
     private MainRecyclerViewAdapter mAdapter = null;
@@ -43,8 +55,17 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_main);
-        setSupportActionBar(mBinding.toolbar);
+        setSupportActionBar(mBinding.toolbarMain);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
+
+        Fade fade = new Fade();
+        fade.setDuration(1000);
+        fade.excludeTarget(mBinding.appBarMain.getId(), true);
+        fade.excludeTarget(android.R.id.statusBarBackground, true);
+        fade.excludeTarget(android.R.id.navigationBarBackground, true);
+        getWindow().setEnterTransition(fade);
+        getWindow().setExitTransition(fade);
+
         Typeface tf = Typeface.createFromAsset(getAssets(), "fonts/Pacifico-Regular.ttf");
         mBinding.toolbarTitle.setTypeface(tf);
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
@@ -172,5 +193,25 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                     }
                 });
         builder.create().show();
+    }
+
+    @Override
+    public void onForecastItemClick(DBModel intentModel, int position, ImageView forecastImageView) {
+        Log.d(getClass().getName(), String.valueOf(findViewById(android.R.id.statusBarBackground)==null));
+        forecastImageView.setTransitionName(String.valueOf(position)+"forecast_image");
+        String imageTransitionName =  String.valueOf(position)+"forecast_image";
+        Intent intent = new Intent(this, WeatherDetailActivity.class);
+        ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(this,
+                Pair.create((View)forecastImageView, imageTransitionName),
+                Pair.create((View)mBinding.forecastCard, ViewCompat.getTransitionName(mBinding.forecastCard)),
+                Pair.create((View)mBinding.backgroundConstaintlayout, ViewCompat.getTransitionName(mBinding.backgroundConstaintlayout)),
+                Pair.create(findViewById(android.R.id.statusBarBackground), Window.STATUS_BAR_BACKGROUND_TRANSITION_NAME),
+                Pair.create(findViewById(android.R.id.navigationBarBackground), Window.NAVIGATION_BAR_BACKGROUND_TRANSITION_NAME),
+                Pair.create((View)mBinding.appBarMain, "APP_BAR")
+                );
+        intent.putExtra(getString(R.string.weather_detail_parcel_name), Parcels.wrap(intentModel));
+        intent.putExtra(getString(R.string.weather_detail_day_name), position);
+        intent.putExtra(getString(R.string.forecats_image_transistion_key), imageTransitionName);
+        startActivity(intent, options.toBundle());
     }
 }

@@ -9,10 +9,13 @@
     <string name="pref_custom_location">Use a custom location</string>
     <string name="pref_metrics_key">bool_use_metrics</string>
     <string name="pref_metrics">Metric units</string>
-    <string name="cardview_transition_name">BackCardView</string>
 
     <string name="weather_detail_parcel_name">data_model</string>
     <string name="weather_detail_day_name">day</string>
     <string name="pressure">Pressure</string>
     <string name="humidity">Humidity</string>
+
+    <string name="forecats_image_transistion_key">forecast_image_transition_name</string>
+    <string name="cardview_transition_name">BackCardView</string>
+    <string name="background_transition_name">BckgroundLayout</string>
 </resources>
