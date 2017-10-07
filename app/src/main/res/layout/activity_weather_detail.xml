@@ -35,6 +35,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:text="@string/app_name"
+                app:fontFamily="@font/pacifico"
                 android:textSize="30sp"
                 android:textColor="#FFFFFFFF"
                 android:layout_marginBottom="8dp"/>
@@ -88,7 +89,7 @@
                     android:textAlignment="viewStart"
                     android:textAppearance="@android:style/TextAppearance.Material.Display1"
                     android:textColor="@color/textColorSecondarySmallCaps"
-                    android:textSize="16sp"
+                    android:textSize="@dimen/detailui_text_size_secondary"
                     app:layout_constraintLeft_toLeftOf="@+id/mainWeatherTextView"
                     app:layout_constraintTop_toTopOf="@+id/weatherImageView"
                     tools:text="Tue, 15 Aug" />
@@ -120,7 +121,7 @@
                     android:textAlignment="textStart"
                     android:textAppearance="@android:style/TextAppearance.Material.Medium"
                     android:textColor="@color/textColorSecondaryAlt"
-                    android:textSize="16sp"
+                    android:textSize="@dimen/detailui_text_size_secondary"
                     android:textStyle="italic"
                     app:layout_constraintHorizontal_bias="0.0"
                     app:layout_constraintLeft_toLeftOf="@+id/mainWeatherTextView"
@@ -206,8 +207,8 @@
 
                 <ImageView
                     android:id="@+id/windDirectionImageView"
-                    android:layout_width="56dp"
-                    android:layout_height="56dp"
+                    android:layout_width="@dimen/detailui_icon_size1"
+                    android:layout_height="@dimen/detailui_icon_size1"
                     android:layout_marginTop="8dp"
                     android:adjustViewBounds="false"
                     android:cropToPadding="false"
@@ -252,7 +253,7 @@
                     android:text="@{dataModel.windDescription}"
                     android:textAlignment="center"
                     android:textColor="@color/textColorSecondaryAlt"
-                    android:textSize="16sp"
+                    android:textSize="@dimen/detailui_text_size_secondary"
                     android:textStyle="italic"
                     app:layout_constraintBaseline_toBaselineOf="@+id/minTemperatureView"
                     app:layout_constraintHorizontal_bias="0.5"
@@ -262,8 +263,8 @@
 
                 <ImageView
                     android:id="@+id/pressureImageView"
-                    android:layout_width="56dp"
-                    android:layout_height="56dp"
+                    android:layout_width="@dimen/detailui_icon_size1"
+                    android:layout_height="@dimen/detailui_icon_size1"
                     android:layout_marginLeft="0dp"
                     android:layout_marginTop="48dp"
                     android:scaleType="fitXY"
@@ -287,7 +288,7 @@
                     android:text="@string/pressure"
                     android:textAppearance="@android:style/TextAppearance.Material.Medium"
                     android:textColor="@color/textColorSecondarySmallCaps"
-                    android:textSize="16sp"
+                    android:textSize="@dimen/detailui_text_size_secondary"
                     app:layout_constraintHorizontal_bias="0.784"
                     app:layout_constraintLeft_toRightOf="@+id/pressureImageView"
                     app:layout_constraintRight_toLeftOf="@+id/guideline"
@@ -312,8 +313,8 @@
 
                 <ImageView
                     android:id="@+id/humidityImageView"
-                    android:layout_width="56dp"
-                    android:layout_height="56dp"
+                    android:layout_width="@dimen/detailui_icon_size1"
+                    android:layout_height="@dimen/detailui_icon_size1"
                     android:layout_marginLeft="0dp"
                     android:layout_marginTop="0dp"
                     android:scaleType="fitXY"
@@ -337,7 +338,7 @@
                     android:text="@string/humidity"
                     android:textAppearance="@android:style/TextAppearance.Material.Medium"
                     android:textColor="@color/textColorSecondarySmallCaps"
-                    android:textSize="16sp"
+                    android:textSize="@dimen/detailui_text_size_secondary"
                     app:layout_constraintHorizontal_bias="0.515"
                     app:layout_constraintLeft_toRightOf="@+id/humidityImageView"
                     app:layout_constraintRight_toRightOf="parent"
@@ -348,7 +349,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="0dp"
-                    android:layout_marginRight="0dp"
+                    android:layout_marginRight="2dp"
                     android:layout_marginTop="0dp"
                     android:text="@{dataModel.humidityValue}"
                     android:textAlignment="center"
@@ -358,12 +359,13 @@
                     app:layout_constraintBottom_toBottomOf="@+id/humidityImageView"
                     app:layout_constraintRight_toRightOf="@+id/justHumidityTextView"
                     app:layout_constraintTop_toBottomOf="@+id/justHumidityTextView"
-                    tools:text="65%" />
+                    tools:text="65%"
+                    app:layout_constraintVertical_bias="0.454" />
 
                 <ImageView
                     android:id="@+id/uvIndexIcon"
-                    android:layout_width="64dp"
-                    android:layout_height="64dp"
+                    android:layout_width="@dimen/detailui_icon_size2"
+                    android:layout_height="@dimen/detailui_icon_size2"
                     android:layout_marginLeft="8dp"
                     android:layout_marginRight="8dp"
                     android:scaleType="fitXY"
@@ -404,7 +406,7 @@
                     android:textAlignment="center"
                     android:textAppearance="@android:style/TextAppearance.Material.Medium"
                     android:textColor="@color/textColorSecondaryAlt"
-                    android:textSize="16sp"
+                    android:textSize="@dimen/detailui_text_size_secondary"
                     android:textStyle="italic"
                     android:text="@{dataModel.uvIndexDescription}"
                     app:layout_constraintLeft_toLeftOf="@+id/uvIndexTextView"
@@ -415,8 +417,8 @@
 
                 <ImageView
                     android:id="@+id/rainImageView"
-                    android:layout_width="64dp"
-                    android:layout_height="64dp"
+                    android:layout_width="@dimen/detailui_icon_size2"
+                    android:layout_height="@dimen/detailui_icon_size2"
                     android:layout_marginLeft="8dp"
                     android:layout_marginRight="8dp"
                     android:layout_marginTop="0dp"
@@ -454,7 +456,7 @@
                     android:layout_marginTop="4dp"
                     android:textAppearance="@android:style/TextAppearance.Material.Medium"
                     android:textColor="@color/textColorSecondaryAlt"
-                    android:textSize="16sp"
+                    android:textSize="@dimen/detailui_text_size_secondary"
                     android:textStyle="italic"
                     android:text="@{dataModel.cloudinessValue}"
                     app:layout_constraintHorizontal_bias="0.5"

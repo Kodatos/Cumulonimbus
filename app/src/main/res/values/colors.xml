@@ -3,8 +3,11 @@
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303f9f</color>
     <color name="colorAccent">#FF4081</color>
+
     <color name="textColorSecondaryAlt">#A0000000</color>
     <color name="textColorSecondarySmallCaps">#AA000000</color>
+    <color name="textColorPrimaryInverse">#FFFFFFFF</color>
+    <color name="textColorSecondaryInverse">#E0FFFFFF</color>
 
     <color name="_01d_icon_tint">#FFD600</color>
     <color name="_01n_icon_tint">#cccccc</color>

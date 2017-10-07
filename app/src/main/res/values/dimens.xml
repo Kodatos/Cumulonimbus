@@ -1,1 +1,10 @@
-<resources></resources>
+<resources>
+    <dimen name="mainui_small_category_icon_size">48dp</dimen>
+    <dimen name="mainui_weather_icon_size">96dp</dimen>
+    <dimen name="mainui_small_category_icon_gap">24dp</dimen>
+
+    <dimen name="detailui_icon_size1">56dp</dimen>
+    <dimen name="detailui_icon_size2">64dp</dimen>
+    <dimen name="detailui_text_size_secondary">16sp</dimen>
+
+</resources>

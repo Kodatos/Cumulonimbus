@@ -2,6 +2,7 @@
     <string name="app_name">Cumulonimbus</string>
     <string name="action_settings">Settings</string>
     <string name="title_activity_settings">Settings</string>
+
     <string name="pref_curr_location_key">bool_current_location</string>
     <string name="pref_curr_location">Use your current location</string>
     <string name="pref_custom_location_def">Delhi,IN</string>
@@ -9,6 +10,8 @@
     <string name="pref_custom_location">Use a custom location</string>
     <string name="pref_metrics_key">bool_use_metrics</string>
     <string name="pref_metrics">Metric units</string>
+    <string name="last_update_date_key">LUDOH4F</string>
+    <string name="last_update_hour_key">LUHOM4F</string>
 
     <string name="weather_detail_parcel_name">data_model</string>
     <string name="weather_detail_day_name">day</string>
@@ -18,4 +21,9 @@
     <string name="forecats_image_transistion_key">forecast_image_transition_name</string>
     <string name="cardview_transition_name">BackCardView</string>
     <string name="background_transition_name">BckgroundLayout</string>
+
+    <string name="current_weather_sunrise_key">sunrise_in_utc</string>
+    <string name="current_weather_sunset_key">sunset_in_utc</string>
+    <string name="current_weather_icon_id_key">icon_id_for_back_color</string>
+    <string name="current_weather_visibility">visibility_in_m</string>
 </resources>
