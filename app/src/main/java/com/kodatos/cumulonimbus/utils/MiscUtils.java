@@ -1,14 +1,9 @@
 package com.kodatos.cumulonimbus.utils;
 
 import android.content.Context;
-import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
-import android.text.Html;
-import android.text.SpannableStringBuilder;
-import android.text.Spanned;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.kodatos.cumulonimbus.apihelper.DBModel;
 import com.kodatos.cumulonimbus.uihelper.DetailActivityDataModel;
@@ -21,7 +16,6 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
-import java.util.TimeZone;
 
 /*
     A utility class containing miscellaneous functions that may be used in other functions.
@@ -50,13 +44,13 @@ public class MiscUtils {
         }
     }
 
-    public static DetailActivityDataModel getDetailModelfromDBModel(DBModel dbModel, int day, int imageId, int iconTint, boolean metric){
+    public static DetailActivityDataModel getDetailModelfromDBModel(DBModel dbModel, int day, int imageId, int iconTint, boolean metric, int forecastToDisplayIndex){
         Calendar calendar = new GregorianCalendar();
         calendar.setTime(new Date());
         calendar.add(Calendar.DATE, day);
         SimpleDateFormat sf = new SimpleDateFormat("EEE, d MMM", Locale.getDefault());
         String date = sf.format(calendar.getTime());
-        String tempMain = dbModel.getTempList().split("/")[getIndexforMainForecast()];
+        String tempMain = dbModel.getTempList().split("/")[forecastToDisplayIndex];
         String unit = makeTemperaturePretty("", metric);
         String tempMin = String.valueOf(Math.round(dbModel.getTemp_min()));
         String tempMax = String.valueOf(Math.round(dbModel.getTemp_max()));
@@ -122,15 +116,13 @@ public class MiscUtils {
         return number>=lower && number<=upper;
     }
 
-    /***
-     * Provides an index which corresponds to forecast for the current time today
-     * @return The index calculated
-     */
-    public static int getIndexforMainForecast(){
+    public static long getUpdateDateAndHour(int what){
         Calendar calendar = new GregorianCalendar();
         calendar.setTime(new Date());
-        calendar.setTimeZone(TimeZone.getTimeZone("UTC"));
-        return (calendar.get(Calendar.HOUR_OF_DAY)/3)+1;
+        switch (what){
+            case 1 : return calendar.get(Calendar.HOUR_OF_DAY);
+            case 121 : return calendar.getTimeInMillis();
+        }
+        return what;
     }
-
 }

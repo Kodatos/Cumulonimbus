@@ -2,12 +2,10 @@ package com.kodatos.cumulonimbus;
 
 import android.content.SharedPreferences;
 import android.databinding.DataBindingUtil;
-import android.graphics.Color;
-import android.graphics.Typeface;
+import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.transition.Fade;
 import android.util.Log;
 
@@ -17,6 +15,10 @@ import com.kodatos.cumulonimbus.uihelper.DetailActivityDataModel;
 import com.kodatos.cumulonimbus.utils.MiscUtils;
 
 import org.parceler.Parcels;
+
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 
 public class WeatherDetailActivity extends AppCompatActivity {
 
@@ -38,8 +40,6 @@ public class WeatherDetailActivity extends AppCompatActivity {
         getWindow().setExitTransition(fade);
 
         setSupportActionBar(mBinding.toolbar);
-        Typeface tf = Typeface.createFromAsset(getAssets(), "fonts/Pacifico-Regular.ttf");
-        mBinding.toolbarTitle.setTypeface(tf);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
         mBinding.weatherImageView.setTransitionName(getIntent().getStringExtra(getString(R.string.forecats_image_transistion_key)));
         mBinding.appBarDetail.setTransitionName("APP_BAR");
@@ -51,10 +51,12 @@ public class WeatherDetailActivity extends AppCompatActivity {
         int day = getIntent().getIntExtra(getString(R.string.weather_detail_day_name), 0);
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
         boolean metric = sp.getBoolean(getString(R.string.pref_metrics_key), true);
-        int currentIndex = MiscUtils.getIndexforMainForecast();
-        int imageId = getResources().getIdentifier("ic_"+mModel.getIcon_id().split("/")[currentIndex],"drawable", getPackageName());
-        int iconTint = getIconTint(mModel.getIcon_id().split("/")[currentIndex]);
-        DetailActivityDataModel bindingModel = MiscUtils.getDetailModelfromDBModel(mModel, day, imageId, iconTint, metric);
+        Calendar calendar = new GregorianCalendar();
+        calendar.setTime(new Date(sp.getLong(getString(R.string.last_update_date_key),0)));
+        int forecastToDisplayIndex = (calendar.get(Calendar.HOUR_OF_DAY)/3)-1;
+        int imageId = getResources().getIdentifier("ic_"+mModel.getIcon_id().split("/")[forecastToDisplayIndex],"drawable", getPackageName());
+        int iconTint = getIconTint(mModel.getIcon_id().split("/")[forecastToDisplayIndex]);
+        DetailActivityDataModel bindingModel = MiscUtils.getDetailModelfromDBModel(mModel, day, imageId, iconTint, metric, forecastToDisplayIndex);
         Log.d(getClass().getName(), bindingModel.tempMain+" "+bindingModel.tempMin+" "+bindingModel.tempMax);
         mBinding.setDataModel(bindingModel);
         supportStartPostponedEnterTransition();

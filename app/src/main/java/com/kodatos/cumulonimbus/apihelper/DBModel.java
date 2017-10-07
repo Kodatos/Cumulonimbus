@@ -1,15 +1,8 @@
 package com.kodatos.cumulonimbus.apihelper;
 
 
-import android.content.ContentValues;
-import android.text.Spanned;
-
-import com.kodatos.cumulonimbus.utils.MiscUtils;
-
 import org.parceler.Parcel;
 import org.parceler.ParcelConstructor;
-
-import static com.kodatos.cumulonimbus.datahelper.WeatherDBContract.*;
 
 /*
     A model class that contains data for transactions with the database. This class holds all the columns in the database.

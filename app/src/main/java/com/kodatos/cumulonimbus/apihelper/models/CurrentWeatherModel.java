@@ -5,7 +5,6 @@ import android.content.ContentValues;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
-import com.kodatos.cumulonimbus.apihelper.DBModel;
 import com.kodatos.cumulonimbus.datahelper.WeatherDBContract;
 
 import java.util.List;

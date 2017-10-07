@@ -2,12 +2,9 @@ package com.kodatos.cumulonimbus.uihelper;
 
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.preference.PreferenceManager;
-import android.support.v4.app.ActivityOptionsCompat;
-import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,13 +12,10 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.kodatos.cumulonimbus.R;
-import com.kodatos.cumulonimbus.WeatherDetailActivity;
 import com.kodatos.cumulonimbus.apihelper.DBModel;
 import com.kodatos.cumulonimbus.databinding.ForecastRecyclerviewItemBinding;
 import com.kodatos.cumulonimbus.datahelper.WeatherDBContract;
 import com.kodatos.cumulonimbus.utils.MiscUtils;
-
-import org.parceler.Parcels;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -32,7 +26,7 @@ public class MainRecyclerViewAdapter extends RecyclerView.Adapter<MainRecyclerVi
 
     private Cursor mCursor = null;
     private Context mContext;
-    private ForecastItemClickListener itemClickListner;
+    private ForecastItemClickListener itemClickListener;
 
 
     public class MainRecyclerViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
@@ -54,23 +48,24 @@ public class MainRecyclerViewAdapter extends RecyclerView.Adapter<MainRecyclerVi
             String displayDay = calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.SHORT, Locale.getDefault());
             SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(mContext);
             boolean metric = sp.getBoolean(mContext.getString(R.string.pref_metrics_key), true);
-            int currentIndex = MiscUtils.getIndexforMainForecast();
-            int imageId = mContext.getResources().getIdentifier("ic_"+dbModel.getIcon_id().split("/")[currentIndex],"drawable",mContext.getPackageName());
-            DBModelCalculatedData calculatedData = new DBModelCalculatedData(imageId, MiscUtils.makeTemperaturePretty(dbModel.getTempList().split("/")[currentIndex], metric), displayDay, dbModel.getWeather_main(), dbModel.getWeather_desc());
+            calendar.setTime(new Date(sp.getLong(mContext.getString(R.string.last_update_date_key),0)));
+            int forecastToDisplayIndex = (calendar.get(Calendar.HOUR_OF_DAY)/3)-1;
+            int imageId = mContext.getResources().getIdentifier("ic_"+dbModel.getIcon_id().split("/")[forecastToDisplayIndex],"drawable",mContext.getPackageName());
+            DBModelCalculatedData calculatedData = new DBModelCalculatedData(imageId, MiscUtils.makeTemperaturePretty(dbModel.getTempList().split("/")[forecastToDisplayIndex], metric), displayDay, dbModel.getWeather_main(), dbModel.getWeather_desc());
             binding.setCalculateddata(calculatedData);
             binding.executePendingBindings();
         }
 
         @Override
         public void onClick(View view) {
-            itemClickListner.onForecastItemClick(getDBModelFromCursor(getAdapterPosition()+1), getAdapterPosition()+1, binding.forecastImage);
+            itemClickListener.onForecastItemClick(getDBModelFromCursor(getAdapterPosition()+1), getAdapterPosition()+1, binding.forecastImage);
         }
     }
 
     public MainRecyclerViewAdapter (Context context){
         mContext = context;
         try {
-            itemClickListner = (ForecastItemClickListener)context;
+            itemClickListener = (ForecastItemClickListener)context;
         } catch (ClassCastException e) {
             e.printStackTrace();
         }

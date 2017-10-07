@@ -10,9 +10,7 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.preference.PreferenceManager;
-import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
-import android.util.Base64;
 import android.util.Log;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -33,7 +31,6 @@ import java.util.List;
 import java.util.Locale;
 
 import retrofit2.Call;
-import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -102,6 +99,7 @@ public class SyncOWMService extends IntentService implements OnSuccessListener<L
                 e.printStackTrace();
             }
         }
+        sp.edit().putLong(getString(R.string.last_update_date_key), System.currentTimeMillis()).apply();
     }
 
     /*
@@ -185,9 +183,10 @@ public class SyncOWMService extends IntentService implements OnSuccessListener<L
             CurrentWeatherModel currentWeatherModelResponse = response.body();
             ContentValues cv = currentWeatherModelResponse.getEquivalentCV();
             SharedPreferences weatherSP = getSharedPreferences("weather_display_pref", MODE_PRIVATE);
-            weatherSP.edit().putLong("sunrise_current", currentWeatherModelResponse.sysCurrent.sunrise).
-                    putLong("sunset_current", currentWeatherModelResponse.sysCurrent.sunset).
-                    putString("icon_id", currentWeatherModelResponse.weather.get(0).icon).apply();
+            weatherSP.edit().putLong(getString(R.string.current_weather_sunrise_key), currentWeatherModelResponse.sysCurrent.sunrise).
+                    putLong(getString(R.string.current_weather_sunset_key), currentWeatherModelResponse.sysCurrent.sunset).
+                    putString(getString(R.string.current_weather_icon_id_key), currentWeatherModelResponse.weather.get(0).icon).
+                    putLong(getString(R.string.current_weather_visibility), currentWeatherModelResponse.visibility).apply();
             String where = "_ID=?";
             String[] selectionArgs = new String[]{"1"};
             if(UPDATE_ACTION.equals(mIntent.getAction())){
