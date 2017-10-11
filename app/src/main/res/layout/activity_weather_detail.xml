@@ -20,6 +20,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:theme="@style/AppTheme.AppBarOverlay"
+        android:transitionName="APP_BAR"
         app:elevation="0dp">
 
         <android.support.v7.widget.Toolbar
@@ -48,7 +49,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        android:background="@color/colorPrimary"
+        android:id="@+id/detail_background_layout"
         android:transitionName="@string/background_transition_name"
         android:transitionGroup="false"
         tools:context="com.kodatos.cumulonimbus.WeatherDetailActivity">

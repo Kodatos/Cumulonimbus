@@ -114,18 +114,15 @@ public class SyncOWMService extends IntentService implements OnSuccessListener<L
         final Call<CurrentWeatherModel> currentWeatherModelCall = weatherAPIService.getCurrentWeatherByCoords(lat,lon,API_KEY, units);
         Log.d(LOG_TAG, currentWeatherModelCall.request().url().toString());
         final Call<ForecastWeatherModel> forecastWeatherModelCall = weatherAPIService.getForecastWeatherByCoords(lat,lon,API_KEY, units);
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    handleCurrentWeatherResponse(currentWeatherModelCall);
-                    handleForecastWeatherResponse(forecastWeatherModelCall);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                MiscUtils.getAddressFromLatLong(lat,lon,SyncOWMService.this);
-                getUVIndex(lat, lon);
+        new Thread(() -> {
+            try {
+                handleCurrentWeatherResponse(currentWeatherModelCall);
+                handleForecastWeatherResponse(forecastWeatherModelCall);
+            } catch (Exception e) {
+                e.printStackTrace();
             }
+            MiscUtils.getAddressFromLatLong(lat,lon,SyncOWMService.this);
+            getUVIndex(lat, lon);
         }).start();
     }
 

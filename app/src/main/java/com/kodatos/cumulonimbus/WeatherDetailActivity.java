@@ -19,6 +19,7 @@ import org.parceler.Parcels;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.TimeZone;
 
 public class WeatherDetailActivity extends AppCompatActivity {
 
@@ -29,20 +30,20 @@ public class WeatherDetailActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_weather_detail);
-        supportPostponeEnterTransition();
+        postponeEnterTransition();
 
         Fade fade = new Fade();
         fade.setDuration(1000);
-        fade.excludeTarget(mBinding.appBarDetail.getId(), true);
         fade.excludeTarget(android.R.id.statusBarBackground, true);
         fade.excludeTarget(android.R.id.navigationBarBackground, true);
         getWindow().setEnterTransition(fade);
         getWindow().setExitTransition(fade);
+        getWindow().setReturnTransition(fade);
+        getWindow().setReenterTransition(fade);
 
         setSupportActionBar(mBinding.toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
         mBinding.weatherImageView.setTransitionName(getIntent().getStringExtra(getString(R.string.forecats_image_transistion_key)));
-        mBinding.appBarDetail.setTransitionName("APP_BAR");
         mModel = Parcels.unwrap(getIntent().getParcelableExtra(getString(R.string.weather_detail_parcel_name)));
         bindData();
     }
@@ -53,13 +54,14 @@ public class WeatherDetailActivity extends AppCompatActivity {
         boolean metric = sp.getBoolean(getString(R.string.pref_metrics_key), true);
         Calendar calendar = new GregorianCalendar();
         calendar.setTime(new Date(sp.getLong(getString(R.string.last_update_date_key),0)));
-        int forecastToDisplayIndex = (calendar.get(Calendar.HOUR_OF_DAY)/3)-1;
+        calendar.setTimeZone(TimeZone.getTimeZone("UTC"));
+        int forecastToDisplayIndex = calendar.get(Calendar.HOUR_OF_DAY)/3;
         int imageId = getResources().getIdentifier("ic_"+mModel.getIcon_id().split("/")[forecastToDisplayIndex],"drawable", getPackageName());
         int iconTint = getIconTint(mModel.getIcon_id().split("/")[forecastToDisplayIndex]);
         DetailActivityDataModel bindingModel = MiscUtils.getDetailModelfromDBModel(mModel, day, imageId, iconTint, metric, forecastToDisplayIndex);
         Log.d(getClass().getName(), bindingModel.tempMain+" "+bindingModel.tempMin+" "+bindingModel.tempMax);
         mBinding.setDataModel(bindingModel);
-        supportStartPostponedEnterTransition();
+        startPostponedEnterTransition();
     }
 
     private int getIconTint(String iconID){

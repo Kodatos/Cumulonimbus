@@ -40,9 +40,6 @@ public class ForecastWeatherModel {
      */
     public ContentValues getEquivalentCV(int day){
         ContentValues cv = new ContentValues();
-        ForecastList fl = forecastList.get(day*8);
-        Weather w = fl.weather.get(0);
-        Main m = fl.main;
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
         Calendar calendar = new GregorianCalendar();
         calendar.setTime(new Date());
@@ -61,6 +58,9 @@ public class ForecastWeatherModel {
             cv.put(WeatherDBContract.WeatherDBEntry.COLUMN_RAIN_3H, netRain3h);
             return cv;
         }
+        ForecastList fl = forecastList.get((day*8)-1);
+        Weather w = fl.weather.get(0);
+        Main m = fl.main;
         for(ForecastList flist : forecastList){
             if(flist.dtTxt.contains(required)){
                 if (flist.rain != null)

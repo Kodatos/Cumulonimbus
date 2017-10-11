@@ -6,6 +6,7 @@ import android.location.Geocoder;
 import android.util.Log;
 
 import com.kodatos.cumulonimbus.apihelper.DBModel;
+import com.kodatos.cumulonimbus.uihelper.CurrentWeatherLayoutDataModel;
 import com.kodatos.cumulonimbus.uihelper.DetailActivityDataModel;
 
 import java.io.IOException;
@@ -27,7 +28,7 @@ public class MiscUtils {
      * @param usefulTempinString Temperature in Kelvin to convert
      * @return A Spanned object with temperature and degree symbol in superscript
      */
-    @SuppressWarnings("deprecation")
+
     public static String makeTemperaturePretty(String usefulTempinString, boolean metric){
         String unit = metric ? "\u2103" : "\u2109";
         return usefulTempinString + unit;
@@ -45,11 +46,7 @@ public class MiscUtils {
     }
 
     public static DetailActivityDataModel getDetailModelfromDBModel(DBModel dbModel, int day, int imageId, int iconTint, boolean metric, int forecastToDisplayIndex){
-        Calendar calendar = new GregorianCalendar();
-        calendar.setTime(new Date());
-        calendar.add(Calendar.DATE, day);
-        SimpleDateFormat sf = new SimpleDateFormat("EEE, d MMM", Locale.getDefault());
-        String date = sf.format(calendar.getTime());
+        String date = getPatternDate("EEE, d MMM", day);
         String tempMain = dbModel.getTempList().split("/")[forecastToDisplayIndex];
         String unit = makeTemperaturePretty("", metric);
         String tempMin = String.valueOf(Math.round(dbModel.getTemp_min()));
@@ -65,6 +62,33 @@ public class MiscUtils {
         String rain = "Rain: "+String.valueOf(new DecimalFormat("#.##").format(dbModel.getRain_3h()))+" mm";
         String clouds = "Cloudiness: "+String.valueOf(dbModel.getClouds())+"%";
         return new DetailActivityDataModel(date, imageId, dbModel.getWeather_main(), dbModel.getWeather_desc(), tempMain, unit, tempMin, tempMax, windDescription, windDirection, iconTint, windValue, pressure, humidity, UV, UVRisk, rain, clouds);
+    }
+
+    public static CurrentWeatherLayoutDataModel getCurrentWeatherDataFromDBModel(DBModel dbModel, int imageId, boolean metric, long visibility, String sunrise, String sunset, String lastUpdated){
+        String date = getPatternDate("dd MMMM, YYYY", 0);
+        String tempMain = makeTemperaturePretty(dbModel.getTempList(), metric);
+        String tempMin = String.valueOf(Math.round(dbModel.getTemp_min()));
+        String tempMax = String.valueOf(Math.round(dbModel.getTemp_max()));
+        String[] windData = dbModel.getWind().split("/");
+        String windDescription = windClassifier(Double.parseDouble(windData[0]));
+        float windDirection = Float.parseFloat(windData[1]);
+        String windValue = windData[0] + (metric ? " m/s" : " mi/h");
+        String humidity = String.valueOf(dbModel.getHumidity())+"%";
+        String pressure = String.valueOf((int)dbModel.getPressure())+"mb";
+        String UVIndexValue = String.valueOf(dbModel.getUvIndex());
+        String UVwithRisk = "UV Index: "+UVClassifier(dbModel.getUvIndex());
+        String rain = dbModel.getRain_3h()== -1 ? "Loading" : String.valueOf(new DecimalFormat("#.##").format(dbModel.getRain_3h()))+" mm";
+        String clouds = String.valueOf(dbModel.getClouds())+"%";
+        String visibilityInKM = String.valueOf(new DecimalFormat("#.#").format((float)visibility/1000.0))+" km";
+        return new CurrentWeatherLayoutDataModel(date, imageId, dbModel.getWeather_main(), dbModel.getWeather_desc(), tempMain, null, tempMin, tempMax, windDescription, windDirection,0, windValue, pressure, humidity, UVIndexValue, UVwithRisk, rain, clouds, visibilityInKM, sunrise, sunset, lastUpdated);
+    }
+
+    public static String getPatternDate(String pattern, int dayOffset){
+        Calendar calendar = new GregorianCalendar();
+        calendar.setTime(new Date());
+        calendar.add(Calendar.DATE, dayOffset);
+        SimpleDateFormat sf = new SimpleDateFormat(pattern, Locale.getDefault());
+        return sf.format(calendar.getTime());
     }
 
     public static String windClassifier(double speed){
@@ -116,13 +140,30 @@ public class MiscUtils {
         return number>=lower && number<=upper;
     }
 
-    public static long getUpdateDateAndHour(int what){
-        Calendar calendar = new GregorianCalendar();
-        calendar.setTime(new Date());
-        switch (what){
-            case 1 : return calendar.get(Calendar.HOUR_OF_DAY);
-            case 121 : return calendar.getTimeInMillis();
-        }
-        return what;
+    /**
+     * Utility method to generate appropriate last updated message based on time passed since last update
+     * @param currentMillis Time at which message is required, in milliseconds
+     * @param lastUpdatedMillis Time of last update, in milliseconds
+     * @return The required String message
+     */
+    public static String getLastUpdatedStringFromMillis(long currentMillis, long lastUpdatedMillis){
+        long second = 1000;
+        long minute = second*60;
+        long hour = minute*60;
+        long day = hour*24;
+        long difference = currentMillis - lastUpdatedMillis;
+        if(difference<=10*second)
+            return "Moments ago";
+        else if(difference<=minute)
+            return String.valueOf(difference/second)+" seconds ago";
+        else if(difference<=hour)
+            return String.valueOf(difference/minute)+" minutes ago";
+        else if(difference<=day)
+            return String.valueOf(difference/hour)+" hours ago";
+        else if(difference<=10*day)
+            return String.valueOf(difference/day)+" day(s) ago";
+        else
+            return "Long ago";
     }
+
 }

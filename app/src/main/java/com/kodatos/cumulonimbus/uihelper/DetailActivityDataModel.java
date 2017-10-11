@@ -1,7 +1,5 @@
 package com.kodatos.cumulonimbus.uihelper;
 
-import android.text.Spanned;
-
 public class DetailActivityDataModel {
     public String date;
     public int weatherImageID;

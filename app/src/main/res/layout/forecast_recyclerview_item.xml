@@ -10,6 +10,7 @@
 <android.support.constraint.ConstraintLayout
     android:id="@+id/itemConstraintLayout"
     android:layout_width="match_parent"
+    android:transitionGroup="false"
     android:layout_height="80dp"
     tools:layout_editor_absoluteY="0dp"
     tools:layout_editor_absoluteX="0dp">

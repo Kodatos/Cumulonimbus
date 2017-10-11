@@ -3,13 +3,11 @@ package com.kodatos.cumulonimbus;
 import android.Manifest;
 import android.app.ActivityOptions;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.databinding.DataBindingUtil;
-import android.graphics.Typeface;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -21,7 +19,6 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.support.v4.view.ViewCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -39,16 +36,24 @@ import com.kodatos.cumulonimbus.apihelper.DBModel;
 import com.kodatos.cumulonimbus.apihelper.SyncOWMService;
 import com.kodatos.cumulonimbus.databinding.ActivityMainBinding;
 import com.kodatos.cumulonimbus.datahelper.WeatherDBContract;
+import com.kodatos.cumulonimbus.uihelper.CurrentWeatherLayoutDataModel;
 import com.kodatos.cumulonimbus.uihelper.MainRecyclerViewAdapter;
+import com.kodatos.cumulonimbus.utils.MiscUtils;
 
 import org.parceler.Parcels;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+import java.util.TimeZone;
 
 public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>
         , SharedPreferences.OnSharedPreferenceChangeListener, MainRecyclerViewAdapter.ForecastItemClickListener {
 
     private ActivityMainBinding mBinding;
     private MainRecyclerViewAdapter mAdapter = null;
-    private SharedPreferences mSharedPreferences;
+    private SharedPreferences defaultSharedPreferences;
+    private SharedPreferences weatherSharedPreferences;
     private static final int LOADER_ID = 301;
 
     @Override
@@ -60,16 +65,15 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
         Fade fade = new Fade();
         fade.setDuration(1000);
-        fade.excludeTarget(mBinding.appBarMain.getId(), true);
-        fade.excludeTarget(android.R.id.statusBarBackground, true);
-        fade.excludeTarget(android.R.id.navigationBarBackground, true);
+        fade.addTarget(mBinding.currentLayout.currentLayoutAlwaysVisible);
         getWindow().setEnterTransition(fade);
         getWindow().setExitTransition(fade);
+        getWindow().setReturnTransition(fade);
+        getWindow().setReenterTransition(fade);
 
-        Typeface tf = Typeface.createFromAsset(getAssets(), "fonts/Pacifico-Regular.ttf");
-        mBinding.toolbarTitle.setTypeface(tf);
-        mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        mSharedPreferences.registerOnSharedPreferenceChangeListener(this);
+        defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        weatherSharedPreferences = getSharedPreferences("weather_display_pref", MODE_PRIVATE);
+        defaultSharedPreferences.registerOnSharedPreferenceChangeListener(this);
         LinearLayoutManager lm = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         mBinding.testMainRecyclerview.setLayoutManager(lm);
         mAdapter = new MainRecyclerViewAdapter(this);
@@ -109,13 +113,13 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     @Override
     protected void onResume() {
-        mSharedPreferences.registerOnSharedPreferenceChangeListener(this);
+        defaultSharedPreferences.registerOnSharedPreferenceChangeListener(this);
         super.onResume();
     }
 
     @Override
     protected void onStop() {
-        mSharedPreferences.unregisterOnSharedPreferenceChangeListener(this);
+        defaultSharedPreferences.unregisterOnSharedPreferenceChangeListener(this);
         super.onStop();
     }
 
@@ -153,7 +157,10 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         if(data.getCount()==0){
             startSync(0);
         }
-        mAdapter.swapCursor(data);
+        else {
+            mAdapter.swapCursor(data);
+            bindCurrentWeatherData();
+        }
     }
 
     @Override
@@ -184,13 +191,10 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(title)
                 .setMessage(message)
-                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                        if(kill==0)
-                            finish();
-                    }
+                .setPositiveButton("OK", (dialog, which) -> {
+                    dialog.dismiss();
+                    if(kill==0)
+                        finish();
                 });
         builder.create().show();
     }
@@ -202,16 +206,32 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         String imageTransitionName =  String.valueOf(position)+"forecast_image";
         Intent intent = new Intent(this, WeatherDetailActivity.class);
         ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(this,
-                Pair.create((View)forecastImageView, imageTransitionName),
-                Pair.create((View)mBinding.forecastCard, ViewCompat.getTransitionName(mBinding.forecastCard)),
-                Pair.create((View)mBinding.backgroundConstaintlayout, ViewCompat.getTransitionName(mBinding.backgroundConstaintlayout)),
-                Pair.create(findViewById(android.R.id.statusBarBackground), Window.STATUS_BAR_BACKGROUND_TRANSITION_NAME),
-                Pair.create(findViewById(android.R.id.navigationBarBackground), Window.NAVIGATION_BAR_BACKGROUND_TRANSITION_NAME),
-                Pair.create((View)mBinding.appBarMain, "APP_BAR")
+                Pair.create(forecastImageView, imageTransitionName),
+                Pair.create(mBinding.forecastCard, mBinding.forecastCard.getTransitionName()),
+                Pair.create((View) findViewById(android.R.id.statusBarBackground), Window.STATUS_BAR_BACKGROUND_TRANSITION_NAME),
+                Pair.create((View) findViewById(android.R.id.navigationBarBackground), Window.NAVIGATION_BAR_BACKGROUND_TRANSITION_NAME),
+                Pair.create(mBinding.appBarMain, mBinding.appBarMain.getTransitionName())
                 );
         intent.putExtra(getString(R.string.weather_detail_parcel_name), Parcels.wrap(intentModel));
         intent.putExtra(getString(R.string.weather_detail_day_name), position);
         intent.putExtra(getString(R.string.forecats_image_transistion_key), imageTransitionName);
         startActivity(intent, options.toBundle());
+    }
+
+    private void bindCurrentWeatherData(){
+        DBModel intermediateModel = mAdapter.getDBModelFromCursor(0);
+        boolean metric = PreferenceManager.getDefaultSharedPreferences(this).getBoolean(getString(R.string.pref_metrics_key), true);
+        int imageId = getResources().getIdentifier("ic_"+intermediateModel.getIcon_id(),"drawable", getPackageName());
+        long visibility = weatherSharedPreferences.getLong(getString(R.string.current_weather_visibility), 0);
+        SimpleDateFormat sf = new SimpleDateFormat("H:mm", Locale.getDefault());
+        sf.setTimeZone(TimeZone.getDefault());
+        long sunriseInMillis = weatherSharedPreferences.getLong(getString(R.string.current_weather_sunrise_key), 0)*1000;
+        long sunsetInMillis = weatherSharedPreferences.getLong(getString(R.string.current_weather_sunset_key), 0)*1000;
+        Date sunriseDate = new Date(sunriseInMillis);
+        String sunrise = sf.format(sunriseDate);
+        String sunset = sf.format(new Date(sunsetInMillis));
+        String lastUpdated = MiscUtils.getLastUpdatedStringFromMillis(System.currentTimeMillis(), defaultSharedPreferences.getLong(getString(R.string.last_update_date_key), 0));
+        CurrentWeatherLayoutDataModel layoutDataModel = MiscUtils.getCurrentWeatherDataFromDBModel(intermediateModel, imageId, metric, visibility, sunrise, sunset, lastUpdated);
+        mBinding.setCurrentWeatherData(layoutDataModel);
     }
 }

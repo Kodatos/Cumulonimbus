@@ -9,16 +9,25 @@
         <item name="android:navigationBarColor">@color/colorPrimaryDark</item>
         <item name="android:statusBarColor">@color/colorPrimaryDark</item>
 
+        <item name="android:windowActivityTransitions">true</item>
         <item name="android:windowContentTransitions">true</item>
         <item name="android:windowSharedElementsUseOverlay">false</item>
+        <item name="android:windowAllowEnterTransitionOverlap">true</item>
+        <item name="android:windowAllowReturnTransitionOverlap">true</item>
 
         <item name="android:windowSharedElementEnterTransition">@transition/detail_shared_transition</item>
         <item name="android:windowSharedElementExitTransition">@transition/detail_shared_transition</item>
+        <item name="android:windowSharedElementReturnTransition">@transition/detail_shared_transition</item>
+        <item name="android:windowSharedElementReenterTransition">@transition/detail_shared_transition</item>
     </style>
 
     <style name="AppTheme.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="AppTheme.NoActionBar.ColouredBackground">
+        <item name="android:windowBackground">@color/colorPrimary</item>
     </style>
 
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />

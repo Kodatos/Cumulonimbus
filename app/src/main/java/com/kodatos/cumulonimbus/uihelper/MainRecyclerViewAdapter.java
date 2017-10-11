@@ -21,6 +21,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Locale;
+import java.util.TimeZone;
 
 public class MainRecyclerViewAdapter extends RecyclerView.Adapter<MainRecyclerViewAdapter.MainRecyclerViewHolder> implements View.OnClickListener{
 
@@ -49,7 +50,8 @@ public class MainRecyclerViewAdapter extends RecyclerView.Adapter<MainRecyclerVi
             SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(mContext);
             boolean metric = sp.getBoolean(mContext.getString(R.string.pref_metrics_key), true);
             calendar.setTime(new Date(sp.getLong(mContext.getString(R.string.last_update_date_key),0)));
-            int forecastToDisplayIndex = (calendar.get(Calendar.HOUR_OF_DAY)/3)-1;
+            calendar.setTimeZone(TimeZone.getTimeZone("UTC"));
+            int forecastToDisplayIndex = calendar.get(Calendar.HOUR_OF_DAY)/3;
             int imageId = mContext.getResources().getIdentifier("ic_"+dbModel.getIcon_id().split("/")[forecastToDisplayIndex],"drawable",mContext.getPackageName());
             DBModelCalculatedData calculatedData = new DBModelCalculatedData(imageId, MiscUtils.makeTemperaturePretty(dbModel.getTempList().split("/")[forecastToDisplayIndex], metric), displayDay, dbModel.getWeather_main(), dbModel.getWeather_desc());
             binding.setCalculateddata(calculatedData);
@@ -108,7 +110,7 @@ public class MainRecyclerViewAdapter extends RecyclerView.Adapter<MainRecyclerVi
      * @param position Position for which data is required
      * @return A DBModel object containing required display data
      */
-    private DBModel getDBModelFromCursor(int position) {
+    public DBModel getDBModelFromCursor(int position) {
         mCursor.moveToPosition(position);
         long id = mCursor.getLong(mCursor.getColumnIndex(WeatherDBContract.WeatherDBEntry._ID));
         String main = mCursor.getString(mCursor.getColumnIndex(WeatherDBContract.WeatherDBEntry.COLUMN_WEATHER_MAIN));
