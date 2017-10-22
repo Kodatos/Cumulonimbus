@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:bind="http://schemas.android.com/apk/res-auto"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
-    xmlns:bind="http://schemas.android.com/apk/res-auto">
+    xmlns:tools="http://schemas.android.com/tools">
 
     <data>
         <variable
@@ -21,8 +21,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:theme="@style/AppTheme.AppBarOverlay"
-        app:elevation="0dp"
-        android:transitionName="APP_BAR">
+        android:transitionName="APP_BAR"
+        app:elevation="0dp">
 
         <android.support.v7.widget.Toolbar
             android:id="@+id/toolbar_main"
@@ -36,56 +36,67 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
+                android:layout_marginBottom="8dp"
                 android:text="@string/app_name"
-                app:fontFamily="@font/pacifico"
-                android:textSize="30sp"
                 android:textColor="#FFFFFFFF"
-                android:layout_marginBottom="8dp"/>
+                android:textSize="30sp"
+                app:fontFamily="@font/pacifico" />
 
         </android.support.v7.widget.Toolbar>
 
     </android.support.design.widget.AppBarLayout>
-    <android.support.v4.widget.NestedScrollView
+
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/mainUISwipeRefreshLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
-    <android.support.constraint.ConstraintLayout
-        android:id="@+id/background_constaintlayout"
-        android:transitionName="@string/background_transition_name"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:context="com.kodatos.cumulonimbus.MainActivity"
-        tools:showIn="@layout/activity_main">
 
-        <include
-            layout="@layout/current_weather_layout"
-            android:id="@+id/currentLayout"
-            bind:currentWeatherData="@{currentWeatherData}"/>
+        <android.support.v4.widget.NestedScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:overScrollMode="never">
 
-        <android.support.v7.widget.CardView
-            android:id="@+id/forecast_card"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:layout_marginLeft="16dp"
-            android:layout_marginRight="16dp"
-            android:transitionName="@string/cardview_transition_name"
-            android:transitionGroup="false"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/currentLayout"
-            card_view:cardCornerRadius="4dp">
-
-            <android.support.v7.widget.RecyclerView
-                android:id="@+id/test_main_recyclerview"
+            <android.support.constraint.ConstraintLayout
+                android:id="@+id/background_constaintlayout"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="16dp"
-                android:layout_marginStart="16dp" />
+                android:layout_height="match_parent"
+                android:animateLayoutChanges="true"
+                android:transitionName="@string/background_transition_name"
+                tools:context="com.kodatos.cumulonimbus.MainActivity"
+                tools:showIn="@layout/activity_main">
 
-        </android.support.v7.widget.CardView>
-    </android.support.constraint.ConstraintLayout>
-    </android.support.v4.widget.NestedScrollView>
+                <include
+                    android:id="@+id/currentLayout"
+                    layout="@layout/current_weather_layout"
+                    bind:currentWeatherData="@{currentWeatherData}" />
+
+                <android.support.v7.widget.CardView
+                    android:id="@+id/forecast_card"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginRight="16dp"
+                    android:layout_marginTop="24dp"
+                    android:transitionGroup="false"
+                    android:transitionName="@string/cardview_transition_name"
+                    app:layout_constraintHorizontal_bias="0.0"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/currentLayout"
+                    card_view:cardCornerRadius="4dp">
+
+                    <android.support.v7.widget.RecyclerView
+                        android:id="@+id/test_main_recyclerview"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="16dp"
+                        android:layout_marginEnd="16dp"
+                        android:layout_marginStart="16dp" />
+
+                </android.support.v7.widget.CardView>
+            </android.support.constraint.ConstraintLayout>
+        </android.support.v4.widget.NestedScrollView>
+    </android.support.v4.widget.SwipeRefreshLayout>
 </android.support.design.widget.CoordinatorLayout>
 </layout>

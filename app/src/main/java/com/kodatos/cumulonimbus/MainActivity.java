@@ -1,6 +1,10 @@
 package com.kodatos.cumulonimbus;
 
 import android.Manifest;
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.ArgbEvaluator;
+import android.animation.ValueAnimator;
 import android.app.ActivityOptions;
 import android.content.Context;
 import android.content.Intent;
@@ -28,7 +32,7 @@ import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
+import android.view.ViewTreeObserver;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -50,11 +54,13 @@ import java.util.TimeZone;
 public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>
         , SharedPreferences.OnSharedPreferenceChangeListener, MainRecyclerViewAdapter.ForecastItemClickListener {
 
+    private static final int LOADER_ID = 301;
     private ActivityMainBinding mBinding;
     private MainRecyclerViewAdapter mAdapter = null;
     private SharedPreferences defaultSharedPreferences;
     private SharedPreferences weatherSharedPreferences;
-    private static final int LOADER_ID = 301;
+    private int previousBackgroundColor;
+    private int hiddenLayoutHeight;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,6 +68,15 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_main);
         setSupportActionBar(mBinding.toolbarMain);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
+
+        mBinding.currentLayout.currentHiddenLayout.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                hiddenLayoutHeight = mBinding.currentLayout.currentHiddenLayout.getHeight();
+                mBinding.currentLayout.currentHiddenLayout.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                mBinding.currentLayout.currentHiddenLayout.setVisibility(View.GONE);
+            }
+        });
 
         Fade fade = new Fade();
         fade.setDuration(1000);
@@ -73,6 +88,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
         defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         weatherSharedPreferences = getSharedPreferences("weather_display_pref", MODE_PRIVATE);
+        int currentBackgroundColor = MiscUtils.getBackgroundColorForIconID(this, weatherSharedPreferences.getString(getString(R.string.current_weather_icon_id_key), "01d"));
+        changeBackgroundColorWithAnimation(currentBackgroundColor);
         defaultSharedPreferences.registerOnSharedPreferenceChangeListener(this);
         LinearLayoutManager lm = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         mBinding.testMainRecyclerview.setLayoutManager(lm);
@@ -83,6 +100,36 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         }
         else
             getSupportLoaderManager().initLoader(LOADER_ID,null,this);
+
+        mBinding.mainUISwipeRefreshLayout.setOnRefreshListener(() -> startSync(1));
+        mBinding.currentLayout.expandArrow.setOnClickListener(v -> {
+            int toVisibility = mBinding.currentLayout.currentHiddenLayout.getVisibility() == View.GONE ? View.VISIBLE : View.GONE;
+            float toAlpha = toVisibility == View.GONE ? 0.0f : 1.0f;
+            mBinding.currentLayout.currentHiddenLayout.animate().alpha(toAlpha).setDuration(500).setListener(new AnimatorListenerAdapter() {
+
+                @Override
+                public void onAnimationStart(Animator animation) {
+                    super.onAnimationStart(animation);
+                    if (toVisibility == View.VISIBLE)
+                        mBinding.currentLayout.currentHiddenLayout.setVisibility(toVisibility);
+                }
+
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    super.onAnimationEnd(animation);
+                    if (toVisibility == View.GONE) {
+                        mBinding.currentLayout.currentHiddenLayout.setVisibility(toVisibility);
+                        mBinding.forecastCard.setTranslationY(0);
+                        v.setTranslationY(0);
+                    }
+                    v.animate().rotation(v.getRotation() == 180 ? 0 : 180);
+                }
+            }).setUpdateListener(animation -> {
+                float translation = toVisibility == View.VISIBLE ? -hiddenLayoutHeight + animation.getAnimatedFraction() * hiddenLayoutHeight : -animation.getAnimatedFraction() * hiddenLayoutHeight;
+                mBinding.forecastCard.setTranslationY(translation);
+                v.setTranslationY(translation);
+            });
+        });
     }
 
     @Override
@@ -105,6 +152,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 startActivity(intent);
                 break;
             case R.id.action_refresh:
+                mBinding.mainUISwipeRefreshLayout.setRefreshing(true);
                 startSync(1);
         }
 
@@ -132,6 +180,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     public void startSync(final int action){
         if(!getConnectionStatus()){
             displayDialogMessage("No Internet Connection Available", "An internet connection is needed for updating. Try again later", action);
+            mBinding.mainUISwipeRefreshLayout.setRefreshing(false);
             return;
         }
         Intent intent = new Intent(this, SyncOWMService.class);
@@ -158,6 +207,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             startSync(0);
         }
         else {
+            mBinding.mainUISwipeRefreshLayout.setRefreshing(false);
             mAdapter.swapCursor(data);
             bindCurrentWeatherData();
         }
@@ -207,10 +257,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         Intent intent = new Intent(this, WeatherDetailActivity.class);
         ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(this,
                 Pair.create(forecastImageView, imageTransitionName),
-                Pair.create(mBinding.forecastCard, mBinding.forecastCard.getTransitionName()),
-                Pair.create((View) findViewById(android.R.id.statusBarBackground), Window.STATUS_BAR_BACKGROUND_TRANSITION_NAME),
-                Pair.create((View) findViewById(android.R.id.navigationBarBackground), Window.NAVIGATION_BAR_BACKGROUND_TRANSITION_NAME),
-                Pair.create(mBinding.appBarMain, mBinding.appBarMain.getTransitionName())
+                Pair.create(mBinding.forecastCard, mBinding.forecastCard.getTransitionName())
                 );
         intent.putExtra(getString(R.string.weather_detail_parcel_name), Parcels.wrap(intentModel));
         intent.putExtra(getString(R.string.weather_detail_day_name), position);
@@ -231,7 +278,25 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         String sunrise = sf.format(sunriseDate);
         String sunset = sf.format(new Date(sunsetInMillis));
         String lastUpdated = MiscUtils.getLastUpdatedStringFromMillis(System.currentTimeMillis(), defaultSharedPreferences.getLong(getString(R.string.last_update_date_key), 0));
-        CurrentWeatherLayoutDataModel layoutDataModel = MiscUtils.getCurrentWeatherDataFromDBModel(intermediateModel, imageId, metric, visibility, sunrise, sunset, lastUpdated);
+        CurrentWeatherLayoutDataModel layoutDataModel = MiscUtils.getCurrentWeatherDataFromDBModel(this, intermediateModel, imageId, metric, visibility, sunrise, sunset, lastUpdated);
         mBinding.setCurrentWeatherData(layoutDataModel);
+        int updatedBackgroundColor = MiscUtils.getBackgroundColorForIconID(this, weatherSharedPreferences.getString(getString(R.string.current_weather_icon_id_key), "01d"));
+        changeBackgroundColorWithAnimation(updatedBackgroundColor);
+    }
+
+    private void changeBackgroundColorWithAnimation(int updatedBackgroundColor) {
+        if (updatedBackgroundColor != previousBackgroundColor) {
+            ValueAnimator backgroundColorAnimator = ValueAnimator.ofObject(new ArgbEvaluator(), previousBackgroundColor, updatedBackgroundColor);
+            backgroundColorAnimator.setDuration(1000);
+            backgroundColorAnimator.addUpdateListener(animation -> {
+                int currentColor = (int) animation.getAnimatedValue();
+                mBinding.toolbarMain.setBackgroundColor(currentColor);
+                getWindow().getDecorView().setBackgroundColor(currentColor);
+                getWindow().setStatusBarColor(currentColor);
+                getWindow().setNavigationBarColor(currentColor);
+            });
+            backgroundColorAnimator.start();
+        }
+        previousBackgroundColor = updatedBackgroundColor;
     }
 }

@@ -59,4 +59,10 @@
     <style name="MainUIText.RightSideText.BoldText">
         <item name="android:textStyle">bold</item>
     </style>
+
+    <style name="MainUISmallCategoryImageView">
+        <item name="android:scaleType">fitXY</item>
+        <item name="android:background">@drawable/circle_background</item>
+        <item name="android:padding">4dp</item>
+    </style>
 </resources>

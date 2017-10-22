@@ -3,8 +3,11 @@ package com.kodatos.cumulonimbus.utils;
 import android.content.Context;
 import android.location.Address;
 import android.location.Geocoder;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.graphics.ColorUtils;
 import android.util.Log;
 
+import com.kodatos.cumulonimbus.R;
 import com.kodatos.cumulonimbus.apihelper.DBModel;
 import com.kodatos.cumulonimbus.uihelper.CurrentWeatherLayoutDataModel;
 import com.kodatos.cumulonimbus.uihelper.DetailActivityDataModel;
@@ -45,7 +48,7 @@ public class MiscUtils {
         }
     }
 
-    public static DetailActivityDataModel getDetailModelfromDBModel(DBModel dbModel, int day, int imageId, int iconTint, boolean metric, int forecastToDisplayIndex){
+    public static DetailActivityDataModel getDetailModelfromDBModel(Context context, DBModel dbModel, int day, int imageId, boolean metric, int forecastToDisplayIndex) {
         String date = getPatternDate("EEE, d MMM", day);
         String tempMain = dbModel.getTempList().split("/")[forecastToDisplayIndex];
         String unit = makeTemperaturePretty("", metric);
@@ -61,10 +64,11 @@ public class MiscUtils {
         String UVRisk = "Risk: "+UVClassifier(dbModel.getUvIndex());
         String rain = "Rain: "+String.valueOf(new DecimalFormat("#.##").format(dbModel.getRain_3h()))+" mm";
         String clouds = "Cloudiness: "+String.valueOf(dbModel.getClouds())+"%";
+        int iconTint = MiscUtils.getIconTint(context, dbModel.getIcon_id().split("/")[forecastToDisplayIndex]);
         return new DetailActivityDataModel(date, imageId, dbModel.getWeather_main(), dbModel.getWeather_desc(), tempMain, unit, tempMin, tempMax, windDescription, windDirection, iconTint, windValue, pressure, humidity, UV, UVRisk, rain, clouds);
     }
 
-    public static CurrentWeatherLayoutDataModel getCurrentWeatherDataFromDBModel(DBModel dbModel, int imageId, boolean metric, long visibility, String sunrise, String sunset, String lastUpdated){
+    public static CurrentWeatherLayoutDataModel getCurrentWeatherDataFromDBModel(Context context, DBModel dbModel, int imageId, boolean metric, long visibility, String sunrise, String sunset, String lastUpdated) {
         String date = getPatternDate("dd MMMM, YYYY", 0);
         String tempMain = makeTemperaturePretty(dbModel.getTempList(), metric);
         String tempMin = String.valueOf(Math.round(dbModel.getTemp_min()));
@@ -77,10 +81,11 @@ public class MiscUtils {
         String pressure = String.valueOf((int)dbModel.getPressure())+"mb";
         String UVIndexValue = String.valueOf(dbModel.getUvIndex());
         String UVwithRisk = "UV Index: "+UVClassifier(dbModel.getUvIndex());
-        String rain = dbModel.getRain_3h()== -1 ? "Loading" : String.valueOf(new DecimalFormat("#.##").format(dbModel.getRain_3h()))+" mm";
+        String rain = dbModel.getRain_3h() == -1 ? "" : String.valueOf(new DecimalFormat("#.##").format(dbModel.getRain_3h())) + " mm";
         String clouds = String.valueOf(dbModel.getClouds())+"%";
         String visibilityInKM = String.valueOf(new DecimalFormat("#.#").format((float)visibility/1000.0))+" km";
-        return new CurrentWeatherLayoutDataModel(date, imageId, dbModel.getWeather_main(), dbModel.getWeather_desc(), tempMain, null, tempMin, tempMax, windDescription, windDirection,0, windValue, pressure, humidity, UVIndexValue, UVwithRisk, rain, clouds, visibilityInKM, sunrise, sunset, lastUpdated);
+        int iconTint = ColorUtils.setAlphaComponent(getBackgroundColorForIconID(context, dbModel.getIcon_id()), 175);
+        return new CurrentWeatherLayoutDataModel(date, imageId, dbModel.getWeather_main(), dbModel.getWeather_desc(), tempMain, null, tempMin, tempMax, windDescription, windDirection, iconTint, windValue, pressure, humidity, UVIndexValue, UVwithRisk, rain, clouds, visibilityInKM, sunrise, sunset, lastUpdated);
     }
 
     public static String getPatternDate(String pattern, int dayOffset){
@@ -164,6 +169,52 @@ public class MiscUtils {
             return String.valueOf(difference/day)+" day(s) ago";
         else
             return "Long ago";
+    }
+
+    public static int getIconTint(Context context, String iconID) {
+        int colorRID = R.color.colorAccent;
+        if ("01d".equals(iconID))
+            colorRID = R.color._01d_icon_tint;
+        else if ("01n".equals(iconID))
+            colorRID = R.color._01n_icon_tint;
+        else if (iconID.contains("02"))
+            colorRID = R.color._02d_icon_tint;
+        else if (iconID.contains("03"))
+            colorRID = R.color._03d_icon_tint;
+        else if (iconID.contains("04"))
+            colorRID = R.color._04d_icon_tint;
+        else if (iconID.contains("09") || iconID.contains("10"))
+            colorRID = R.color._09d_icon_tint;
+        else if (iconID.contains("11"))
+            colorRID = R.color._11d_icon_tint;
+        else if (iconID.contains("13"))
+            colorRID = R.color._13d_icon_tint;
+        else if (iconID.contains("50"))
+            colorRID = R.color._50d_icon_tint;
+        return ContextCompat.getColor(context, colorRID);
+    }
+
+    public static int getBackgroundColorForIconID(Context context, String iconID) {
+        int colorRID = R.color.colorPrimary;
+        if ("01d".equals(iconID))
+            colorRID = R.color._01d_background;
+        else if ("01n".equals(iconID))
+            colorRID = R.color._01n_background;
+        else if (iconID.contains("02"))
+            colorRID = R.color._02d_background;
+        else if (iconID.contains("03"))
+            colorRID = R.color._03d_background;
+        else if (iconID.contains("04"))
+            colorRID = R.color._04d_background;
+        else if (iconID.contains("09") || iconID.contains("10"))
+            colorRID = R.color._09d_background;
+        else if (iconID.contains("11"))
+            colorRID = R.color._11d_background;
+        else if (iconID.contains("13"))
+            colorRID = R.color._13d_background;
+        else if (iconID.contains("50"))
+            colorRID = R.color._50d_background;
+        return ContextCompat.getColor(context, colorRID);
     }
 
 }
