@@ -17,6 +17,11 @@
     <string name="weather_detail_day_name">day</string>
     <string name="pressure">Pressure</string>
     <string name="humidity">Humidity</string>
+    <string name="rain_volume">Rain Volume</string>
+    <string name="cloudiness">Cloudiness</string>
+    <string name="sunrise">Sunrise</string>
+    <string name="sunset">Sunset</string>
+    <string name="visibility">Visibility</string>
 
     <string name="forecats_image_transistion_key">forecast_image_transition_name</string>
     <string name="cardview_transition_name">BackCardView</string>
@@ -26,4 +31,6 @@
     <string name="current_weather_sunset_key">sunset_in_utc</string>
     <string name="current_weather_icon_id_key">icon_id_for_back_color</string>
     <string name="current_weather_visibility">visibility_in_m</string>
+    <string name="location_name_key">Location in string</string>
+
 </resources>

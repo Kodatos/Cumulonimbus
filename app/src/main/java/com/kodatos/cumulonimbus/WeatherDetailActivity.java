@@ -60,7 +60,7 @@ public class WeatherDetailActivity extends AppCompatActivity {
         getWindow().setStatusBarColor(currentColor);
         getWindow().setNavigationBarColor(currentColor);
         int imageId = getResources().getIdentifier("ic_"+mModel.getIcon_id().split("/")[forecastToDisplayIndex],"drawable", getPackageName());
-        DetailActivityDataModel bindingModel = MiscUtils.getDetailModelfromDBModel(this, mModel, day, imageId, metric, forecastToDisplayIndex);
+        DetailActivityDataModel bindingModel = MiscUtils.getDetailModelFromDBModel(this, mModel, day, imageId, metric, forecastToDisplayIndex);
         Log.d(getClass().getName(), bindingModel.tempMain+" "+bindingModel.tempMin+" "+bindingModel.tempMax);
         mBinding.setDataModel(bindingModel);
         startPostponedEnterTransition();

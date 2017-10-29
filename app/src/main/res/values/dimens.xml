@@ -7,4 +7,5 @@
     <dimen name="detailui_icon_size2">64dp</dimen>
     <dimen name="detailui_text_size_secondary">16sp</dimen>
 
+    <dimen name="common_card_margin_bottom">16dp</dimen>
 </resources>

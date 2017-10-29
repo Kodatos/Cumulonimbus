@@ -5,7 +5,6 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.ColorUtils;
-import android.util.Log;
 
 import com.kodatos.cumulonimbus.R;
 import com.kodatos.cumulonimbus.apihelper.DBModel;
@@ -27,7 +26,7 @@ import java.util.Locale;
 public class MiscUtils {
 
     /**
-     * Converts given temperature for display purpose.
+     * Utility method to convert given temperature for display purpose.
      * @param usefulTempinString Temperature in Kelvin to convert
      * @return A Spanned object with temperature and degree symbol in superscript
      */
@@ -37,18 +36,27 @@ public class MiscUtils {
         return usefulTempinString + unit;
     }
 
-    public static void getAddressFromLatLong(double lat, double lon, Context context){
+    /**
+     * Utility method to get user friendly address from co-ordinates
+     *
+     * @param lat     Latitude of location
+     * @param lon     Longitude of location
+     * @param context Requesting context
+     * @return String containing locality and country
+     */
+    public static String getAddressFromLatLong(double lat, double lon, Context context) {
         Geocoder geocoder = new Geocoder(context, Locale.getDefault());
         try {
-            List<Address> addresses = geocoder.getFromLocation(lat,lon,1);
-            String toastMessage = addresses.get(0).getLocality()+", "+addresses.get(0).getCountryName();
-            Log.d("Location geocoded", toastMessage);
+            List<Address> addresses = geocoder.getFromLocation(lat, lon, 1);
+            return addresses.get(0).getSubLocality() + ", " + addresses.get(0).getLocality() + ", " + addresses.get(0).getCountryName();
         } catch (IOException e) {
             e.printStackTrace();
+            return "";
         }
     }
 
-    public static DetailActivityDataModel getDetailModelfromDBModel(Context context, DBModel dbModel, int day, int imageId, boolean metric, int forecastToDisplayIndex) {
+    public static DetailActivityDataModel getDetailModelFromDBModel(Context context, DBModel dbModel,
+                                                                    int day, int imageId, boolean metric, int forecastToDisplayIndex) {
         String date = getPatternDate("EEE, d MMM", day);
         String tempMain = dbModel.getTempList().split("/")[forecastToDisplayIndex];
         String unit = makeTemperaturePretty("", metric);
@@ -65,10 +73,12 @@ public class MiscUtils {
         String rain = "Rain: "+String.valueOf(new DecimalFormat("#.##").format(dbModel.getRain_3h()))+" mm";
         String clouds = "Cloudiness: "+String.valueOf(dbModel.getClouds())+"%";
         int iconTint = MiscUtils.getIconTint(context, dbModel.getIcon_id().split("/")[forecastToDisplayIndex]);
-        return new DetailActivityDataModel(date, imageId, dbModel.getWeather_main(), dbModel.getWeather_desc(), tempMain, unit, tempMin, tempMax, windDescription, windDirection, iconTint, windValue, pressure, humidity, UV, UVRisk, rain, clouds);
+        return new DetailActivityDataModel(date, imageId, dbModel.getWeather_main(), dbModel.getWeather_desc(), tempMain, unit, tempMin,
+                tempMax, windDescription, windDirection, iconTint, windValue, pressure, humidity, UV, UVRisk, rain, clouds);
     }
 
-    public static CurrentWeatherLayoutDataModel getCurrentWeatherDataFromDBModel(Context context, DBModel dbModel, int imageId, boolean metric, long visibility, String sunrise, String sunset, String lastUpdated) {
+    public static CurrentWeatherLayoutDataModel getCurrentWeatherDataFromDBModel(Context context, DBModel dbModel, int imageId,
+                                                                                 boolean metric, long visibility, String sunrise, String sunset, String lastUpdated, String locationAndIcon) {
         String date = getPatternDate("dd MMMM, YYYY", 0);
         String tempMain = makeTemperaturePretty(dbModel.getTempList(), metric);
         String tempMin = String.valueOf(Math.round(dbModel.getTemp_min()));
@@ -85,7 +95,9 @@ public class MiscUtils {
         String clouds = String.valueOf(dbModel.getClouds())+"%";
         String visibilityInKM = String.valueOf(new DecimalFormat("#.#").format((float)visibility/1000.0))+" km";
         int iconTint = ColorUtils.setAlphaComponent(getBackgroundColorForIconID(context, dbModel.getIcon_id()), 175);
-        return new CurrentWeatherLayoutDataModel(date, imageId, dbModel.getWeather_main(), dbModel.getWeather_desc(), tempMain, null, tempMin, tempMax, windDescription, windDirection, iconTint, windValue, pressure, humidity, UVIndexValue, UVwithRisk, rain, clouds, visibilityInKM, sunrise, sunset, lastUpdated);
+        return new CurrentWeatherLayoutDataModel(date, imageId, dbModel.getWeather_main(), dbModel.getWeather_desc(), tempMain,
+                null, tempMin, tempMax, windDescription, windDirection, iconTint, windValue, pressure, humidity,
+                UVIndexValue, UVwithRisk, rain, clouds, visibilityInKM, sunrise, sunset, lastUpdated, locationAndIcon);
     }
 
     public static String getPatternDate(String pattern, int dayOffset){
@@ -216,5 +228,4 @@ public class MiscUtils {
             colorRID = R.color._50d_background;
         return ContextCompat.getColor(context, colorRID);
     }
-
 }

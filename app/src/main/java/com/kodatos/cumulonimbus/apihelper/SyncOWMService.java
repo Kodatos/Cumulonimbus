@@ -42,20 +42,17 @@ import retrofit2.converter.gson.GsonConverterFactory;
  */
 public class SyncOWMService extends IntentService implements OnSuccessListener<Location>{
 
-    private Intent mIntent;
-    private WeatherAPIService weatherAPIService;
-    private String units;
-
-    //TODO Insert own OpenWeatherMap API_KEY here or make user enter one
-    private static String API_KEY;
     public static final String BASE_URL = "http://api.openweathermap.org/";
-
     //Action strings for use in caller function
     public static final String UPDATE_ACTION = "com.kodatos.cumulonimbus.apihelper.SyncOWMService.ACTION_UPDATE_DB";
     public static final String CREATE_ACTION = "com.kodatos.cumulonimbus.apihelper.SyncOWMService.ACTION_NEW_DB";
-
+    //TODO Insert own OpenWeatherMap API_KEY here or make user enter one
+    private static String API_KEY;
     //Tag for logging
     private final String LOG_TAG = getClass().getName();
+    private Intent mIntent;
+    private WeatherAPIService weatherAPIService;
+    private String units;
 
     public SyncOWMService() {
         super("SyncOWMService");
@@ -91,9 +88,9 @@ public class SyncOWMService extends IntentService implements OnSuccessListener<L
             //forecastWeatherModelCall.enqueue(mForecastWeatherCallback);
             Geocoder geocoder = new Geocoder(this, Locale.getDefault());
             try {
+                List<Address> addresses = geocoder.getFromLocationName(custom_location, 1);
                 handleCurrentWeatherResponse(currentWeatherModelCall);
                 handleForecastWeatherResponse(forecastWeatherModelCall);
-                List<Address> addresses = geocoder.getFromLocationName(custom_location, 1);
                 getUVIndex(addresses.get(0).getLatitude(), addresses.get(0).getLongitude());
             } catch (Exception e) {
                 e.printStackTrace();
@@ -116,12 +113,11 @@ public class SyncOWMService extends IntentService implements OnSuccessListener<L
         final Call<ForecastWeatherModel> forecastWeatherModelCall = weatherAPIService.getForecastWeatherByCoords(lat,lon,API_KEY, units);
         new Thread(() -> {
             try {
-                handleCurrentWeatherResponse(currentWeatherModelCall);
+                handleCurrentWeatherResponse(currentWeatherModelCall, lat, lon);
                 handleForecastWeatherResponse(forecastWeatherModelCall);
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            MiscUtils.getAddressFromLatLong(lat,lon,SyncOWMService.this);
             getUVIndex(lat, lon);
         }).start();
     }
@@ -129,8 +125,6 @@ public class SyncOWMService extends IntentService implements OnSuccessListener<L
     private void getUVIndex(double lat, double lon){
         Call<UVIndexModel> uvIndexModelCall = weatherAPIService.getCurrentUVIndex(lat, lon, API_KEY);
         Call<List<UVIndexModel>> uvIndexModelsCall = weatherAPIService.getForecastUVIndex(lat,lon,API_KEY,4);
-        //uvIndexModelCall.enqueue(new CurrentUVIndexCallback());
-        //uvIndexModelsCall.enqueue(new ForecastUVIndexCallback());
         try {
             Response<UVIndexModel> uvIndexModelResponse = uvIndexModelCall.execute();
             Response<List<UVIndexModel>> uvIndexModelsResponse = uvIndexModelsCall.execute();
@@ -174,16 +168,23 @@ public class SyncOWMService extends IntentService implements OnSuccessListener<L
         }
     }
 
-    private void handleCurrentWeatherResponse(Call<CurrentWeatherModel> call) throws IOException {
+    private void handleCurrentWeatherResponse(Call<CurrentWeatherModel> call, double... coords) throws IOException {
         Response<CurrentWeatherModel> response = call.execute();
         if(response.isSuccessful()){
             CurrentWeatherModel currentWeatherModelResponse = response.body();
             ContentValues cv = currentWeatherModelResponse.getEquivalentCV();
             SharedPreferences weatherSP = getSharedPreferences("weather_display_pref", MODE_PRIVATE);
+            String locationAndIcon;
+            if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean(this.getString(R.string.pref_curr_location_key), false)) {
+                locationAndIcon = MiscUtils.getAddressFromLatLong(coords[0], coords[1], this) + "/true";
+            } else {
+                locationAndIcon = PreferenceManager.getDefaultSharedPreferences(this).getString(getString(R.string.pref_custom_location_key), "") + "/false";
+            }
             weatherSP.edit().putLong(getString(R.string.current_weather_sunrise_key), currentWeatherModelResponse.sysCurrent.sunrise).
                     putLong(getString(R.string.current_weather_sunset_key), currentWeatherModelResponse.sysCurrent.sunset).
                     putString(getString(R.string.current_weather_icon_id_key), currentWeatherModelResponse.weather.get(0).icon).
-                    putLong(getString(R.string.current_weather_visibility), currentWeatherModelResponse.visibility).apply();
+                    putLong(getString(R.string.current_weather_visibility), currentWeatherModelResponse.visibility).
+                    putString(getString(R.string.location_name_key), locationAndIcon).apply();
             String where = "_ID=?";
             String[] selectionArgs = new String[]{"1"};
             if(UPDATE_ACTION.equals(mIntent.getAction())){
@@ -193,7 +194,6 @@ public class SyncOWMService extends IntentService implements OnSuccessListener<L
                 cv.put(WeatherDBContract.WeatherDBEntry.COLUMN_UV_INDEX, 0.0);
                 getContentResolver().insert(WeatherDBContract.WeatherDBEntry.CONTENT_URI,cv);
             }
-
         }
         else {
             JSONObject jsonError;

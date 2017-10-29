@@ -55,12 +55,16 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         , SharedPreferences.OnSharedPreferenceChangeListener, MainRecyclerViewAdapter.ForecastItemClickListener {
 
     private static final int LOADER_ID = 301;
+
     private ActivityMainBinding mBinding;
     private MainRecyclerViewAdapter mAdapter = null;
+
     private SharedPreferences defaultSharedPreferences;
     private SharedPreferences weatherSharedPreferences;
+
     private int previousBackgroundColor;
     private int hiddenLayoutHeight;
+    private boolean justOpened = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,8 +92,11 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
         defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         weatherSharedPreferences = getSharedPreferences("weather_display_pref", MODE_PRIVATE);
-        int currentBackgroundColor = MiscUtils.getBackgroundColorForIconID(this, weatherSharedPreferences.getString(getString(R.string.current_weather_icon_id_key), "01d"));
-        changeBackgroundColorWithAnimation(currentBackgroundColor);
+
+        previousBackgroundColor = MiscUtils.getBackgroundColorForIconID(this, weatherSharedPreferences.getString(getString(R.string.current_weather_icon_id_key), "01d"));
+        changeBackgroundColor(previousBackgroundColor);
+        //changeBackgroundColorWithAnimation(currentBackgroundColor);
+
         defaultSharedPreferences.registerOnSharedPreferenceChangeListener(this);
         LinearLayoutManager lm = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         mBinding.testMainRecyclerview.setLayoutManager(lm);
@@ -101,35 +108,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         else
             getSupportLoaderManager().initLoader(LOADER_ID,null,this);
 
-        mBinding.mainUISwipeRefreshLayout.setOnRefreshListener(() -> startSync(1));
-        mBinding.currentLayout.expandArrow.setOnClickListener(v -> {
-            int toVisibility = mBinding.currentLayout.currentHiddenLayout.getVisibility() == View.GONE ? View.VISIBLE : View.GONE;
-            float toAlpha = toVisibility == View.GONE ? 0.0f : 1.0f;
-            mBinding.currentLayout.currentHiddenLayout.animate().alpha(toAlpha).setDuration(500).setListener(new AnimatorListenerAdapter() {
-
-                @Override
-                public void onAnimationStart(Animator animation) {
-                    super.onAnimationStart(animation);
-                    if (toVisibility == View.VISIBLE)
-                        mBinding.currentLayout.currentHiddenLayout.setVisibility(toVisibility);
-                }
-
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    super.onAnimationEnd(animation);
-                    if (toVisibility == View.GONE) {
-                        mBinding.currentLayout.currentHiddenLayout.setVisibility(toVisibility);
-                        mBinding.forecastCard.setTranslationY(0);
-                        v.setTranslationY(0);
-                    }
-                    v.animate().rotation(v.getRotation() == 180 ? 0 : 180);
-                }
-            }).setUpdateListener(animation -> {
-                float translation = toVisibility == View.VISIBLE ? -hiddenLayoutHeight + animation.getAnimatedFraction() * hiddenLayoutHeight : -animation.getAnimatedFraction() * hiddenLayoutHeight;
-                mBinding.forecastCard.setTranslationY(translation);
-                v.setTranslationY(translation);
-            });
-        });
+        setUpUIInteractions();
     }
 
     @Override
@@ -169,6 +148,46 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     protected void onStop() {
         defaultSharedPreferences.unregisterOnSharedPreferenceChangeListener(this);
         super.onStop();
+    }
+
+    private void setUpUIInteractions() {
+        mBinding.mainUISwipeRefreshLayout.setOnRefreshListener(() -> startSync(1));
+
+        /* Enable animated view hiding by clicking on expand arrow */
+        mBinding.currentLayout.expandArrow.setOnClickListener(v -> {
+            //Decide on the visibility and alpha to achieve
+            int toVisibility = mBinding.currentLayout.currentHiddenLayout.getVisibility() == View.GONE ? View.VISIBLE : View.GONE;
+            float toAlpha = toVisibility == View.GONE ? 0.0f : 1.0f;
+
+            mBinding.currentLayout.currentHiddenLayout.animate().alpha(toAlpha).setDuration(500).setListener(new AnimatorListenerAdapter() {
+
+                @Override
+                public void onAnimationStart(Animator animation) {
+                    super.onAnimationStart(animation);
+                    if (toVisibility == View.VISIBLE)
+                        //Make visible before animating alpha
+                        mBinding.currentLayout.currentHiddenLayout.setVisibility(toVisibility);
+                }
+
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    super.onAnimationEnd(animation);
+                    if (toVisibility == View.GONE) {
+                        //Set visibility as gone after animating alpha to 0 and bring back translated views
+                        mBinding.currentLayout.currentHiddenLayout.setVisibility(toVisibility);
+                        mBinding.forecastCard.setTranslationY(0);
+                        v.setTranslationY(0);
+                    }
+                    //Rotate arrow at end
+                    v.animate().rotation(v.getRotation() == 180 ? 0 : 180);
+                }
+            }).setUpdateListener(animation -> {
+                //Calculate instantaneous displacement from original position
+                float translation = toVisibility == View.VISIBLE ? -hiddenLayoutHeight + animation.getAnimatedFraction() * hiddenLayoutHeight : -animation.getAnimatedFraction() * hiddenLayoutHeight;
+                mBinding.forecastCard.setTranslationY(translation);
+                v.setTranslationY(translation);
+            });
+        });
     }
 
     public boolean getConnectionStatus(){
@@ -278,10 +297,22 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         String sunrise = sf.format(sunriseDate);
         String sunset = sf.format(new Date(sunsetInMillis));
         String lastUpdated = MiscUtils.getLastUpdatedStringFromMillis(System.currentTimeMillis(), defaultSharedPreferences.getLong(getString(R.string.last_update_date_key), 0));
-        CurrentWeatherLayoutDataModel layoutDataModel = MiscUtils.getCurrentWeatherDataFromDBModel(this, intermediateModel, imageId, metric, visibility, sunrise, sunset, lastUpdated);
+        String locationAndBoolean = weatherSharedPreferences.getString(getString(R.string.location_name_key), "Delhi,IN/false");
+        CurrentWeatherLayoutDataModel layoutDataModel = MiscUtils.getCurrentWeatherDataFromDBModel(this, intermediateModel, imageId, metric, visibility, sunrise, sunset, lastUpdated, locationAndBoolean);
         mBinding.setCurrentWeatherData(layoutDataModel);
         int updatedBackgroundColor = MiscUtils.getBackgroundColorForIconID(this, weatherSharedPreferences.getString(getString(R.string.current_weather_icon_id_key), "01d"));
-        changeBackgroundColorWithAnimation(updatedBackgroundColor);
+        if (!justOpened)
+            changeBackgroundColorWithAnimation(updatedBackgroundColor);
+        else
+            justOpened = false;
+        mBinding.mainUISwipeRefreshLayout.setColorSchemeColors(MiscUtils.getIconTint(this, intermediateModel.getIcon_id()));
+    }
+
+    private void changeBackgroundColor(int currentColor) {
+        mBinding.toolbarMain.setBackgroundColor(currentColor);
+        getWindow().getDecorView().setBackgroundColor(currentColor);
+        getWindow().setStatusBarColor(currentColor);
+        getWindow().setNavigationBarColor(currentColor);
     }
 
     private void changeBackgroundColorWithAnimation(int updatedBackgroundColor) {
@@ -290,10 +321,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             backgroundColorAnimator.setDuration(1000);
             backgroundColorAnimator.addUpdateListener(animation -> {
                 int currentColor = (int) animation.getAnimatedValue();
-                mBinding.toolbarMain.setBackgroundColor(currentColor);
-                getWindow().getDecorView().setBackgroundColor(currentColor);
-                getWindow().setStatusBarColor(currentColor);
-                getWindow().setNavigationBarColor(currentColor);
+                changeBackgroundColor(currentColor);
             });
             backgroundColorAnimator.start();
         }

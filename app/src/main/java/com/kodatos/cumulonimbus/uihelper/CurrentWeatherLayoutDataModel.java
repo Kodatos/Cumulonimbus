@@ -6,13 +6,20 @@ public class CurrentWeatherLayoutDataModel extends DetailActivityDataModel {
     public String sunrise;
     public String sunset;
     public String lastUpdated;
+    public String locationAndIcon;
 
-    public CurrentWeatherLayoutDataModel(String date, int weatherImageID, String weatherMain, String weatherDescription, String tempMain, String unit, String tempMin, String tempMax, String windDescription, float windDirection, int iconTint, String windValue, String pressureValue, String humidityValue, String uvIndexValue, String uvIndexDescription, String rainValue, String cloudinessValue, String visibility, String sunrise, String sunset, String lastUpdated) {
+    public CurrentWeatherLayoutDataModel(String date, int weatherImageID, String weatherMain, String weatherDescription,
+                                         String tempMain, String unit, String tempMin, String tempMax, String windDescription,
+                                         float windDirection, int iconTint, String windValue, String pressureValue,
+                                         String humidityValue, String uvIndexValue, String uvIndexDescription,
+                                         String rainValue, String cloudinessValue, String visibility, String sunrise,
+                                         String sunset, String lastUpdated, String locationAndIcon) {
         super(date, weatherImageID, weatherMain, weatherDescription, tempMain, unit, tempMin, tempMax, windDescription, windDirection, iconTint, windValue, pressureValue, humidityValue, uvIndexValue, uvIndexDescription, rainValue, cloudinessValue);
         this.visibility = visibility;
         this.sunrise = sunrise;
         this.sunset = sunset;
         this.lastUpdated = lastUpdated;
+        this.locationAndIcon = locationAndIcon;
     }
 
 }
