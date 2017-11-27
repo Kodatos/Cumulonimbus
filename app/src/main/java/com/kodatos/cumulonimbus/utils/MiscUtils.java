@@ -93,7 +93,8 @@ public class MiscUtils {
         String UVwithRisk = "UV Index: "+UVClassifier(dbModel.getUvIndex());
         String rain = dbModel.getRain_3h() == -1 ? "" : String.valueOf(new DecimalFormat("#.##").format(dbModel.getRain_3h())) + " mm";
         String clouds = String.valueOf(dbModel.getClouds())+"%";
-        String visibilityInKM = String.valueOf(new DecimalFormat("#.#").format((float)visibility/1000.0))+" km";
+        double calculatedVisibility = (double) (visibility / 1000) * (metric ? 1 : 0.621);
+        String visibilityInKM = String.valueOf(new DecimalFormat("#.#").format(calculatedVisibility)) + (metric ? " km" : " mi");
         int iconTint = ColorUtils.setAlphaComponent(getBackgroundColorForIconID(context, dbModel.getIcon_id()), 175);
         return new CurrentWeatherLayoutDataModel(date, imageId, dbModel.getWeather_main(), dbModel.getWeather_desc(), tempMain,
                 null, tempMin, tempMax, windDescription, windDirection, iconTint, windValue, pressure, humidity,
@@ -169,18 +170,21 @@ public class MiscUtils {
         long hour = minute*60;
         long day = hour*24;
         long difference = currentMillis - lastUpdatedMillis;
+        String updated = "Updated ";
+        String time;
         if(difference<=10*second)
-            return "Moments ago";
+            time = "moments ago";
         else if(difference<=minute)
-            return String.valueOf(difference/second)+" seconds ago";
+            time = String.valueOf(difference / second) + " seconds ago";
         else if(difference<=hour)
-            return String.valueOf(difference/minute)+" minutes ago";
+            time = String.valueOf(difference / minute) + " minutes ago";
         else if(difference<=day)
-            return String.valueOf(difference/hour)+" hours ago";
+            time = String.valueOf(difference / hour) + " hours ago";
         else if(difference<=10*day)
-            return String.valueOf(difference/day)+" day(s) ago";
+            time = String.valueOf(difference / day) + " day(s) ago";
         else
-            return "Long ago";
+            time = "long ago";
+        return updated + time;
     }
 
     public static int getIconTint(Context context, String iconID) {

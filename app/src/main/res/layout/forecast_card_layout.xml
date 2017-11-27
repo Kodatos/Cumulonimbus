@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/forecastHeading"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="#F5F5F5"
+            android:padding="8dp"
+            android:text="Forecast"
+            android:textAlignment="center"
+            android:textAppearance="@android:style/TextAppearance.Material"
+            android:textSize="20sp"
+            app:fontFamily="@font/pacifico"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/dateHeaderView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="#F5F5F5"
+            android:paddingBottom="8dp"
+            android:paddingStart="24dp"
+            android:text="Date"
+            android:textAppearance="@android:style/TextAppearance.Material"
+            android:textColor="@color/textColorSecondaryAlt"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toStartOf="@+id/descriptionHeaderView"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/forecastHeading" />
+
+        <TextView
+            android:id="@+id/descriptionHeaderView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="96dp"
+            android:layout_marginStart="96dp"
+            android:background="#F5F5F5"
+            android:paddingBottom="8dp"
+            android:text="Description"
+            android:textAppearance="@android:style/TextAppearance.Material"
+            android:textColor="@color/textColorSecondaryAlt"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/forecastHeading" />
+
+        <TextView
+            android:id="@+id/tempHeaderView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="#F5F5F5"
+            android:paddingBottom="8dp"
+            android:paddingRight="32dp"
+            android:text="Temp"
+            android:textAlignment="textEnd"
+            android:textAppearance="@android:style/TextAppearance.Material"
+            android:textColor="@color/textColorSecondaryAlt"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/descriptionHeaderView"
+            app:layout_constraintTop_toBottomOf="@id/forecastHeading" />
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/main_recyclerview"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/dateHeaderView" />
+
+    </android.support.constraint.ConstraintLayout>
+</layout>

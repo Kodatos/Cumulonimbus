@@ -95,13 +95,12 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
         previousBackgroundColor = MiscUtils.getBackgroundColorForIconID(this, weatherSharedPreferences.getString(getString(R.string.current_weather_icon_id_key), "01d"));
         changeBackgroundColor(previousBackgroundColor);
-        //changeBackgroundColorWithAnimation(currentBackgroundColor);
 
         defaultSharedPreferences.registerOnSharedPreferenceChangeListener(this);
         LinearLayoutManager lm = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
-        mBinding.testMainRecyclerview.setLayoutManager(lm);
+        mBinding.forecastLayout.mainRecyclerview.setLayoutManager(lm);
         mAdapter = new MainRecyclerViewAdapter(this);
-        mBinding.testMainRecyclerview.setAdapter(mAdapter);
+        mBinding.forecastLayout.mainRecyclerview.setAdapter(mAdapter);
         if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)!= PackageManager.PERMISSION_GRANTED){
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 140);
         }
@@ -128,7 +127,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         switch (id) {
             case R.id.action_settings:
                 Intent intent = new Intent(this, SettingsActivity.class);
-                startActivity(intent);
+                startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(this).toBundle());
                 break;
             case R.id.action_refresh:
                 mBinding.mainUISwipeRefreshLayout.setRefreshing(true);
@@ -139,9 +138,9 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     }
 
     @Override
-    protected void onResume() {
+    protected void onStart() {
         defaultSharedPreferences.registerOnSharedPreferenceChangeListener(this);
-        super.onResume();
+        super.onStart();
     }
 
     @Override
@@ -198,7 +197,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     public void startSync(final int action){
         if(!getConnectionStatus()){
-            displayDialogMessage("No Internet Connection Available", "An internet connection is needed for updating. Try again later", action);
+            displayDialogMessage("No Internet Connection Available", "An internet connection is needed for updating. Try again later", action == 0);
             mBinding.mainUISwipeRefreshLayout.setRefreshing(false);
             return;
         }
@@ -252,18 +251,17 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 getSupportLoaderManager().initLoader(LOADER_ID,null,this);
             }
             else
-                displayDialogMessage("Location Required", "This app cannot run without location permissions", 0);
+                displayDialogMessage("Location Required", "This app cannot run without location permissions", true);
         }
     }
 
-    public void displayDialogMessage(String title, String message, final int kill){
+    public void displayDialogMessage(String title, String message, final boolean kill) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(title)
                 .setMessage(message)
                 .setPositiveButton("OK", (dialog, which) -> {
                     dialog.dismiss();
-                    if(kill==0)
-                        finish();
+                    if (kill) finish();
                 });
         builder.create().show();
     }
@@ -305,6 +303,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             changeBackgroundColorWithAnimation(updatedBackgroundColor);
         else
             justOpened = false;
+
+        mBinding.forecastLayout.forecastHeading.setTextColor(updatedBackgroundColor);
         mBinding.mainUISwipeRefreshLayout.setColorSchemeColors(MiscUtils.getIconTint(this, intermediateModel.getIcon_id()));
     }
 

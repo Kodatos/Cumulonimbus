@@ -60,9 +60,8 @@ public class SyncOWMService extends IntentService implements OnSuccessListener<L
 
     @Override
     protected void onHandleIntent(final Intent intent) {
-        //TODO Remove Base64 decode
         API_KEY = getString(R.string.owm_api_key);
-        Log.w(LOG_TAG, API_KEY);
+        Log.d(LOG_TAG, API_KEY);
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
@@ -80,12 +79,10 @@ public class SyncOWMService extends IntentService implements OnSuccessListener<L
         }
         else{
             String custom_location = sp.getString(this.getString(R.string.pref_custom_location_key), this.getString(R.string.pref_custom_location_def));
-            Log.d(LOG_TAG, custom_location);
+            Log.i(LOG_TAG, custom_location);
             Call<CurrentWeatherModel> currentWeatherModelCall = weatherAPIService.getCurrentWeatherByString(custom_location, API_KEY, units);
-            Log.d(LOG_TAG, currentWeatherModelCall.request().url().toString());
+            Log.i(LOG_TAG, currentWeatherModelCall.request().url().toString());
             Call<ForecastWeatherModel> forecastWeatherModelCall = weatherAPIService.getForecastWeatherByString(custom_location, API_KEY, units);
-            //currentWeatherModelCall.enqueue(mCurrentWeatherCallback);
-            //forecastWeatherModelCall.enqueue(mForecastWeatherCallback);
             Geocoder geocoder = new Geocoder(this, Locale.getDefault());
             try {
                 List<Address> addresses = geocoder.getFromLocationName(custom_location, 1);
@@ -109,7 +106,7 @@ public class SyncOWMService extends IntentService implements OnSuccessListener<L
         final double lat = location.getLatitude();
         final double lon = location.getLongitude();
         final Call<CurrentWeatherModel> currentWeatherModelCall = weatherAPIService.getCurrentWeatherByCoords(lat,lon,API_KEY, units);
-        Log.d(LOG_TAG, currentWeatherModelCall.request().url().toString());
+        Log.i(LOG_TAG, currentWeatherModelCall.request().url().toString());
         final Call<ForecastWeatherModel> forecastWeatherModelCall = weatherAPIService.getForecastWeatherByCoords(lat,lon,API_KEY, units);
         new Thread(() -> {
             try {

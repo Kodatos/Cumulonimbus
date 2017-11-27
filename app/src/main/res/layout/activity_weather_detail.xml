@@ -36,7 +36,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginBottom="8dp"
-                android:text="@string/app_name"
+                android:text="Forecast"
                 android:textColor="#FFFFFFFF"
                 android:textSize="30sp"
                 app:fontFamily="@font/pacifico" />
