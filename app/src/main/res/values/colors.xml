@@ -1,16 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#303f9f</color>
-    <color name="colorPrimaryDark">#283593</color>
-    <color name="colorAccent">#ffc400</color>
+    <color name="colorPrimary">#3E2723</color>
+    <color name="colorPrimaryDark">#3E2723</color>
+    <color name="colorAccent">#FFC107</color>
 
-    <color name="textColorSecondaryAlt">#A0000000</color>
-    <color name="textColorSecondarySmallCaps">#AA000000</color>
+    <color name="textColorTertiary">#A0000000</color>
+    <color name="textColorSecondaryAlt">#AA000000</color>
+    <color name="textColorPrimary">#DF000000</color>
     <color name="textColorPrimaryInverse">#FFFFFFFF</color>
-    <color name="whiteOneShadeDarker">#FFFAFAFA</color>
+    <color name="whiteOneShadeDarker">#FFF5F5F5</color>
     <color name="textColorSecondaryInverse">#E0FFFFFF</color>
 
-    <color name="_01d_icon_tint">#FDD835</color>
+    <color name="_01d_icon_tint">#FFCA28</color>
     <color name="_01n_icon_tint">#cccccc</color>
     <color name="_02d_icon_tint">#bdbdbd</color>
     <color name="_03d_icon_tint">#9E9E9E</color>
@@ -27,6 +28,6 @@
     <color name="_04d_background">#424242</color>
     <color name="_09d_background">#283593</color>
     <color name="_11d_background">#000020</color>
-    <color name="_13d_background">#536DFE</color>
+    <color name="_13d_background">#7986CB</color>
     <color name="_50d_background">#757575</color>
 </resources>

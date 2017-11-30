@@ -26,6 +26,7 @@
         android:textAlignment="center"
         android:textAppearance="@android:style/TextAppearance.Material"
         android:textSize="16sp"
+        app:fontFamily="@font/product_sans_regular"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -53,6 +54,7 @@
         android:textAlignment="textStart"
         android:textAppearance="@android:style/TextAppearance.Material"
         android:textSize="16sp"
+        app:fontFamily="@font/product_sans_regular"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="Main" />
@@ -68,6 +70,7 @@
         android:textAlignment="textStart"
         android:textAppearance="@android:style/TextAppearance.Material.Medium"
         android:textSize="16sp"
+        app:fontFamily="@font/product_sans_regular"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="@+id/forecast_main_textview"
         tools:text="Description" />
@@ -81,6 +84,7 @@
         android:textAlignment="textEnd"
         android:textAppearance="@android:style/TextAppearance.Material"
         android:textSize="20sp"
+        app:fontFamily="@font/product_sans_regular"
         app:layout_constraintBaseline_toBaselineOf="@+id/day_textview"
         app:layout_constraintRight_toRightOf="parent"
         tools:text="30" />

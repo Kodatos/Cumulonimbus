@@ -23,46 +23,12 @@ import java.util.GregorianCalendar;
 import java.util.Locale;
 import java.util.TimeZone;
 
-public class MainRecyclerViewAdapter extends RecyclerView.Adapter<MainRecyclerViewAdapter.MainRecyclerViewHolder> implements View.OnClickListener{
+public class MainRecyclerViewAdapter extends RecyclerView.Adapter<MainRecyclerViewAdapter.MainRecyclerViewHolder> {
 
     private Cursor mCursor = null;
     private Context mContext;
     private ForecastItemClickListener itemClickListener;
 
-
-    public class MainRecyclerViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
-
-        private final ForecastRecyclerviewItemBinding binding;
-
-        public MainRecyclerViewHolder(ForecastRecyclerviewItemBinding recycleItemBinding) {
-            super(recycleItemBinding.getRoot());
-            this.binding = recycleItemBinding;
-            binding.getRoot().setOnClickListener(this);
-        }
-
-        // Method to create a calculated data model and bind it to the layout
-        public void bind(DBModel dbModel){
-            int offset = getAdapterPosition()+1;
-            Calendar calendar = new GregorianCalendar();
-            calendar.setTime(new Date());
-            calendar.add(Calendar.DAY_OF_WEEK, offset);
-            String displayDay = calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.SHORT, Locale.getDefault());
-            SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(mContext);
-            boolean metric = sp.getBoolean(mContext.getString(R.string.pref_metrics_key), true);
-            calendar.setTime(new Date(sp.getLong(mContext.getString(R.string.last_update_date_key),0)));
-            calendar.setTimeZone(TimeZone.getTimeZone("UTC"));
-            int forecastToDisplayIndex = calendar.get(Calendar.HOUR_OF_DAY)/3;
-            int imageId = mContext.getResources().getIdentifier("ic_"+dbModel.getIcon_id().split("/")[forecastToDisplayIndex],"drawable",mContext.getPackageName());
-            DBModelCalculatedData calculatedData = new DBModelCalculatedData(imageId, MiscUtils.makeTemperaturePretty(dbModel.getTempList().split("/")[forecastToDisplayIndex], metric), displayDay, dbModel.getWeather_main(), dbModel.getWeather_desc());
-            binding.setCalculateddata(calculatedData);
-            binding.executePendingBindings();
-        }
-
-        @Override
-        public void onClick(View view) {
-            itemClickListener.onForecastItemClick(getDBModelFromCursor(getAdapterPosition()+1), getAdapterPosition()+1, binding.forecastImage);
-        }
-    }
 
     public MainRecyclerViewAdapter (Context context){
         mContext = context;
@@ -77,7 +43,6 @@ public class MainRecyclerViewAdapter extends RecyclerView.Adapter<MainRecyclerVi
     public MainRecyclerViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         LayoutInflater layoutInflater = LayoutInflater.from(parent.getContext());
         ForecastRecyclerviewItemBinding recycleItemBinding = ForecastRecyclerviewItemBinding.inflate(layoutInflater, parent, false);
-        recycleItemBinding.itemConstraintLayout.setOnClickListener(this);
         return new MainRecyclerViewHolder(recycleItemBinding);
     }
 
@@ -98,11 +63,6 @@ public class MainRecyclerViewAdapter extends RecyclerView.Adapter<MainRecyclerVi
     public long getItemId(int position) {
         mCursor.moveToPosition(position);
         return mCursor.getLong(0);
-    }
-
-    @Override
-    public void onClick(View view) {
-
     }
 
     /**
@@ -135,5 +95,39 @@ public class MainRecyclerViewAdapter extends RecyclerView.Adapter<MainRecyclerVi
 
     public interface ForecastItemClickListener{
         void onForecastItemClick(DBModel intentModel, int position, ImageView forecastImageView);
+    }
+
+    public class MainRecyclerViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+
+        private final ForecastRecyclerviewItemBinding binding;
+
+        public MainRecyclerViewHolder(ForecastRecyclerviewItemBinding recycleItemBinding) {
+            super(recycleItemBinding.getRoot());
+            this.binding = recycleItemBinding;
+            binding.getRoot().setOnClickListener(this);
+        }
+
+        // Method to create a calculated data model and bind it to the layout
+        public void bind(DBModel dbModel) {
+            int offset = getAdapterPosition() + 1;
+            Calendar calendar = new GregorianCalendar();
+            calendar.setTime(new Date());
+            calendar.add(Calendar.DAY_OF_WEEK, offset);
+            String displayDay = calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.SHORT, Locale.getDefault());
+            SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(mContext);
+            boolean metric = sp.getBoolean(mContext.getString(R.string.pref_metrics_key), true);
+            calendar.setTime(new Date(sp.getLong(mContext.getString(R.string.last_update_date_key), 0)));
+            calendar.setTimeZone(TimeZone.getTimeZone("UTC"));
+            int forecastToDisplayIndex = calendar.get(Calendar.HOUR_OF_DAY) / 3;
+            int imageId = mContext.getResources().getIdentifier("ic_" + dbModel.getIcon_id().split("/")[forecastToDisplayIndex], "drawable", mContext.getPackageName());
+            DBModelCalculatedData calculatedData = new DBModelCalculatedData(imageId, MiscUtils.makeTemperaturePretty(dbModel.getTempList().split("/")[forecastToDisplayIndex], metric), displayDay, dbModel.getWeather_main(), dbModel.getWeather_desc());
+            binding.setCalculateddata(calculatedData);
+            binding.executePendingBindings();
+        }
+
+        @Override
+        public void onClick(View view) {
+            itemClickListener.onForecastItemClick(getDBModelFromCursor(getAdapterPosition() + 1), getAdapterPosition() + 1, binding.forecastImage);
+        }
     }
 }

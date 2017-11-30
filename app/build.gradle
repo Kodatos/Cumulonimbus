@@ -29,22 +29,22 @@ android {
 }
 
 dependencies {
-    compile fileTree(include: ['*.jar'], dir: 'libs')
-    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    androidTestImplementation('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    compile 'com.android.support:appcompat-v7:26.1.0'
-    compile 'com.android.support.constraint:constraint-layout:1.1.0-beta2'
-    compile 'com.android.support:design:26.1.0'
-    compile 'com.google.code.gson:gson:2.8.1'
-    compile 'com.squareup.retrofit2:retrofit:2.3.0'
-    compile 'com.squareup.retrofit2:converter-gson:2.3.0'
-    compile 'com.android.support:support-v4:26.1.0'
-    compile 'com.android.support:recyclerview-v7:26.1.0'
-    compile 'com.android.support:cardview-v7:26.1.0'
-    compile 'com.google.android.gms:play-services-location:11.6.0'
-    compile 'org.parceler:parceler-api:1.1.9'
+    implementation 'com.android.support:appcompat-v7:26.1.0'
+    implementation 'com.android.support.constraint:constraint-layout:1.1.0-beta2'
+    implementation 'com.android.support:design:26.1.0'
+    implementation 'com.google.code.gson:gson:2.8.1'
+    implementation 'com.squareup.retrofit2:retrofit:2.3.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.3.0'
+    implementation 'com.android.support:support-v4:26.1.0'
+    implementation 'com.android.support:recyclerview-v7:26.1.0'
+    implementation 'com.android.support:cardview-v7:26.1.0'
+    implementation 'com.google.android.gms:play-services-location:11.6.0'
+    implementation 'org.parceler:parceler-api:1.1.9'
     annotationProcessor 'org.parceler:parceler:1.1.9'
-    testCompile 'junit:junit:4.12'
-    testCompile 'org.robolectric:robolectric:3.3.2'
+    testImplementation 'junit:junit:4.12'
+    testImplementation 'org.robolectric:robolectric:3.3.2'
 }

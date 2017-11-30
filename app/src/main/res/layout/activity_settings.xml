@@ -44,7 +44,6 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/common_card_margin_bottom"
                 android:layout_marginTop="8dp"
-                android:background="@color/whiteOneShadeDarker"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">

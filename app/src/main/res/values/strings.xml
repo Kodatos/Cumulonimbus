@@ -22,6 +22,7 @@
     <string name="sunrise">Sunrise</string>
     <string name="sunset">Sunset</string>
     <string name="visibility">Visibility</string>
+    <string name="forecast">Forecast</string>
 
     <string name="forecats_image_transistion_key">forecast_image_transition_name</string>
     <string name="cardview_transition_name">BackCardView</string>
@@ -33,4 +34,8 @@
     <string name="current_weather_visibility">visibility_in_m</string>
     <string name="location_name_key">Location in string</string>
 
+    <string name="date_header_text">Date</string>
+    <string name="description_header_text">Description</string>
+    <string name="temperature_header_text">Temp</string>
+    <string name="_3_hour_forecast">3 hour forecast</string>
 </resources>
