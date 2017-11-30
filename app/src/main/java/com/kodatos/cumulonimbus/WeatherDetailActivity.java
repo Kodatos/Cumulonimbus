@@ -5,12 +5,14 @@ import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
 import android.transition.Fade;
 import android.util.Log;
 
 import com.kodatos.cumulonimbus.apihelper.DBModel;
 import com.kodatos.cumulonimbus.databinding.ActivityWeatherDetailBinding;
 import com.kodatos.cumulonimbus.uihelper.DetailActivityDataModel;
+import com.kodatos.cumulonimbus.uihelper.TimelineRecyclerViewAdapter;
 import com.kodatos.cumulonimbus.utils.MiscUtils;
 
 import org.parceler.Parcels;
@@ -43,6 +45,8 @@ public class WeatherDetailActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayShowTitleEnabled(false);
         mBinding.weatherImageView.setTransitionName(getIntent().getStringExtra(getString(R.string.forecats_image_transistion_key)));
         mModel = Parcels.unwrap(getIntent().getParcelableExtra(getString(R.string.weather_detail_parcel_name)));
+        LinearLayoutManager lm = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
+        mBinding.timelineRecyclerView.setLayoutManager(lm);
         bindData();
     }
 
@@ -63,6 +67,8 @@ public class WeatherDetailActivity extends AppCompatActivity {
         DetailActivityDataModel bindingModel = MiscUtils.getDetailModelFromDBModel(this, mModel, day, imageId, metric, forecastToDisplayIndex);
         Log.d(getClass().getName(), bindingModel.tempMain+" "+bindingModel.tempMin+" "+bindingModel.tempMax);
         mBinding.setDataModel(bindingModel);
+        TimelineRecyclerViewAdapter adapter = new TimelineRecyclerViewAdapter(mModel.getIcon_id(), mModel.getTempList(), this);
+        mBinding.timelineRecyclerView.setAdapter(adapter);
         startPostponedEnterTransition();
     }
 
