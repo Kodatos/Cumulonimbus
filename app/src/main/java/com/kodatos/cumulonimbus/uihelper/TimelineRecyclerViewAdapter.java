@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 
 import com.kodatos.cumulonimbus.R;
 import com.kodatos.cumulonimbus.databinding.ForecastTimelineRecyclerviewItemBinding;
+import com.kodatos.cumulonimbus.utils.MiscUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -45,7 +46,7 @@ public class TimelineRecyclerViewAdapter extends RecyclerView.Adapter<TimelineRe
     public void onBindViewHolder(TimelineRecyclerViewHolder holder, int position) {
         String iconIdAtPosition = iconIds[position];
         String temperatureAtPosition = temperatures[position];
-        int imageId = mContext.getResources().getIdentifier("ic_" + iconIdAtPosition, "drawable", mContext.getPackageName());
+        int imageId = MiscUtils.getResourceIDForIconID(mContext, iconIdAtPosition);
         String displayTemperature = String.valueOf(temperatureAtPosition) + "\u00B0";
         SimpleDateFormat sdf = new SimpleDateFormat("HH:mm", Locale.getDefault());
         sdf.setTimeZone(TimeZone.getDefault());

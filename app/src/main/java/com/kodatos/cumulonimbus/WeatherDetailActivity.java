@@ -1,5 +1,6 @@
 package com.kodatos.cumulonimbus;
 
+import android.app.ActivityManager;
 import android.content.SharedPreferences;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
@@ -63,13 +64,13 @@ public class WeatherDetailActivity extends AppCompatActivity {
         getWindow().getDecorView().setBackgroundColor(currentColor);
         getWindow().setStatusBarColor(currentColor);
         getWindow().setNavigationBarColor(currentColor);
-        int imageId = getResources().getIdentifier("ic_"+mModel.getIcon_id().split("/")[forecastToDisplayIndex],"drawable", getPackageName());
-        DetailActivityDataModel bindingModel = MiscUtils.getDetailModelFromDBModel(this, mModel, day, imageId, metric, forecastToDisplayIndex);
+        ActivityManager.TaskDescription taskDescription = new ActivityManager.TaskDescription(getString(R.string.app_name), null, currentColor);
+        setTaskDescription(taskDescription);
+        DetailActivityDataModel bindingModel = MiscUtils.getDetailModelFromDBModel(this, mModel, day, metric, forecastToDisplayIndex);
         Log.d(getClass().getName(), bindingModel.tempMain+" "+bindingModel.tempMin+" "+bindingModel.tempMax);
         mBinding.setDataModel(bindingModel);
         TimelineRecyclerViewAdapter adapter = new TimelineRecyclerViewAdapter(mModel.getIcon_id(), mModel.getTempList(), this);
         mBinding.timelineRecyclerView.setAdapter(adapter);
         startPostponedEnterTransition();
     }
-
 }

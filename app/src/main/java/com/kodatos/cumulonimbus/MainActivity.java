@@ -5,6 +5,7 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ArgbEvaluator;
 import android.animation.ValueAnimator;
+import android.app.ActivityManager;
 import android.app.ActivityOptions;
 import android.content.Context;
 import android.content.Intent;
@@ -285,7 +286,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     private void bindCurrentWeatherData(){
         DBModel intermediateModel = mAdapter.getDBModelFromCursor(0);
         boolean metric = PreferenceManager.getDefaultSharedPreferences(this).getBoolean(getString(R.string.pref_metrics_key), true);
-        int imageId = getResources().getIdentifier("ic_"+intermediateModel.getIcon_id(),"drawable", getPackageName());
         long visibility = weatherSharedPreferences.getLong(getString(R.string.current_weather_visibility), 0);
         SimpleDateFormat sf = new SimpleDateFormat("H:mm", Locale.getDefault());
         sf.setTimeZone(TimeZone.getDefault());
@@ -296,7 +296,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         String sunset = sf.format(new Date(sunsetInMillis));
         String lastUpdated = MiscUtils.getLastUpdatedStringFromMillis(System.currentTimeMillis(), defaultSharedPreferences.getLong(getString(R.string.last_update_date_key), 0));
         String locationAndBoolean = weatherSharedPreferences.getString(getString(R.string.location_name_key), "Delhi,IN/false");
-        CurrentWeatherLayoutDataModel layoutDataModel = MiscUtils.getCurrentWeatherDataFromDBModel(this, intermediateModel, imageId, metric, visibility, sunrise, sunset, lastUpdated, locationAndBoolean);
+        CurrentWeatherLayoutDataModel layoutDataModel = MiscUtils.getCurrentWeatherDataFromDBModel(this, intermediateModel, metric, visibility, sunrise, sunset, lastUpdated, locationAndBoolean);
         mBinding.setCurrentWeatherData(layoutDataModel);
         int updatedBackgroundColor = MiscUtils.getBackgroundColorForIconID(this, weatherSharedPreferences.getString(getString(R.string.current_weather_icon_id_key), "01d"));
         if (!justOpened)
@@ -306,6 +306,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
         mBinding.forecastLayout.forecastHeading.setTextColor(updatedBackgroundColor);
         mBinding.mainUISwipeRefreshLayout.setColorSchemeColors(MiscUtils.getIconTint(this, intermediateModel.getIcon_id()));
+        ActivityManager.TaskDescription taskDescription = new ActivityManager.TaskDescription(getString(R.string.app_name), null, updatedBackgroundColor);
+        setTaskDescription(taskDescription);
     }
 
     private void changeBackgroundColor(int currentColor) {

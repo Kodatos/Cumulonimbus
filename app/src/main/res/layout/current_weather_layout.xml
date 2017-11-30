@@ -10,8 +10,6 @@
             type="com.kodatos.cumulonimbus.uihelper.CurrentWeatherLayoutDataModel"/>
     </data>
 
-    <!--TODO : Add content descriptions to ImageViews -->
-
     <android.support.constraint.ConstraintLayout
         android:id="@+id/current_layout_always_visible"
         android:layout_width="match_parent"
@@ -179,8 +177,6 @@
             style="@style/MainUIText.RightSideText"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="0dp"
-            android:layout_marginTop="0dp"
             android:text="@{currentWeatherData.lastUpdated}"
             app:layout_constraintBottom_toBottomOf="@+id/dateImageView"
             app:layout_constraintHorizontal_bias="0.0"

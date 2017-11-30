@@ -119,7 +119,7 @@ public class MainRecyclerViewAdapter extends RecyclerView.Adapter<MainRecyclerVi
             calendar.setTime(new Date(sp.getLong(mContext.getString(R.string.last_update_date_key), 0)));
             calendar.setTimeZone(TimeZone.getTimeZone("UTC"));
             int forecastToDisplayIndex = calendar.get(Calendar.HOUR_OF_DAY) / 3;
-            int imageId = mContext.getResources().getIdentifier("ic_" + dbModel.getIcon_id().split("/")[forecastToDisplayIndex], "drawable", mContext.getPackageName());
+            int imageId = MiscUtils.getResourceIDForIconID(mContext, dbModel.getIcon_id().split("/")[forecastToDisplayIndex]);
             DBModelCalculatedData calculatedData = new DBModelCalculatedData(imageId, MiscUtils.makeTemperaturePretty(dbModel.getTempList().split("/")[forecastToDisplayIndex], metric), displayDay, dbModel.getWeather_main(), dbModel.getWeather_desc());
             binding.setCalculateddata(calculatedData);
             binding.executePendingBindings();

@@ -56,7 +56,7 @@ public class MiscUtils {
     }
 
     public static DetailActivityDataModel getDetailModelFromDBModel(Context context, DBModel dbModel,
-                                                                    int day, int imageId, boolean metric, int forecastToDisplayIndex) {
+                                                                    int day, boolean metric, int forecastToDisplayIndex) {
         String date = getPatternDate("EEE, d MMM", day);
         String tempMain = dbModel.getTempList().split("/")[forecastToDisplayIndex];
         String unit = makeTemperaturePretty("", metric);
@@ -67,18 +67,18 @@ public class MiscUtils {
         float windDirection = Float.parseFloat(windData[1]);
         String windValue = windData[0] + (metric ? " m/s" : " mi/h");
         String humidity = String.valueOf(dbModel.getHumidity())+"%";
-        String pressure = String.valueOf(dbModel.getPressure())+"mb";
+        String pressure = String.valueOf(dbModel.getPressure()) + " mb";
         String UV = "UV Index: "+String.valueOf(dbModel.getUvIndex());
         String UVRisk = "Risk: "+UVClassifier(dbModel.getUvIndex());
         String rain = "Rain: "+String.valueOf(new DecimalFormat("#.##").format(dbModel.getRain_3h()))+" mm";
         String clouds = "Cloudiness: "+String.valueOf(dbModel.getClouds())+"%";
+        int imageId = getResourceIDForIconID(context, dbModel.getIcon_id().split("/")[forecastToDisplayIndex]);
         int iconTint = MiscUtils.getIconTint(context, dbModel.getIcon_id().split("/")[forecastToDisplayIndex]);
         return new DetailActivityDataModel(date, imageId, dbModel.getWeather_main(), dbModel.getWeather_desc(), tempMain, unit, tempMin,
                 tempMax, windDescription, windDirection, iconTint, windValue, pressure, humidity, UV, UVRisk, rain, clouds);
     }
 
-    public static CurrentWeatherLayoutDataModel getCurrentWeatherDataFromDBModel(Context context, DBModel dbModel, int imageId,
-                                                                                 boolean metric, long visibility, String sunrise, String sunset, String lastUpdated, String locationAndIcon) {
+    public static CurrentWeatherLayoutDataModel getCurrentWeatherDataFromDBModel(Context context, DBModel dbModel, boolean metric, long visibility, String sunrise, String sunset, String lastUpdated, String locationAndIcon) {
         String date = getPatternDate("dd MMMM, YYYY", 0);
         String tempMain = makeTemperaturePretty(dbModel.getTempList(), metric);
         String tempMin = String.valueOf(Math.round(dbModel.getTemp_min()));
@@ -95,6 +95,7 @@ public class MiscUtils {
         String clouds = String.valueOf(dbModel.getClouds())+"%";
         double calculatedVisibility = (double) (visibility / 1000) * (metric ? 1 : 0.621);
         String visibilityInKM = String.valueOf(new DecimalFormat("#.#").format(calculatedVisibility)) + (metric ? " km" : " mi");
+        int imageId = getResourceIDForIconID(context, dbModel.getIcon_id());
         int iconTint = ColorUtils.setAlphaComponent(getBackgroundColorForIconID(context, dbModel.getIcon_id()), 175);
         return new CurrentWeatherLayoutDataModel(date, imageId, dbModel.getWeather_main(), dbModel.getWeather_desc(), tempMain,
                 null, tempMin, tempMax, windDescription, windDirection, iconTint, windValue, pressure, humidity,
@@ -185,6 +186,22 @@ public class MiscUtils {
         else
             time = "long ago";
         return updated + time;
+    }
+
+    public static int getResourceIDForIconID(Context context, String iconID) {
+        if ("03n".equals(iconID))
+            iconID = "03d";
+        else if ("04n".equals(iconID))
+            iconID = "04d";
+        else if ("09n".equals(iconID))
+            iconID = "09d";
+        else if ("11n".equals(iconID))
+            iconID = "11d";
+        else if ("13n".equals(iconID))
+            iconID = "13d";
+        else if ("50n".equals(iconID))
+            iconID = "50d";
+        return context.getResources().getIdentifier("ic_" + iconID, "drawable", context.getPackageName());
     }
 
     public static int getIconTint(Context context, String iconID) {
