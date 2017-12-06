@@ -24,7 +24,6 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.transition.Fade;
@@ -35,7 +34,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import com.kodatos.cumulonimbus.apihelper.DBModel;
 import com.kodatos.cumulonimbus.apihelper.SyncOWMService;
@@ -52,8 +50,7 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 
-public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>
-        , SharedPreferences.OnSharedPreferenceChangeListener, MainRecyclerViewAdapter.ForecastItemClickListener {
+public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>, MainRecyclerViewAdapter.ForecastItemClickListener {
 
     private static final int LOADER_ID = 301;
 
@@ -97,7 +94,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         previousBackgroundColor = MiscUtils.getBackgroundColorForIconID(this, weatherSharedPreferences.getString(getString(R.string.current_weather_icon_id_key), "01d"));
         changeBackgroundColor(previousBackgroundColor);
 
-        defaultSharedPreferences.registerOnSharedPreferenceChangeListener(this);
         LinearLayoutManager lm = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         mBinding.forecastLayout.mainRecyclerview.setLayoutManager(lm);
         mAdapter = new MainRecyclerViewAdapter(this);
@@ -136,18 +132,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    protected void onStart() {
-        defaultSharedPreferences.registerOnSharedPreferenceChangeListener(this);
-        super.onStart();
-    }
-
-    @Override
-    protected void onStop() {
-        defaultSharedPreferences.unregisterOnSharedPreferenceChangeListener(this);
-        super.onStop();
     }
 
     private void setUpUIInteractions() {
@@ -192,13 +176,13 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     public boolean getConnectionStatus(){
         ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo info = cm.getActiveNetworkInfo();
+        NetworkInfo info = cm != null ? cm.getActiveNetworkInfo() : null;
         return info!=null && info.isConnectedOrConnecting();
     }
 
     public void startSync(final int action){
         if(!getConnectionStatus()){
-            displayDialogMessage("No Internet Connection Available", "An internet connection is needed for updating. Try again later", action == 0);
+            MiscUtils.displayDialogMessage(this, "No Internet Connection Available", "An internet connection is needed for updating. Try again later", action == 0);
             mBinding.mainUISwipeRefreshLayout.setRefreshing(false);
             return;
         }
@@ -210,13 +194,15 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         startService(intent);
     }
 
+    /*
+        LoaderCallback Overrides
+     */
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         if(id==LOADER_ID){
             Uri uri = WeatherDBContract.WeatherDBEntry.CONTENT_URI;
             return new CursorLoader(this, uri, null, null, null, null);
-        }
-        else
+        } else
             throw new UnsupportedOperationException("Such a loader not implemented");
     }
 
@@ -238,33 +224,14 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     }
 
     @Override
-    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        if(key.equals(getString(R.string.pref_custom_location_key))){
-            startSync(1);
-            Toast.makeText(this, "Updated location to "+sharedPreferences.getString(key, "NULL"), Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if(requestCode==140){
             if(grantResults.length>0 && grantResults[0]==PackageManager.PERMISSION_GRANTED){
                 getSupportLoaderManager().initLoader(LOADER_ID,null,this);
             }
             else
-                displayDialogMessage("Location Required", "This app cannot run without location permissions", true);
+                MiscUtils.displayDialogMessage(this, "Location Required", "This app cannot run without location permissions", true);
         }
-    }
-
-    public void displayDialogMessage(String title, String message, final boolean kill) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle(title)
-                .setMessage(message)
-                .setPositiveButton("OK", (dialog, which) -> {
-                    dialog.dismiss();
-                    if (kill) finish();
-                });
-        builder.create().show();
     }
 
     @Override
@@ -310,11 +277,11 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         setTaskDescription(taskDescription);
     }
 
-    private void changeBackgroundColor(int currentColor) {
-        mBinding.toolbarMain.setBackgroundColor(currentColor);
-        getWindow().getDecorView().setBackgroundColor(currentColor);
-        getWindow().setStatusBarColor(currentColor);
-        getWindow().setNavigationBarColor(currentColor);
+    private void changeBackgroundColor(int updatedBackgroundColor) {
+        mBinding.toolbarMain.setBackgroundColor(updatedBackgroundColor);
+        getWindow().getDecorView().setBackgroundColor(updatedBackgroundColor);
+        getWindow().setStatusBarColor(updatedBackgroundColor);
+        getWindow().setNavigationBarColor(updatedBackgroundColor);
     }
 
     private void changeBackgroundColorWithAnimation(int updatedBackgroundColor) {

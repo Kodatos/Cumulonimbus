@@ -71,7 +71,7 @@ public class SyncOWMService extends IntentService implements OnSuccessListener<L
 
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
         units = sp.getBoolean(getString(R.string.pref_metrics_key), true) ? "metric" : "imperial";
-        if (sp.getBoolean(this.getString(R.string.pref_curr_location_key), false)) {
+        if (sp.getBoolean(this.getString(R.string.pref_curr_location_key), true)) {
             FusedLocationProviderClient mFusedClient = LocationServices.getFusedLocationProviderClient(this);
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                 mFusedClient.getLastLocation().addOnSuccessListener(this);
@@ -172,7 +172,7 @@ public class SyncOWMService extends IntentService implements OnSuccessListener<L
             ContentValues cv = currentWeatherModelResponse.getEquivalentCV();
             SharedPreferences weatherSP = getSharedPreferences("weather_display_pref", MODE_PRIVATE);
             String locationAndIcon;
-            if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean(this.getString(R.string.pref_curr_location_key), false)) {
+            if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean(this.getString(R.string.pref_curr_location_key), true)) {
                 locationAndIcon = MiscUtils.getAddressFromLatLong(coords[0], coords[1], this) + "/true";
             } else {
                 locationAndIcon = PreferenceManager.getDefaultSharedPreferences(this).getString(getString(R.string.pref_custom_location_key), "") + "/false";

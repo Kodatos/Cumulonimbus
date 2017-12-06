@@ -1,10 +1,12 @@
 package com.kodatos.cumulonimbus.utils;
 
+import android.app.Activity;
 import android.content.Context;
 import android.location.Address;
 import android.location.Geocoder;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.ColorUtils;
+import android.support.v7.app.AlertDialog;
 
 import com.kodatos.cumulonimbus.R;
 import com.kodatos.cumulonimbus.apihelper.DBModel;
@@ -23,6 +25,7 @@ import java.util.Locale;
 /*
     A utility class containing miscellaneous functions that may be used in other functions.
  */
+@SuppressWarnings("WeakerAccess")
 public class MiscUtils {
 
     /**
@@ -186,6 +189,28 @@ public class MiscUtils {
         else
             time = "long ago";
         return updated + time;
+    }
+
+    /***
+     * Shows a dialog message
+     * @param activity Activity that requires the dialog
+     * @param title Title of the dialog
+     * @param message Message of the dialog
+     * @param kill Denotes whether to finish the calling activity
+     */
+    public static void displayDialogMessage(Activity activity, String title, String message, final boolean kill) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+        builder.setTitle(title)
+                .setMessage(message)
+                .setPositiveButton("OK", (dialog, which) -> {
+                    dialog.dismiss();
+                    if (kill) activity.finish();
+                });
+        AlertDialog dialog = builder.create();
+        if (kill) {
+            dialog.setCanceledOnTouchOutside(false);
+        }
+        dialog.show();
     }
 
     public static int getResourceIDForIconID(Context context, String iconID) {

@@ -59,6 +59,7 @@ public class WeatherDetailActivity extends AppCompatActivity {
         calendar.setTime(new Date(sp.getLong(getString(R.string.last_update_date_key),0)));
         calendar.setTimeZone(TimeZone.getTimeZone("UTC"));
         int forecastToDisplayIndex = calendar.get(Calendar.HOUR_OF_DAY)/3;
+
         int currentColor = MiscUtils.getBackgroundColorForIconID(this, mModel.getIcon_id().split("/")[forecastToDisplayIndex]);
         mBinding.toolbar.setBackgroundColor(currentColor);
         getWindow().getDecorView().setBackgroundColor(currentColor);
@@ -66,11 +67,14 @@ public class WeatherDetailActivity extends AppCompatActivity {
         getWindow().setNavigationBarColor(currentColor);
         ActivityManager.TaskDescription taskDescription = new ActivityManager.TaskDescription(getString(R.string.app_name), null, currentColor);
         setTaskDescription(taskDescription);
+
         DetailActivityDataModel bindingModel = MiscUtils.getDetailModelFromDBModel(this, mModel, day, metric, forecastToDisplayIndex);
         Log.d(getClass().getName(), bindingModel.tempMain+" "+bindingModel.tempMin+" "+bindingModel.tempMax);
         mBinding.setDataModel(bindingModel);
+
         TimelineRecyclerViewAdapter adapter = new TimelineRecyclerViewAdapter(mModel.getIcon_id(), mModel.getTempList(), this);
         mBinding.timelineRecyclerView.setAdapter(adapter);
+
         startPostponedEnterTransition();
     }
 }

@@ -1,13 +1,12 @@
 package com.kodatos.cumulonimbus;
 
 
-
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.widget.Toast;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -26,6 +25,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         if(key.equals(getString(R.string.pref_custom_location_key))){
             findPreference(key).setSummary(sharedPreferences.getString(key, ""));
+            Toast.makeText(getActivity(), "Updated location. Please refresh at main screen", Toast.LENGTH_SHORT).show();
         }
     }
 
