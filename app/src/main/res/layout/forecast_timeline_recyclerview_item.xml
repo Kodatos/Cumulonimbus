@@ -9,7 +9,7 @@
 
         <TextView
             android:id="@+id/timelineTimeView"
-            style="@style/DetailUIPriorityTwoText"
+            style="@style/PriorityTwoText"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
@@ -35,7 +35,7 @@
 
         <TextView
             android:id="@+id/timelineTemperatureView"
-            style="@style/DetailUIPriorityOneText"
+            style="@style/PriorityOneText"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"

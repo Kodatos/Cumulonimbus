@@ -25,7 +25,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         if(key.equals(getString(R.string.pref_custom_location_key))){
             findPreference(key).setSummary(sharedPreferences.getString(key, ""));
-            Toast.makeText(getActivity(), "Updated location. Please refresh at main screen", Toast.LENGTH_SHORT).show();
+            if (!getPreferenceScreen().getSharedPreferences().getBoolean(getString(R.string.pref_curr_location_key), true))
+                Toast.makeText(getActivity(), "Updated location. Please refresh at main screen", Toast.LENGTH_SHORT).show();
         }
     }
 

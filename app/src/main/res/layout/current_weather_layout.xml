@@ -191,6 +191,7 @@
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:layout_marginTop="8dp"
+            android:background="@drawable/ripple_drawable"
             android:src="@drawable/ic_keyboard_arrow_down_black_24dp"
             android:tint="#FFFFFFFF"
             app:layout_constraintEnd_toEndOf="parent"
@@ -307,6 +308,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:text="@string/humidity"
+                android:textColor="@color/textColorPrimaryInverse"
                 android:textSize="16sp"
                 app:layout_constraintLeft_toRightOf="@+id/currentMeterImageView"
                 app:layout_constraintRight_toRightOf="parent"
@@ -318,6 +320,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:text="@{currentWeatherData.humidityValue}"
+                android:textColor="@color/textColorPrimaryInverse"
                 app:layout_constraintStart_toEndOf="@+id/currentMeterImageView"
                 app:layout_constraintTop_toBottomOf="@+id/currentHumidity"
                 tools:text="60%" />
@@ -362,6 +365,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:text="@string/cloudiness"
+                android:textColor="@color/textColorPrimaryInverse"
                 android:textSize="16sp"
                 app:layout_constraintStart_toEndOf="@+id/currentRainImageView"
                 app:layout_constraintTop_toTopOf="@+id/currentRainImageView" />
@@ -372,6 +376,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@{currentWeatherData.cloudinessValue}"
+                android:textColor="@color/textColorPrimaryInverse"
                 app:layout_constraintStart_toEndOf="@+id/currentRainImageView"
                 app:layout_constraintTop_toBottomOf="@+id/currentCloudiness"
                 tools:text="50%" />
@@ -416,6 +421,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:text="@string/sunset"
+                android:textColor="@color/textColorPrimaryInverse"
                 android:textSize="16sp"
                 app:layout_constraintStart_toEndOf="@+id/currentSunImageView"
                 app:layout_constraintTop_toTopOf="@+id/currentSunImageView" />
@@ -426,6 +432,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@{currentWeatherData.sunset}"
+                android:textColor="@color/textColorPrimaryInverse"
                 app:layout_constraintStart_toEndOf="@+id/currentSunImageView"
                 app:layout_constraintTop_toBottomOf="@+id/currentSunset"
                 tools:text="18:00" />
@@ -470,6 +477,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:text="@{currentWeatherData.uvIndexDescription}"
+                android:textColor="@color/textColorPrimaryInverse"
                 android:textSize="16sp"
                 app:layout_constraintStart_toEndOf="@+id/currentShadesImageView"
                 app:layout_constraintTop_toTopOf="@+id/currentShadesImageView"
@@ -481,6 +489,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@{currentWeatherData.uvIndexValue}"
+                android:textColor="@color/textColorPrimaryInverse"
                 app:layout_constraintStart_toEndOf="@+id/currentShadesImageView"
                 app:layout_constraintTop_toBottomOf="@+id/currentUVIndex"
                 tools:text="9.1" />

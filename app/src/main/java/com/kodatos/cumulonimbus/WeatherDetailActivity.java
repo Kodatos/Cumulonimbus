@@ -8,7 +8,6 @@ import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.transition.Fade;
-import android.util.Log;
 
 import com.kodatos.cumulonimbus.apihelper.DBModel;
 import com.kodatos.cumulonimbus.databinding.ActivityWeatherDetailBinding;
@@ -69,7 +68,6 @@ public class WeatherDetailActivity extends AppCompatActivity {
         setTaskDescription(taskDescription);
 
         DetailActivityDataModel bindingModel = MiscUtils.getDetailModelFromDBModel(this, mModel, day, metric, forecastToDisplayIndex);
-        Log.d(getClass().getName(), bindingModel.tempMain+" "+bindingModel.tempMin+" "+bindingModel.tempMax);
         mBinding.setDataModel(bindingModel);
 
         TimelineRecyclerViewAdapter adapter = new TimelineRecyclerViewAdapter(mModel.getIcon_id(), mModel.getTempList(), this);

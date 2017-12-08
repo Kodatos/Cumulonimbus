@@ -66,9 +66,11 @@
                     android:layout_marginEnd="16dp"
                     android:layout_marginStart="16dp"
                     android:layout_marginTop="16dp"
+                    app:cardElevation="4dp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent">
+                    app:layout_constraintTop_toTopOf="parent"
+                    card_view:cardCornerRadius="4dp">
 
                     <android.support.constraint.ConstraintLayout
                         android:layout_width="match_parent"
@@ -76,7 +78,7 @@
 
                         <TextView
                             android:id="@+id/timelineTitle"
-                            style="@style/DetailUIPriorityOneText"
+                            style="@style/PriorityOneText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="20dp"
@@ -107,11 +109,14 @@
                     android:id="@+id/detail_card"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
                     android:layout_marginEnd="16dp"
                     android:layout_marginStart="16dp"
                     android:layout_marginTop="16dp"
                     android:transitionGroup="false"
                     android:transitionName="@string/cardview_transition_name"
+                    app:cardElevation="4dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="1.0"
                     app:layout_constraintStart_toStartOf="parent"
@@ -133,7 +138,7 @@
 
                         <TextView
                             android:id="@+id/detailTitle"
-                            style="@style/DetailUIPriorityOneText"
+                            style="@style/PriorityOneText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="20dp"
@@ -158,7 +163,7 @@
 
                         <TextView
                             android:id="@+id/dateTextView"
-                            style="@style/DetailUIPriorityTwoText"
+                            style="@style/PriorityTwoText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="0dp"
@@ -172,7 +177,7 @@
 
                         <TextView
                             android:id="@+id/mainWeatherTextView"
-                            style="@style/DetailUIPriorityOneText"
+                            style="@style/PriorityOneText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="24dp"
@@ -186,7 +191,7 @@
 
                         <TextView
                             android:id="@+id/descWeatherTextView"
-                            style="@style/DetailUIPriorityThreeText"
+                            style="@style/PriorityThreeText"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="0dp"
@@ -203,7 +208,7 @@
 
                         <TextView
                             android:id="@+id/temperatureView"
-                            style="@style/DetailUIPriorityOneText"
+                            style="@style/PriorityOneText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="40dp"
@@ -217,7 +222,7 @@
 
                         <TextView
                             android:id="@+id/unitTextView"
-                            style="@style/DetailUIPriorityTwoText"
+                            style="@style/PriorityTwoText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="4dp"
@@ -230,7 +235,7 @@
 
                         <TextView
                             android:id="@+id/maxTemperatureView"
-                            style="@style/DetailUIPriorityTwoText"
+                            style="@style/PriorityTwoText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="8dp"
@@ -248,7 +253,7 @@
 
                         <TextView
                             android:id="@+id/minTemperatureView"
-                            style="@style/DetailUIPriorityTwoText"
+                            style="@style/PriorityTwoText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="8dp"
@@ -283,7 +288,7 @@
 
                         <TextView
                             android:id="@+id/windValueTextView"
-                            style="@style/DetailUIPriorityOneText"
+                            style="@style/PriorityOneText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginBottom="0dp"
@@ -302,7 +307,7 @@
 
                         <TextView
                             android:id="@+id/windTitle"
-                            style="@style/DetailUIPriorityThreeText"
+                            style="@style/PriorityThreeText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="8dp"
@@ -334,7 +339,7 @@
 
                         <TextView
                             android:id="@+id/justPressureTextView"
-                            style="@style/DetailUIPriorityTwoText"
+                            style="@style/PriorityTwoText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="6dp"
@@ -347,7 +352,7 @@
 
                         <TextView
                             android:id="@+id/pressureTextView"
-                            style="@style/DetailUIPriorityOneText"
+                            style="@style/PriorityOneText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginBottom="0dp"
@@ -379,7 +384,7 @@
 
                         <TextView
                             android:id="@+id/justHumidityTextView"
-                            style="@style/DetailUIPriorityTwoText"
+                            style="@style/PriorityTwoText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="8dp"
@@ -394,7 +399,7 @@
 
                         <TextView
                             android:id="@+id/humidityTextView"
-                            style="@style/DetailUIPriorityOneText"
+                            style="@style/PriorityOneText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginBottom="0dp"
@@ -426,12 +431,9 @@
 
                         <TextView
                             android:id="@+id/uvIndexTextView"
-                            style="@style/DetailUIPriorityOneText"
+                            style="@style/PriorityOneText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginLeft="0dp"
-                            android:layout_marginRight="0dp"
-                            android:layout_marginTop="0dp"
                             android:text="@{dataModel.uvIndexValue}"
                             android:textSize="18sp"
                             app:layout_constraintHorizontal_bias="0.5"
@@ -442,7 +444,7 @@
 
                         <TextView
                             android:id="@+id/uvIndexRiskTextView"
-                            style="@style/DetailUIPriorityThreeText"
+                            style="@style/PriorityThreeText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="0dp"
@@ -473,7 +475,7 @@
 
                         <TextView
                             android:id="@+id/rainVolumeTextView"
-                            style="@style/DetailUIPriorityOneText"
+                            style="@style/PriorityOneText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="0dp"
@@ -489,7 +491,7 @@
 
                         <TextView
                             android:id="@+id/cloudinessTextView"
-                            style="@style/DetailUIPriorityThreeText"
+                            style="@style/PriorityThreeText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="0dp"

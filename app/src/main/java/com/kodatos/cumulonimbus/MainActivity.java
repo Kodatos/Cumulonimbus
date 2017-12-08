@@ -42,6 +42,7 @@ import com.kodatos.cumulonimbus.datahelper.WeatherDBContract;
 import com.kodatos.cumulonimbus.uihelper.CurrentWeatherLayoutDataModel;
 import com.kodatos.cumulonimbus.uihelper.MainRecyclerViewAdapter;
 import com.kodatos.cumulonimbus.utils.MiscUtils;
+import com.kodatos.cumulonimbus.utils.UVIndexActivity;
 
 import org.parceler.Parcels;
 
@@ -171,6 +172,11 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 mBinding.forecastCard.setTranslationY(translation);
                 v.setTranslationY(translation);
             });
+        });
+
+        mBinding.currentLayout.currentShadesImageView.setOnClickListener(v -> {
+            Intent intent = new Intent(this, UVIndexActivity.class);
+            startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(this).toBundle());
         });
     }
 
