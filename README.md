@@ -1,7 +1,21 @@
-# Cumulonimbus
-#### Work in progress weather app to practice all topics covered in the intermediate and advanced Android Udacity course
-- The weather data is requested from *Open Weather Map*. However the free API package is used, so widescale usage is currently not possible. As it is the very first project involving Android, using paid API is currently not desired.
-- The *Data Binding Library* is used as much as possible, but efforts are made to not make the xml files a mess with unnecessary code. The model classes do not implement Observable, since they are updated as whole from database.
+![header](assets/cb_github_header.png)
+### A Work in progress weather app
+Cumulonimbus is a simple and succint weather app with a fresh bold design, inspired by Material Design (but doesn't adhere to its guidelines).
+
+![screenshots](assets/github_screens.png)
+Check out more screenshots in the [here](assets/)
+
+Things to note:
+- The weather data is requested from *Open Weather Map*. However the free API package is used, so it won't scale properly in its current condition, although options are being researched on.
+- Efforts have been made to use the latest additions to the Android libraries, and other open source libraries are being looked at as well 
 - The goal is to make the UI clean and responsive, so themes and animated UI changes are a priority.
-- The weather icons are colored and modified versions of [**Climacons**](https://github.com/AdamWhitcroft/climacons), courtesy Adam Whitcroft.
-- The app is still work in progress, so there is a lot of work to be done yet.
+- The app is nearing a release on Github and after maturing more, will be added to the Play Store eventually.
+
+TO-DO :
+1. Add tablet layout
+2. Add user friendly tutorials
+3. Widgets
+4. Add Air Quality Index
+
+Credits:
+- The weather icons are colored and modified versions of [**Climacons**](https://github.com/AdamWhitcroft/climacons) from Adam Whitcroft.
