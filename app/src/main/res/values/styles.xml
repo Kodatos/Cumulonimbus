@@ -42,7 +42,7 @@
     <style name="MainUIText.LeftSideText">
         <item name="android:textColor">@color/textColorPrimaryInverse</item>
         <item name="android:textAlignment">textEnd</item>
-        <item name="android:layout_marginStart">0dp</item>
+        <item name="android:layout_marginStart">8dp</item>
         <item name="android:layout_marginEnd">8dp</item>
         <item name="fontFamily">@font/product_sans_regular</item>
     </style>
@@ -55,7 +55,7 @@
         <item name="android:textColor">@color/textColorSecondaryInverse</item>
         <item name="android:textAlignment">textStart</item>
         <item name="android:layout_marginStart">8dp</item>
-        <item name="android:layout_marginEnd">0dp</item>
+        <item name="android:layout_marginEnd">8dp</item>
         <item name="fontFamily">@font/product_sans_regular</item>
     </style>
 

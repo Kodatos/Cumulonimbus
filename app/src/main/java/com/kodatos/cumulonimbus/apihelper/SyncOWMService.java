@@ -15,7 +15,7 @@ import android.util.Log;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Tasks;
 import com.kodatos.cumulonimbus.R;
 import com.kodatos.cumulonimbus.apihelper.models.CurrentWeatherModel;
 import com.kodatos.cumulonimbus.apihelper.models.ForecastWeatherModel;
@@ -29,6 +29,7 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.ExecutionException;
 
 import retrofit2.Call;
 import retrofit2.Response;
@@ -40,7 +41,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
  * An {@link IntentService} subclass for handling asynchronous task requests in
  * a service on a separate handler thread for getting weather data from OpenWeatherMap.
  */
-public class SyncOWMService extends IntentService implements OnSuccessListener<Location>{
+public class SyncOWMService extends IntentService {
 
     public static final String BASE_URL = "http://api.openweathermap.org/";
     //Action strings for use in caller function
@@ -74,7 +75,19 @@ public class SyncOWMService extends IntentService implements OnSuccessListener<L
         if (sp.getBoolean(this.getString(R.string.pref_curr_location_key), true)) {
             FusedLocationProviderClient mFusedClient = LocationServices.getFusedLocationProviderClient(this);
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                mFusedClient.getLastLocation().addOnSuccessListener(this);
+                try {
+                    Location location = Tasks.await(mFusedClient.getLastLocation());
+                    final double lat = location.getLatitude();
+                    final double lon = location.getLongitude();
+                    final Call<CurrentWeatherModel> currentWeatherModelCall = weatherAPIService.getCurrentWeatherByCoords(lat, lon, API_KEY, units);
+                    Log.i(LOG_TAG, currentWeatherModelCall.request().url().toString());
+                    final Call<ForecastWeatherModel> forecastWeatherModelCall = weatherAPIService.getForecastWeatherByCoords(lat, lon, API_KEY, units);
+                    handleCurrentWeatherResponse(currentWeatherModelCall, lat, lon);
+                    handleForecastWeatherResponse(forecastWeatherModelCall);
+                    getUVIndex(lat, lon);
+                } catch (ExecutionException | InterruptedException | IOException e) {
+                    e.printStackTrace();
+                }
             }
         }
         else{
@@ -94,29 +107,6 @@ public class SyncOWMService extends IntentService implements OnSuccessListener<L
             }
         }
         sp.edit().putLong(getString(R.string.last_update_date_key), System.currentTimeMillis()).apply();
-    }
-
-    /*
-        onSuccess() apparently runs on the main UI thread and has been confirmed. Also, the workaround
-        for calling this in a new thread is too intricate for me and it would be a mess to shift the code below to the main activity.
-        Hence, a new thread is used for the Geocoder and call executions are also enqueued.
-     */
-    @Override
-    public void onSuccess(Location location) {
-        final double lat = location.getLatitude();
-        final double lon = location.getLongitude();
-        final Call<CurrentWeatherModel> currentWeatherModelCall = weatherAPIService.getCurrentWeatherByCoords(lat,lon,API_KEY, units);
-        Log.i(LOG_TAG, currentWeatherModelCall.request().url().toString());
-        final Call<ForecastWeatherModel> forecastWeatherModelCall = weatherAPIService.getForecastWeatherByCoords(lat,lon,API_KEY, units);
-        new Thread(() -> {
-            try {
-                handleCurrentWeatherResponse(currentWeatherModelCall, lat, lon);
-                handleForecastWeatherResponse(forecastWeatherModelCall);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            getUVIndex(lat, lon);
-        }).start();
     }
 
     private void getUVIndex(double lat, double lon){
