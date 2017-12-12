@@ -27,7 +27,6 @@ import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.transition.Fade;
-import android.util.Log;
 import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -47,7 +46,10 @@ import com.kodatos.cumulonimbus.utils.UVIndexActivity;
 import org.parceler.Parcels;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.Locale;
 import java.util.TimeZone;
 
@@ -98,6 +100,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         LinearLayoutManager lm = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         mBinding.forecastLayout.mainRecyclerview.setLayoutManager(lm);
         mAdapter = new MainRecyclerViewAdapter(this);
+        mAdapter.setHasStableIds(true);
         mBinding.forecastLayout.mainRecyclerview.setAdapter(mAdapter);
         if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)!= PackageManager.PERMISSION_GRANTED){
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 140);
@@ -241,8 +244,17 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     }
 
     @Override
-    public void onForecastItemClick(DBModel intentModel, int position, ImageView forecastImageView) {
-        Log.d(getClass().getName(), String.valueOf(findViewById(android.R.id.statusBarBackground)==null));
+    public void onForecastItemClick(int position, ImageView forecastImageView) {
+        ArrayList<DBModel> intentModels = new ArrayList<>();
+        Calendar calendar = new GregorianCalendar();
+        calendar.setTime(new Date(defaultSharedPreferences.getLong(getString(R.string.last_update_date_key), 0)));
+        calendar.setTimeZone(TimeZone.getTimeZone("UTC"));
+
+        int startingRow = 8 - (calendar.get(Calendar.HOUR_OF_DAY) / 3);
+        startingRow += position * 8;
+        for (int i = startingRow; i < startingRow + 8; i++)
+            intentModels.add(mAdapter.getDBModelFromCursor(i));
+
         forecastImageView.setTransitionName(String.valueOf(position)+"forecast_image");
         String imageTransitionName =  String.valueOf(position)+"forecast_image";
         Intent intent = new Intent(this, WeatherDetailActivity.class);
@@ -250,8 +262,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 Pair.create(forecastImageView, imageTransitionName),
                 Pair.create(mBinding.forecastCard, mBinding.forecastCard.getTransitionName())
                 );
-        intent.putExtra(getString(R.string.weather_detail_parcel_name), Parcels.wrap(intentModel));
-        intent.putExtra(getString(R.string.weather_detail_day_name), position);
+        intent.putExtra(getString(R.string.weather_detail_parcel_name), Parcels.wrap(intentModels));
+        intent.putExtra(getString(R.string.weather_detail_day_name), position + 1);
         intent.putExtra(getString(R.string.forecats_image_transistion_key), imageTransitionName);
         startActivity(intent, options.toBundle());
     }

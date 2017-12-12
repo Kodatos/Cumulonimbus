@@ -1,5 +1,7 @@
 package com.kodatos.cumulonimbus;
 
+import android.animation.ArgbEvaluator;
+import android.animation.ValueAnimator;
 import android.app.ActivityManager;
 import android.content.SharedPreferences;
 import android.databinding.DataBindingUtil;
@@ -17,15 +19,22 @@ import com.kodatos.cumulonimbus.utils.MiscUtils;
 
 import org.parceler.Parcels;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.List;
 import java.util.TimeZone;
 
-public class WeatherDetailActivity extends AppCompatActivity {
+public class WeatherDetailActivity extends AppCompatActivity implements TimelineRecyclerViewAdapter.TimelineItemClickListener {
 
     private ActivityWeatherDetailBinding mBinding;
-    private DBModel mModel;
+    private ArrayList<DBModel> mModels;
+    private boolean justOpened = true;
+    private int previousBackgroundColor;
+
+    private int day;
+    private boolean metric;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,35 +53,73 @@ public class WeatherDetailActivity extends AppCompatActivity {
         setSupportActionBar(mBinding.toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
         mBinding.weatherImageView.setTransitionName(getIntent().getStringExtra(getString(R.string.forecats_image_transistion_key)));
-        mModel = Parcels.unwrap(getIntent().getParcelableExtra(getString(R.string.weather_detail_parcel_name)));
+        mModels = Parcels.unwrap(getIntent().getParcelableExtra(getString(R.string.weather_detail_parcel_name)));
         LinearLayoutManager lm = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
         mBinding.timelineRecyclerView.setLayoutManager(lm);
-        bindData();
+        initialize();
     }
 
-    private void bindData(){
-        int day = getIntent().getIntExtra(getString(R.string.weather_detail_day_name), 0);
+    private void initialize() {
+        day = getIntent().getIntExtra(getString(R.string.weather_detail_day_name), 0);
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
-        boolean metric = sp.getBoolean(getString(R.string.pref_metrics_key), true);
+        metric = sp.getBoolean(getString(R.string.pref_metrics_key), true);
         Calendar calendar = new GregorianCalendar();
         calendar.setTime(new Date(sp.getLong(getString(R.string.last_update_date_key),0)));
         calendar.setTimeZone(TimeZone.getTimeZone("UTC"));
-        int forecastToDisplayIndex = calendar.get(Calendar.HOUR_OF_DAY)/3;
+        int initialExpandedPosition = calendar.get(Calendar.HOUR_OF_DAY) / 3;
+        bindData(initialExpandedPosition);
 
-        int currentColor = MiscUtils.getBackgroundColorForIconID(this, mModel.getIcon_id().split("/")[forecastToDisplayIndex]);
-        mBinding.toolbar.setBackgroundColor(currentColor);
-        getWindow().getDecorView().setBackgroundColor(currentColor);
-        getWindow().setStatusBarColor(currentColor);
-        getWindow().setNavigationBarColor(currentColor);
-        ActivityManager.TaskDescription taskDescription = new ActivityManager.TaskDescription(getString(R.string.app_name), null, currentColor);
-        setTaskDescription(taskDescription);
-
-        DetailActivityDataModel bindingModel = MiscUtils.getDetailModelFromDBModel(this, mModel, day, metric, forecastToDisplayIndex);
-        mBinding.setDataModel(bindingModel);
-
-        TimelineRecyclerViewAdapter adapter = new TimelineRecyclerViewAdapter(mModel.getIcon_id(), mModel.getTempList(), this);
+        List<String> iconIds = new ArrayList<>();
+        List<String> temperatures = new ArrayList<>();
+        for (DBModel model : mModels) {
+            iconIds.add(model.getIcon_id());
+            temperatures.add(model.getTemp());
+            model.setUvIndex(mModels.get(initialExpandedPosition).getUvIndex());
+        }
+        TimelineRecyclerViewAdapter adapter = new TimelineRecyclerViewAdapter(this, iconIds, temperatures, initialExpandedPosition);
         mBinding.timelineRecyclerView.setAdapter(adapter);
 
         startPostponedEnterTransition();
+    }
+
+    private void bindData(int position) {
+        DetailActivityDataModel bindingModel = MiscUtils.getDetailModelFromDBModel(this, mModels.get(position), day, metric);
+        mBinding.setDataModel(bindingModel);
+
+        int currentColor = MiscUtils.getBackgroundColorForIconID(this, mModels.get(position).getIcon_id());
+        if (!justOpened)
+            changeBackgroundColorWithAnimation(currentColor);
+        else {
+            changeBackgroundColor(currentColor);
+            previousBackgroundColor = currentColor;
+            justOpened = false;
+        }
+        ActivityManager.TaskDescription taskDescription = new ActivityManager.TaskDescription(getString(R.string.app_name), null, currentColor);
+        setTaskDescription(taskDescription);
+    }
+
+    private void changeBackgroundColor(int updatedBackgroundColor) {
+        mBinding.toolbar.setBackgroundColor(updatedBackgroundColor);
+        getWindow().getDecorView().setBackgroundColor(updatedBackgroundColor);
+        getWindow().setStatusBarColor(updatedBackgroundColor);
+        getWindow().setNavigationBarColor(updatedBackgroundColor);
+    }
+
+    private void changeBackgroundColorWithAnimation(int updatedBackgroundColor) {
+        if (updatedBackgroundColor != previousBackgroundColor) {
+            ValueAnimator backgroundColorAnimator = ValueAnimator.ofObject(new ArgbEvaluator(), previousBackgroundColor, updatedBackgroundColor);
+            backgroundColorAnimator.setDuration(1000);
+            backgroundColorAnimator.addUpdateListener(animation -> {
+                int currentColor = (int) animation.getAnimatedValue();
+                changeBackgroundColor(currentColor);
+            });
+            backgroundColorAnimator.start();
+        }
+        previousBackgroundColor = updatedBackgroundColor;
+    }
+
+    @Override
+    public void onTimelineItemClick(int position) {
+        bindData(position);
     }
 }

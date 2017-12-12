@@ -59,9 +59,9 @@ public class MiscUtils {
     }
 
     public static DetailActivityDataModel getDetailModelFromDBModel(Context context, DBModel dbModel,
-                                                                    int day, boolean metric, int forecastToDisplayIndex) {
+                                                                    int day, boolean metric) {
         String date = getPatternDate("EEE, d MMM", day);
-        String tempMain = dbModel.getTempList().split("/")[forecastToDisplayIndex];
+        String tempMain = dbModel.getTemp();
         String unit = makeTemperaturePretty("", metric);
         String tempMin = String.valueOf(Math.round(dbModel.getTemp_min()));
         String tempMax = String.valueOf(Math.round(dbModel.getTemp_max()));
@@ -75,15 +75,15 @@ public class MiscUtils {
         String UVRisk = "Risk: "+UVClassifier(dbModel.getUvIndex());
         String rain = "Rain: "+String.valueOf(new DecimalFormat("#.##").format(dbModel.getRain_3h()))+" mm";
         String clouds = "Cloudiness: "+String.valueOf(dbModel.getClouds())+"%";
-        int imageId = getResourceIDForIconID(context, dbModel.getIcon_id().split("/")[forecastToDisplayIndex]);
-        int iconTint = MiscUtils.getIconTint(context, dbModel.getIcon_id().split("/")[forecastToDisplayIndex]);
+        int imageId = getResourceIDForIconID(context, dbModel.getIcon_id());
+        int iconTint = MiscUtils.getIconTint(context, dbModel.getIcon_id());
         return new DetailActivityDataModel(date, imageId, dbModel.getWeather_main(), dbModel.getWeather_desc(), tempMain, unit, tempMin,
                 tempMax, windDescription, windDirection, iconTint, windValue, pressure, humidity, UV, UVRisk, rain, clouds);
     }
 
     public static CurrentWeatherLayoutDataModel getCurrentWeatherDataFromDBModel(Context context, DBModel dbModel, boolean metric, long visibility, String sunrise, String sunset, String lastUpdated, String locationAndIcon) {
         String date = getPatternDate("dd MMMM, YYYY", 0);
-        String tempMain = makeTemperaturePretty(dbModel.getTempList(), metric);
+        String tempMain = makeTemperaturePretty(dbModel.getTemp(), metric);
         String tempMin = String.valueOf(Math.round(dbModel.getTemp_min()));
         String tempMax = String.valueOf(Math.round(dbModel.getTemp_max()));
         String[] windData = dbModel.getWind().split("/");
@@ -91,9 +91,9 @@ public class MiscUtils {
         float windDirection = Float.parseFloat(windData[1]);
         String windValue = windData[0] + (metric ? " m/s" : " mi/h");
         String humidity = String.valueOf(dbModel.getHumidity())+"%";
-        String pressure = String.valueOf((int)dbModel.getPressure())+"mb";
+        String pressure = String.valueOf((int) dbModel.getPressure()) + " mb";
         String UVIndexValue = String.valueOf(dbModel.getUvIndex());
-        String UVwithRisk = "UV Index: "+UVClassifier(dbModel.getUvIndex());
+        String UVWithRisk = "UV Index: " + UVClassifier(dbModel.getUvIndex());
         String rain = dbModel.getRain_3h() == -1 ? "" : String.valueOf(new DecimalFormat("#.##").format(dbModel.getRain_3h())) + " mm";
         String clouds = String.valueOf(dbModel.getClouds())+"%";
         double calculatedVisibility = (double) (visibility / 1000) * (metric ? 1 : 0.621);
@@ -102,7 +102,7 @@ public class MiscUtils {
         int iconTint = ColorUtils.setAlphaComponent(getBackgroundColorForIconID(context, dbModel.getIcon_id()), 175);
         return new CurrentWeatherLayoutDataModel(date, imageId, dbModel.getWeather_main(), dbModel.getWeather_desc(), tempMain,
                 null, tempMin, tempMax, windDescription, windDirection, iconTint, windValue, pressure, humidity,
-                UVIndexValue, UVwithRisk, rain, clouds, visibilityInKM, sunrise, sunset, lastUpdated, locationAndIcon);
+                UVIndexValue, UVWithRisk, rain, clouds, visibilityInKM, sunrise, sunset, lastUpdated, locationAndIcon);
     }
 
     public static String getPatternDate(String pattern, int dayOffset){

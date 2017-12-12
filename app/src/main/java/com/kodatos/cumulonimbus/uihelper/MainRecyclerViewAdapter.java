@@ -48,21 +48,27 @@ public class MainRecyclerViewAdapter extends RecyclerView.Adapter<MainRecyclerVi
 
     @Override
     public void onBindViewHolder(MainRecyclerViewHolder holder, int position) {
-        DBModel dbModel = getDBModelFromCursor(position+1);         //Since current weather is excluded, the first row of cursor is skipped
+        DBModel dbModel = getDBModelFromCursor((getProperPositionForCursor(position)));
         holder.bind(dbModel);
     }
 
     @Override
     public int getItemCount() {
-        if(null==mCursor)
+        if (null == mCursor || mCursor.getCount() < 33)
             return 0;
-        return mCursor.getCount()-1;
+        return 4;
     }
 
     @Override
     public long getItemId(int position) {
         mCursor.moveToPosition(position);
         return mCursor.getLong(0);
+    }
+
+    private int getProperPositionForCursor(int position) {
+        //Since current weather is excluded, the first row of cursor is skipped
+        //Also, every 8th row after first row is the required data for the upcoming days to be displayed on main screen
+        return ((position + 1) * 8);
     }
 
     /**
@@ -94,7 +100,7 @@ public class MainRecyclerViewAdapter extends RecyclerView.Adapter<MainRecyclerVi
     }
 
     public interface ForecastItemClickListener{
-        void onForecastItemClick(DBModel intentModel, int position, ImageView forecastImageView);
+        void onForecastItemClick(int position, ImageView forecastImageView);
     }
 
     public class MainRecyclerViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -118,16 +124,15 @@ public class MainRecyclerViewAdapter extends RecyclerView.Adapter<MainRecyclerVi
             boolean metric = sp.getBoolean(mContext.getString(R.string.pref_metrics_key), true);
             calendar.setTime(new Date(sp.getLong(mContext.getString(R.string.last_update_date_key), 0)));
             calendar.setTimeZone(TimeZone.getTimeZone("UTC"));
-            int forecastToDisplayIndex = calendar.get(Calendar.HOUR_OF_DAY) / 3;
-            int imageId = MiscUtils.getResourceIDForIconID(mContext, dbModel.getIcon_id().split("/")[forecastToDisplayIndex]);
-            DBModelCalculatedData calculatedData = new DBModelCalculatedData(imageId, MiscUtils.makeTemperaturePretty(dbModel.getTempList().split("/")[forecastToDisplayIndex], metric), displayDay, dbModel.getWeather_main(), dbModel.getWeather_desc());
+            int imageId = MiscUtils.getResourceIDForIconID(mContext, dbModel.getIcon_id());
+            DBModelCalculatedData calculatedData = new DBModelCalculatedData(imageId, MiscUtils.makeTemperaturePretty(dbModel.getTemp(), metric), displayDay, dbModel.getWeather_main(), dbModel.getWeather_desc());
             binding.setCalculateddata(calculatedData);
             binding.executePendingBindings();
         }
 
         @Override
         public void onClick(View view) {
-            itemClickListener.onForecastItemClick(getDBModelFromCursor(getAdapterPosition() + 1), getAdapterPosition() + 1, binding.forecastImage);
+            itemClickListener.onForecastItemClick(getAdapterPosition(), binding.forecastImage);
         }
     }
 }
