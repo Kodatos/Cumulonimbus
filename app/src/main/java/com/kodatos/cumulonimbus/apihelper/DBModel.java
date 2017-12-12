@@ -14,7 +14,7 @@ public class DBModel {
     private long id;
     private String weather_main;
     private String weather_desc;
-    private String tempList;
+    private String temp;
     private float temp_min;
     private float temp_max;
     private float pressure;
@@ -28,7 +28,7 @@ public class DBModel {
     public DBModel() {}
 
     @ParcelConstructor
-    public DBModel(long id, String weather_main, String weather_desc, String tempList, float temp_min, float temp_max, float pressure, long humidity, String wind, long clouds, String icon_id, double uvIndex, double rain_3h) {
+    public DBModel(long id, String weather_main, String weather_desc, String temp, float temp_min, float temp_max, float pressure, long humidity, String wind, long clouds, String icon_id, double uvIndex, double rain_3h) {
         this.id = id;
         this.weather_main = weather_main;
         //Capitalize first word of description
@@ -39,7 +39,7 @@ public class DBModel {
         }
         weather_desc = sb.toString();
         this.weather_desc = weather_desc;
-        this.tempList = tempList;
+        this.temp = temp;
         this.temp_min = temp_min;
         this.temp_max = temp_max;
         this.pressure = pressure;
@@ -75,12 +75,12 @@ public class DBModel {
         this.weather_desc = weather_desc;
     }
 
-    public String getTempList() {
-        return tempList;
+    public String getTemp() {
+        return temp;
     }
 
-    public void setTempList(String tempList) {
-        this.tempList = tempList;
+    public void setTemp(String temp) {
+        this.temp = temp;
     }
 
     public float getTemp_min() {

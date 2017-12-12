@@ -113,10 +113,10 @@ public class SyncOWMService extends IntentService {
         Call<UVIndexModel> uvIndexModelCall = weatherAPIService.getCurrentUVIndex(lat, lon, API_KEY);
         Call<List<UVIndexModel>> uvIndexModelsCall = weatherAPIService.getForecastUVIndex(lat,lon,API_KEY,4);
         try {
-            Response<UVIndexModel> uvIndexModelResponse = uvIndexModelCall.execute();
-            Response<List<UVIndexModel>> uvIndexModelsResponse = uvIndexModelsCall.execute();
-            if(uvIndexModelResponse.isSuccessful()){
-                UVIndexModel uvIndexModel = uvIndexModelResponse.body();
+            Response<UVIndexModel> currentUVIndexModelResponse = uvIndexModelCall.execute();
+            Response<List<UVIndexModel>> forecastUVIndexModelsResponse = uvIndexModelsCall.execute();
+            if (currentUVIndexModelResponse.isSuccessful()) {
+                UVIndexModel uvIndexModel = currentUVIndexModelResponse.body();
                 ContentValues cv = new ContentValues();
                 cv.put(WeatherDBContract.WeatherDBEntry.COLUMN_UV_INDEX, uvIndexModel.value);
                 String where = "_ID=?";
@@ -125,25 +125,25 @@ public class SyncOWMService extends IntentService {
             }
             else {
                 JSONObject jsonError;
-                jsonError = new JSONObject(uvIndexModelResponse.errorBody().string());
+                jsonError = new JSONObject(currentUVIndexModelResponse.errorBody().string());
                 String errorCode = String.valueOf(jsonError.getInt("cod"));
                 String errorMessage = jsonError.getString("message");
                 String errorLog = errorCode+":"+errorMessage;
                 Log.w(LOG_TAG, errorLog);
             }
-            if(uvIndexModelsResponse.isSuccessful()){
-                List<UVIndexModel> uvIndexModels = uvIndexModelsResponse.body();
+            if (forecastUVIndexModelsResponse.isSuccessful()) {
+                List<UVIndexModel> uvIndexModels = forecastUVIndexModelsResponse.body();
                 for(int i=1; i<=4; i++){
                     ContentValues cv = new ContentValues();
                     cv.put(WeatherDBContract.WeatherDBEntry.COLUMN_UV_INDEX,uvIndexModels.get(i-1).value);
                     String where = "_ID=?";
-                    String[] selectionArgs = new String[]{String.valueOf(i+1)};
+                    String[] selectionArgs = new String[]{String.valueOf((i * 8) + 1)};
                     getContentResolver().update(WeatherDBContract.WeatherDBEntry.CONTENT_URI,cv,where,selectionArgs);
                 }
             }
             else {
                 JSONObject jsonError;
-                jsonError = new JSONObject(uvIndexModelsResponse.errorBody().string());
+                jsonError = new JSONObject(forecastUVIndexModelsResponse.errorBody().string());
                 String errorCode = String.valueOf(jsonError.getInt("cod"));
                 String errorMessage = jsonError.getString("message");
                 String errorLog = errorCode+":"+errorMessage;
@@ -200,7 +200,7 @@ public class SyncOWMService extends IntentService {
         Response<ForecastWeatherModel> response = call.execute();
         if (response.isSuccessful()) {
             ForecastWeatherModel forecastWeatherModelResponse = response.body();
-            for(int i=0; i<=4; i++){
+            for (int i = 0; i <= forecastWeatherModelResponse.cnt; i++) {
                 ContentValues cv = forecastWeatherModelResponse.getEquivalentCV(i);
                 String where = "_ID=?";
                 String[] selectionArgs = new String[]{String.valueOf(i+1)};
