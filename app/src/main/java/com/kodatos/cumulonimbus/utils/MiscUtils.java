@@ -58,6 +58,7 @@ public class MiscUtils {
         }
     }
 
+    //Generates a ready to use data binding model for the detail screen from database model
     public static DetailActivityDataModel getDetailModelFromDBModel(Context context, DBModel dbModel,
                                                                     int day, boolean metric) {
         String date = getPatternDate("EEE, d MMM", day);
@@ -81,6 +82,7 @@ public class MiscUtils {
                 tempMax, windDescription, windDirection, iconTint, windValue, pressure, humidity, UV, UVRisk, rain, clouds);
     }
 
+    // Generates a ready to use data binding model for main screen from database model and other variables
     public static CurrentWeatherLayoutDataModel getCurrentWeatherDataFromDBModel(Context context, DBModel dbModel, boolean metric, long visibility, String sunrise, String sunset, String lastUpdated, String locationAndIcon) {
         String date = getPatternDate("dd MMMM, YYYY", 0);
         String tempMain = makeTemperaturePretty(dbModel.getTemp(), metric);

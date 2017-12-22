@@ -4,7 +4,6 @@ import android.content.Context;
 import android.graphics.Color;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -75,6 +74,7 @@ public class TimelineRecyclerViewAdapter extends RecyclerView.Adapter<TimelineRe
         return calendar.getTime();
     }
 
+    //Callback to containing activity
     public interface TimelineItemClickListener {
         void onTimelineItemClick(int position);
     }
@@ -94,7 +94,6 @@ public class TimelineRecyclerViewAdapter extends RecyclerView.Adapter<TimelineRe
             binding.timelineTemperatureView.setText(temperature);
             binding.timelineWeatherImageView.setImageDrawable(mContext.getDrawable(imageID));
             if (isCurrentlyExpanded) {
-                Log.d(getClass().getName(), "Darkening position" + getAdapterPosition());
                 binding.getRoot().setBackgroundColor(ContextCompat.getColor(mContext, R.color.whiteOneShadeDarker));
             } else {
                 binding.getRoot().setBackgroundColor(Color.WHITE);

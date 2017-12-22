@@ -20,7 +20,6 @@
             android:id="@+id/currentWeatherImageView"
             android:layout_width="@dimen/mainui_weather_icon_size"
             android:layout_height="@dimen/mainui_weather_icon_size"
-            android:layout_marginTop="16dp"
             android:scaleType="fitXY"
             app:drawableResource="@{currentWeatherData.weatherImageID}"
             app:layout_constraintHorizontal_bias="0.5"

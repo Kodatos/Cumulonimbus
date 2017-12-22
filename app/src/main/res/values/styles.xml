@@ -31,6 +31,17 @@
         <item name="android:listDivider">@null</item>
     </style>
 
+    <style name="CustomMenuButton" parent="Widget.AppCompat.ActionButton.Overflow">
+        <item name="android:paddingTop">8dp</item>
+        <item name="android:scaleType">center</item>
+    </style>
+
+    <style name="AppTheme.NoActionBar.ColouredBackground.Main">
+        <item name="android:windowBackground">@drawable/placeholder_background</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:actionOverflowButtonStyle">@style/CustomMenuButton</item>
+    </style>
+
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />

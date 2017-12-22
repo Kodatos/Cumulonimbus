@@ -56,6 +56,7 @@ import java.util.TimeZone;
 public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>, MainRecyclerViewAdapter.ForecastItemClickListener {
 
     private static final int LOADER_ID = 301;
+    private static final int PERMISSION_REQUEST_ID = 140;
 
     private ActivityMainBinding mBinding;
     private MainRecyclerViewAdapter mAdapter = null;
@@ -94,8 +95,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         weatherSharedPreferences = getSharedPreferences("weather_display_pref", MODE_PRIVATE);
 
-        previousBackgroundColor = MiscUtils.getBackgroundColorForIconID(this, weatherSharedPreferences.getString(getString(R.string.current_weather_icon_id_key), "01d"));
-        changeBackgroundColor(previousBackgroundColor);
+        previousBackgroundColor = MiscUtils.getBackgroundColorForIconID(this, weatherSharedPreferences.getString(getString(R.string.current_weather_icon_id_key), ""));
+        //changeBackgroundColor(previousBackgroundColor);
 
         LinearLayoutManager lm = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         mBinding.forecastLayout.mainRecyclerview.setLayoutManager(lm);
@@ -103,7 +104,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         mAdapter.setHasStableIds(true);
         mBinding.forecastLayout.mainRecyclerview.setAdapter(mAdapter);
         if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)!= PackageManager.PERMISSION_GRANTED){
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 140);
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_REQUEST_ID);
         }
         else
             getSupportLoaderManager().initLoader(LOADER_ID,null,this);
@@ -120,9 +121,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
         switch (id) {
@@ -138,10 +136,11 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         return super.onOptionsItemSelected(item);
     }
 
+    // Implement necessary listeners to UI elements
     private void setUpUIInteractions() {
         mBinding.mainUISwipeRefreshLayout.setOnRefreshListener(() -> startSync(1));
 
-        /* Enable animated view hiding by clicking on expand arrow */
+        //Enable animated view hiding by clicking on expand arrow
         mBinding.currentLayout.expandArrow.setOnClickListener(v -> {
             //Decide on the visibility and alpha to achieve
             int toVisibility = mBinding.currentLayout.currentHiddenLayout.getVisibility() == View.GONE ? View.VISIBLE : View.GONE;
@@ -203,9 +202,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         startService(intent);
     }
 
-    /*
-        LoaderCallback Overrides
-     */
+    //LoaderCallback Overrides
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         if(id==LOADER_ID){
@@ -219,8 +216,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         if(data.getCount()==0){
             startSync(0);
-        }
-        else {
+        } else if (data.getCount() > 32) {
             mBinding.mainUISwipeRefreshLayout.setRefreshing(false);
             mAdapter.swapCursor(data);
             bindCurrentWeatherData();
@@ -234,7 +230,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if(requestCode==140){
+        if (requestCode == PERMISSION_REQUEST_ID) {
             if(grantResults.length>0 && grantResults[0]==PackageManager.PERMISSION_GRANTED){
                 getSupportLoaderManager().initLoader(LOADER_ID,null,this);
             }
@@ -246,15 +242,19 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     @Override
     public void onForecastItemClick(int position, ImageView forecastImageView) {
         ArrayList<DBModel> intentModels = new ArrayList<>();
+
+        //Generate string that corresponds to the date
         Calendar calendar = new GregorianCalendar();
         calendar.setTime(new Date(defaultSharedPreferences.getLong(getString(R.string.last_update_date_key), 0)));
         calendar.setTimeZone(TimeZone.getTimeZone("UTC"));
-
         int startingRow = 8 - (calendar.get(Calendar.HOUR_OF_DAY) / 3);
         startingRow += position * 8;
+
+        //Add all 8 models to the list
         for (int i = startingRow; i < startingRow + 8; i++)
             intentModels.add(mAdapter.getDBModelFromCursor(i));
 
+        //Assign a unique transition name to the image
         forecastImageView.setTransitionName(String.valueOf(position)+"forecast_image");
         String imageTransitionName =  String.valueOf(position)+"forecast_image";
         Intent intent = new Intent(this, WeatherDetailActivity.class);
@@ -286,15 +286,26 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         int updatedBackgroundColor = MiscUtils.getBackgroundColorForIconID(this, weatherSharedPreferences.getString(getString(R.string.current_weather_icon_id_key), "01d"));
         if (!justOpened)
             changeBackgroundColorWithAnimation(updatedBackgroundColor);
-        else
+        else {
+            changeBackgroundColor(updatedBackgroundColor);
             justOpened = false;
-
+        }
+        if (mBinding.placeholderImageView.getVisibility() == View.VISIBLE) {
+            mBinding.placeholderImageView.animate().alpha(0.0f).setDuration(300).setListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    mBinding.placeholderImageView.setVisibility(View.GONE);
+                    super.onAnimationEnd(animation);
+                }
+            });
+        }
         mBinding.forecastLayout.forecastHeading.setTextColor(updatedBackgroundColor);
         mBinding.mainUISwipeRefreshLayout.setColorSchemeColors(MiscUtils.getIconTint(this, intermediateModel.getIcon_id()));
         ActivityManager.TaskDescription taskDescription = new ActivityManager.TaskDescription(getString(R.string.app_name), null, updatedBackgroundColor);
         setTaskDescription(taskDescription);
     }
 
+    //Utility method to change background color of the activity
     private void changeBackgroundColor(int updatedBackgroundColor) {
         mBinding.toolbarMain.setBackgroundColor(updatedBackgroundColor);
         getWindow().getDecorView().setBackgroundColor(updatedBackgroundColor);

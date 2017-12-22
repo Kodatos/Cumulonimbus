@@ -73,6 +73,8 @@ public class SyncOWMService extends IntentService {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
         units = sp.getBoolean(getString(R.string.pref_metrics_key), true) ? "metric" : "imperial";
         if (sp.getBoolean(this.getString(R.string.pref_curr_location_key), true)) {
+
+            //User expects current location data. Hence, last known co-ordinates are retrieved and the respective url called.
             FusedLocationProviderClient mFusedClient = LocationServices.getFusedLocationProviderClient(this);
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                 try {
@@ -82,6 +84,8 @@ public class SyncOWMService extends IntentService {
                     final Call<CurrentWeatherModel> currentWeatherModelCall = weatherAPIService.getCurrentWeatherByCoords(lat, lon, API_KEY, units);
                     Log.i(LOG_TAG, currentWeatherModelCall.request().url().toString());
                     final Call<ForecastWeatherModel> forecastWeatherModelCall = weatherAPIService.getForecastWeatherByCoords(lat, lon, API_KEY, units);
+
+                    //Execute responses
                     handleCurrentWeatherResponse(currentWeatherModelCall, lat, lon);
                     handleForecastWeatherResponse(forecastWeatherModelCall);
                     getUVIndex(lat, lon);
@@ -91,13 +95,17 @@ public class SyncOWMService extends IntentService {
             }
         }
         else{
+            // User expects data for a particular custom location. The location string is directly used for url call.
             String custom_location = sp.getString(this.getString(R.string.pref_custom_location_key), this.getString(R.string.pref_custom_location_def));
             Log.i(LOG_TAG, custom_location);
             Call<CurrentWeatherModel> currentWeatherModelCall = weatherAPIService.getCurrentWeatherByString(custom_location, API_KEY, units);
             Log.i(LOG_TAG, currentWeatherModelCall.request().url().toString());
             Call<ForecastWeatherModel> forecastWeatherModelCall = weatherAPIService.getForecastWeatherByString(custom_location, API_KEY, units);
             Geocoder geocoder = new Geocoder(this, Locale.getDefault());
+
+            //Execute responses
             try {
+                //The UV index API only accepts co-ordinates as parameters. Hence the custom location name has to be geocoded
                 List<Address> addresses = geocoder.getFromLocationName(custom_location, 1);
                 handleCurrentWeatherResponse(currentWeatherModelCall);
                 handleForecastWeatherResponse(forecastWeatherModelCall);
@@ -109,12 +117,14 @@ public class SyncOWMService extends IntentService {
         sp.edit().putLong(getString(R.string.last_update_date_key), System.currentTimeMillis()).apply();
     }
 
+    // Handles acquiring UV index data for both current and forecast weather
     private void getUVIndex(double lat, double lon){
         Call<UVIndexModel> uvIndexModelCall = weatherAPIService.getCurrentUVIndex(lat, lon, API_KEY);
         Call<List<UVIndexModel>> uvIndexModelsCall = weatherAPIService.getForecastUVIndex(lat,lon,API_KEY,4);
         try {
             Response<UVIndexModel> currentUVIndexModelResponse = uvIndexModelCall.execute();
             Response<List<UVIndexModel>> forecastUVIndexModelsResponse = uvIndexModelsCall.execute();
+
             if (currentUVIndexModelResponse.isSuccessful()) {
                 UVIndexModel uvIndexModel = currentUVIndexModelResponse.body();
                 ContentValues cv = new ContentValues();
@@ -122,8 +132,7 @@ public class SyncOWMService extends IntentService {
                 String where = "_ID=?";
                 String[] selectionArgs = new String[]{"1"};
                 getContentResolver().update(WeatherDBContract.WeatherDBEntry.CONTENT_URI,cv,where,selectionArgs);
-            }
-            else {
+            } else {
                 JSONObject jsonError;
                 jsonError = new JSONObject(currentUVIndexModelResponse.errorBody().string());
                 String errorCode = String.valueOf(jsonError.getInt("cod"));
@@ -131,17 +140,22 @@ public class SyncOWMService extends IntentService {
                 String errorLog = errorCode+":"+errorMessage;
                 Log.w(LOG_TAG, errorLog);
             }
+
             if (forecastUVIndexModelsResponse.isSuccessful()) {
                 List<UVIndexModel> uvIndexModels = forecastUVIndexModelsResponse.body();
-                for(int i=1; i<=4; i++){
+                for(int i = 1; i<=4; i++){
+                    /*
+                     * The UV Index API response only has one record per day, in contrast to 8 records per day for weather data.
+                     * Hence, it is written at only one row from the 8 rows of that particular day at a position which can be determined
+                     * easily at data binding
+                     */
                     ContentValues cv = new ContentValues();
                     cv.put(WeatherDBContract.WeatherDBEntry.COLUMN_UV_INDEX,uvIndexModels.get(i-1).value);
                     String where = "_ID=?";
                     String[] selectionArgs = new String[]{String.valueOf((i * 8) + 1)};
                     getContentResolver().update(WeatherDBContract.WeatherDBEntry.CONTENT_URI,cv,where,selectionArgs);
                 }
-            }
-            else {
+            } else {
                 JSONObject jsonError;
                 jsonError = new JSONObject(forecastUVIndexModelsResponse.errorBody().string());
                 String errorCode = String.valueOf(jsonError.getInt("cod"));
@@ -155,13 +169,17 @@ public class SyncOWMService extends IntentService {
         }
     }
 
+    //Handles acquiring current weather data
     private void handleCurrentWeatherResponse(Call<CurrentWeatherModel> call, double... coords) throws IOException {
         Response<CurrentWeatherModel> response = call.execute();
         if(response.isSuccessful()){
             CurrentWeatherModel currentWeatherModelResponse = response.body();
             ContentValues cv = currentWeatherModelResponse.getEquivalentCV();
             SharedPreferences weatherSP = getSharedPreferences("weather_display_pref", MODE_PRIVATE);
+
+            //Current weather data that cannot be written in database is saved in shared preferences.
             String locationAndIcon;
+            //Generate location string to display in UI. The boolean segment indicates current or custom location.
             if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean(this.getString(R.string.pref_curr_location_key), true)) {
                 locationAndIcon = MiscUtils.getAddressFromLatLong(coords[0], coords[1], this) + "/true";
             } else {
@@ -172,17 +190,18 @@ public class SyncOWMService extends IntentService {
                     putString(getString(R.string.current_weather_icon_id_key), currentWeatherModelResponse.weather.get(0).icon).
                     putLong(getString(R.string.current_weather_visibility), currentWeatherModelResponse.visibility).
                     putString(getString(R.string.location_name_key), locationAndIcon).apply();
+
+            // Current weather data is stored as 1st ID
             String where = "_ID=?";
             String[] selectionArgs = new String[]{"1"};
             if(UPDATE_ACTION.equals(mIntent.getAction())){
                 getContentResolver().update(WeatherDBContract.WeatherDBEntry.CONTENT_URI,cv,where,selectionArgs);
-            }
-            else if(CREATE_ACTION.equals(mIntent.getAction())){
+            } else if(CREATE_ACTION.equals(mIntent.getAction())){
+                //Since UV Index data is acquired after current weather, it is initially set as 0
                 cv.put(WeatherDBContract.WeatherDBEntry.COLUMN_UV_INDEX, 0.0);
                 getContentResolver().insert(WeatherDBContract.WeatherDBEntry.CONTENT_URI,cv);
             }
-        }
-        else {
+        } else {
             JSONObject jsonError;
             try {
                 jsonError = new JSONObject(response.errorBody().string());
@@ -196,25 +215,27 @@ public class SyncOWMService extends IntentService {
         }
     }
 
+    //Handles acquiring forecast weather data for next 4 days
     private void handleForecastWeatherResponse(Call<ForecastWeatherModel> call) throws IOException {
         Response<ForecastWeatherModel> response = call.execute();
         if (response.isSuccessful()) {
             ForecastWeatherModel forecastWeatherModelResponse = response.body();
+
+            //Store all records available
             for (int i = 0; i <= forecastWeatherModelResponse.cnt; i++) {
                 ContentValues cv = forecastWeatherModelResponse.getEquivalentCV(i);
                 String where = "_ID=?";
                 String[] selectionArgs = new String[]{String.valueOf(i+1)};
                 if(UPDATE_ACTION.equals(mIntent.getAction()) || i==0){
+                    //Current weather data rarely gives rain volume for the day. Hence, it is calculated here.
                     getContentResolver().update(WeatherDBContract.WeatherDBEntry.CONTENT_URI,cv,where,selectionArgs);
-                }
-                else if(CREATE_ACTION.equals(mIntent.getAction())){
+                } else if(CREATE_ACTION.equals(mIntent.getAction())){
                     cv.put(WeatherDBContract.WeatherDBEntry.COLUMN_UV_INDEX, 0.0);
                     getContentResolver().insert(WeatherDBContract.WeatherDBEntry.CONTENT_URI,cv);
                 }
             }
             Log.d(LOG_TAG, "forecast done");
-        }
-        else {
+        } else {
             JSONObject jsonError;
             try {
                 jsonError = new JSONObject(response.errorBody().string());

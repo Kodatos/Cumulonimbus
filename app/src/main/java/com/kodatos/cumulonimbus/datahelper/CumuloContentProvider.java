@@ -9,9 +9,10 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
-import static com.kodatos.cumulonimbus.datahelper.WeatherDBContract.*;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+
+import static com.kodatos.cumulonimbus.datahelper.WeatherDBContract.WeatherDBEntry;
 
 
 public class CumuloContentProvider extends ContentProvider {
@@ -21,9 +22,8 @@ public class CumuloContentProvider extends ContentProvider {
     //Codes for supported uris
     public static final int WEATHER_DATA = 100;
     public static final int WEATHER_WITH_ID = 101;
-
-    private WeatherDBHelper mDBHelper;
     private static final UriMatcher sUriMatcher = buildMatcher();
+    private WeatherDBHelper mDBHelper;
 
     //URIMatcher builder for two uris
     public static UriMatcher buildMatcher(){
@@ -105,7 +105,8 @@ public class CumuloContentProvider extends ContentProvider {
                                 break;
             default: throw new UnsupportedOperationException("Unknown Uri "+uri.toString());
         }
-        getContext().getContentResolver().notifyChange(uri,null);
+        if (selectionArgs != null && ("1".equals(selectionArgs[0]) || "33".equals(selectionArgs[0])))
+            getContext().getContentResolver().notifyChange(uri, null);
         return retno;
     }
 }

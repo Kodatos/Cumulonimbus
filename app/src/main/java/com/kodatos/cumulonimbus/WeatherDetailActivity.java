@@ -33,7 +33,7 @@ public class WeatherDetailActivity extends AppCompatActivity implements Timeline
     private boolean justOpened = true;
     private int previousBackgroundColor;
 
-    private int day;
+    private int day;        // Day for which details are shown
     private boolean metric;
 
     @Override
@@ -74,6 +74,7 @@ public class WeatherDetailActivity extends AppCompatActivity implements Timeline
         for (DBModel model : mModels) {
             iconIds.add(model.getIcon_id());
             temperatures.add(model.getTemp());
+            //Carry over UV Index data available from one model to all 8 models
             model.setUvIndex(mModels.get(initialExpandedPosition).getUvIndex());
         }
         TimelineRecyclerViewAdapter adapter = new TimelineRecyclerViewAdapter(this, iconIds, temperatures, initialExpandedPosition);
