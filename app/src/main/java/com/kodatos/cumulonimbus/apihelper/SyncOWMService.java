@@ -40,6 +40,12 @@ import retrofit2.converter.gson.GsonConverterFactory;
 /**
  * An {@link IntentService} subclass for handling asynchronous task requests in
  * a service on a separate handler thread for getting weather data from OpenWeatherMap.
+ *
+ * Two notable observations are used to properly set and evaluate weather data while properly demarcating current and forecast :
+ *  1. For any given time in UTC, the number of 3 hour forecasts for the same day available can be given by 7 - (time/3).
+ *      Also, since the first row is occupied by current data, one more row has to be skipped to get the next day forecast
+ *  2. Every 8th record from the beginning of forecast data corresponds to data for the current time but for the next coming days.
+ *     This is suitable for getting a row from the whole database which is guaranteed to belong to the desired day.
  */
 public class SyncOWMService extends IntentService {
 

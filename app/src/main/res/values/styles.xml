@@ -82,9 +82,8 @@
     </style>
 
     <style name="ForecastHeaderText">
-        <item name="android:background">@color/whiteOneShadeDarker</item>
         <item name="android:textAppearance">@android:style/TextAppearance.Material</item>
-        <item name="android:textColor">@color/textColorTertiary</item>
+        <item name="android:textColor">@color/textColorPrimaryInverse</item>
         <item name="android:textSize">16sp</item>
         <item name="fontFamily">@font/product_sans_bold</item>
     </style>

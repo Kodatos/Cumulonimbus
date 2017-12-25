@@ -39,4 +39,6 @@
     <string name="temperature_header_text">Temp</string>
     <string name="_3_hour_forecast">3 hour forecast</string>
     <string name="detail_forecast">Details at current time</string>
+    <string name="today_at_a_glance">Today at a glance</string>
+    <string name="next_four_days">Next four days</string>
 </resources>

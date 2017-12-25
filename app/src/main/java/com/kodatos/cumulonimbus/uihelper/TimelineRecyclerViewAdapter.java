@@ -34,11 +34,8 @@ public class TimelineRecyclerViewAdapter extends RecyclerView.Adapter<TimelineRe
         this.iconIds = iconIds;
         this.temperatures = temperatures;
         mContext = context;
-        try {
+        if (expandedPosition != Integer.MIN_VALUE)
             this.timelineItemClickListener = (TimelineItemClickListener) context;
-        } catch (ClassCastException e) {
-            e.printStackTrace();
-        }
         this.expandedPosition = expandedPosition;
     }
 
@@ -63,14 +60,23 @@ public class TimelineRecyclerViewAdapter extends RecyclerView.Adapter<TimelineRe
 
     @Override
     public int getItemCount() {
-        return 8;
+        return iconIds.size();
+    }
+
+    public void setIconIds(List<String> iconIds) {
+        this.iconIds = iconIds;
+    }
+
+    public void setTemperatures(List<String> temperatures) {
+        this.temperatures = temperatures;
     }
 
     private Date getCalendarHour(int position) {
+        int startingPosition = 8 - iconIds.size();
         Calendar calendar = new GregorianCalendar(TimeZone.getTimeZone("GMT"));
         calendar.set(Calendar.HOUR_OF_DAY, 0);
         calendar.set(Calendar.MINUTE, 0);
-        calendar.add(Calendar.HOUR, position * 3);
+        calendar.add(Calendar.HOUR, (startingPosition + position) * 3);
         return calendar.getTime();
     }
 
@@ -86,7 +92,8 @@ public class TimelineRecyclerViewAdapter extends RecyclerView.Adapter<TimelineRe
         public TimelineRecyclerViewHolder(ForecastTimelineRecyclerviewItemBinding binding) {
             super(binding.getRoot());
             this.binding = binding;
-            binding.getRoot().setOnClickListener(this);
+            if (expandedPosition != Integer.MIN_VALUE)
+                binding.getRoot().setOnClickListener(this);
         }
 
         public void bind(String time, String temperature, int imageID, boolean isCurrentlyExpanded) {

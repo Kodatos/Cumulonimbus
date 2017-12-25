@@ -5,9 +5,10 @@
     tools:ignore="ContentDescription">
 
     <data>
+
         <variable
             name="currentWeatherData"
-            type="com.kodatos.cumulonimbus.uihelper.CurrentWeatherLayoutDataModel"/>
+            type="com.kodatos.cumulonimbus.uihelper.CurrentWeatherLayoutDataModel" />
     </data>
 
     <android.support.constraint.ConstraintLayout
