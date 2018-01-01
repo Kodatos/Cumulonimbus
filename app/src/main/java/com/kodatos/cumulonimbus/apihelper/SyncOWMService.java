@@ -11,6 +11,7 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.preference.PreferenceManager;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -21,7 +22,7 @@ import com.kodatos.cumulonimbus.apihelper.models.CurrentWeatherModel;
 import com.kodatos.cumulonimbus.apihelper.models.ForecastWeatherModel;
 import com.kodatos.cumulonimbus.apihelper.models.UVIndexModel;
 import com.kodatos.cumulonimbus.datahelper.WeatherDBContract;
-import com.kodatos.cumulonimbus.utils.MiscUtils;
+import com.kodatos.cumulonimbus.utils.ServiceErrorContract;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -85,42 +86,116 @@ public class SyncOWMService extends IntentService {
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                 try {
                     Location location = Tasks.await(mFusedClient.getLastLocation());
-                    final double lat = location.getLatitude();
-                    final double lon = location.getLongitude();
-                    final Call<CurrentWeatherModel> currentWeatherModelCall = weatherAPIService.getCurrentWeatherByCoords(lat, lon, API_KEY, units);
-                    Log.i(LOG_TAG, currentWeatherModelCall.request().url().toString());
-                    final Call<ForecastWeatherModel> forecastWeatherModelCall = weatherAPIService.getForecastWeatherByCoords(lat, lon, API_KEY, units);
+                    if (location != null) {
+                        final double lat = location.getLatitude();
+                        final double lon = location.getLongitude();
+                        final Call<CurrentWeatherModel> currentWeatherModelCall = weatherAPIService.getCurrentWeatherByCoords(lat, lon, API_KEY, units);
+                        Log.i(LOG_TAG, currentWeatherModelCall.request().url().toString());
+                        final Call<ForecastWeatherModel> forecastWeatherModelCall = weatherAPIService.getForecastWeatherByCoords(lat, lon, API_KEY, units);
 
-                    //Execute responses
-                    handleCurrentWeatherResponse(currentWeatherModelCall, lat, lon);
-                    handleForecastWeatherResponse(forecastWeatherModelCall);
-                    getUVIndex(lat, lon);
-                } catch (ExecutionException | InterruptedException | IOException e) {
+                        //Execute responses
+                        handleCurrentWeatherResponse(currentWeatherModelCall, lat, lon);
+                        handleForecastWeatherResponse(forecastWeatherModelCall);
+                        getUVIndex(lat, lon);
+                    } else {
+                        broadcastError(ServiceErrorContract.ERROR_LOCATION, "null");
+                        return;
+                    }
+                } catch (InterruptedException e) {
                     e.printStackTrace();
+                } catch (ExecutionException | IOException e) {
+                    broadcastError(ServiceErrorContract.ERROR_LOCATION, "io");
+                    return;
                 }
             }
-        }
-        else{
+        } else {
             // User expects data for a particular custom location. The location string is directly used for url call.
             String custom_location = sp.getString(this.getString(R.string.pref_custom_location_key), this.getString(R.string.pref_custom_location_def));
             Log.i(LOG_TAG, custom_location);
             Call<CurrentWeatherModel> currentWeatherModelCall = weatherAPIService.getCurrentWeatherByString(custom_location, API_KEY, units);
             Log.i(LOG_TAG, currentWeatherModelCall.request().url().toString());
             Call<ForecastWeatherModel> forecastWeatherModelCall = weatherAPIService.getForecastWeatherByString(custom_location, API_KEY, units);
-            Geocoder geocoder = new Geocoder(this, Locale.getDefault());
 
             //Execute responses
             try {
                 //The UV index API only accepts co-ordinates as parameters. Hence the custom location name has to be geocoded
-                List<Address> addresses = geocoder.getFromLocationName(custom_location, 1);
-                handleCurrentWeatherResponse(currentWeatherModelCall);
-                handleForecastWeatherResponse(forecastWeatherModelCall);
-                getUVIndex(addresses.get(0).getLatitude(), addresses.get(0).getLongitude());
-            } catch (Exception e) {
-                e.printStackTrace();
+                String coords = getCachedOrGeocodedCoords(custom_location);
+                if (coords != null) {
+                    double latitude = Double.parseDouble(coords.split("/")[0]);
+                    double longitude = Double.parseDouble(coords.split("/")[1]);
+                    handleCurrentWeatherResponse(currentWeatherModelCall);
+                    handleForecastWeatherResponse(forecastWeatherModelCall);
+                    getUVIndex(latitude, longitude);
+                } else {
+                    broadcastError(ServiceErrorContract.ERROR_GEOCODER, "null");
+                    return;
+                }
+            } catch (IOException e) {
+                broadcastError(ServiceErrorContract.ERROR_GEOCODER, "io");
+                return;
             }
         }
         sp.edit().putLong(getString(R.string.last_update_date_key), System.currentTimeMillis()).apply();
+    }
+
+    /**
+     * Utility function that converts provided location to co-ordinates. First it checks whether the same location has
+     * been geocoded previously. If yes, it provides the previous co-ordinate results. Else, it does a fresh geocoding of
+     * the location name and saves the results.
+     *
+     * @param custom_location The user provided location to convert to co-ordinates.
+     * @return A string with co-ordinate data. Null if geocoding failed.
+     * @throws IOException If geocoding encountered network errors as specified in official Android documentation.
+     */
+    private String getCachedOrGeocodedCoords(String custom_location) throws IOException {
+        String customLocationKey = getString(R.string.cached_custom_location_key);
+        String customCoordsKey = getString(R.string.cached_custom_location_coords_key);
+        SharedPreferences weatherSP = getSharedPreferences("weather_display_pref", MODE_PRIVATE);
+        if (weatherSP.contains(customCoordsKey) && weatherSP.contains(customLocationKey)) {
+            if (weatherSP.getString(customLocationKey, "").equals(custom_location))
+                return weatherSP.getString(customCoordsKey, "");
+        }
+        Geocoder geocoder = new Geocoder(this, Locale.getDefault());
+        List<Address> addresses = geocoder.getFromLocationName(custom_location, 1);
+        if (addresses == null)
+            return null;
+        String coordsAsString = String.valueOf(addresses.get(0).getLatitude()) + "/" + String.valueOf(addresses.get(0).getLongitude());
+        weatherSP.edit()
+                .putString(customCoordsKey, coordsAsString)
+                .putString(customLocationKey, custom_location)
+                .apply();
+        return coordsAsString;
+    }
+
+    /**
+     * Utility function that converts provided co-ordinates to human readable address. First it checks whether the same co-ordinates have
+     * been reverse geocoded previously. If yes, it provides the previous address results. Else, it does a fresh reverse-geocoding of
+     * the co-ordinates and saves the results.
+     *
+     * @param lat Latitude part of co-ordinates
+     * @param lon Longitude part of co-ordinates
+     * @return String representing a human readable address. Null if reverse geocoding failed
+     * @throws IOException If geocoding encountered network errors as specified in official Android documentation.
+     */
+    private String getCachedOrReverseGeocodedAddress(double lat, double lon) throws IOException {
+        String addressKey = getString(R.string.cached_address_key);
+        String coordsKey = getString(R.string.cached_coords_key);
+        String coordsAsString = String.valueOf(lat) + "/" + String.valueOf(lon);
+        SharedPreferences weatherSP = getSharedPreferences("weather_display_pref", MODE_PRIVATE);
+        if (weatherSP.contains(coordsKey) && weatherSP.contains(addressKey)) {
+            if (weatherSP.getString(coordsKey, "").equals(coordsAsString))
+                return weatherSP.getString(addressKey, "");
+        }
+        Geocoder geocoder = new Geocoder(this, Locale.getDefault());
+        List<Address> addresses = geocoder.getFromLocation(lat, lon, 1);
+        if (addresses == null)
+            return null;
+        String address = addresses.get(0).getSubLocality() + ", " + addresses.get(0).getLocality() + ", " + addresses.get(0).getCountryName();
+        weatherSP.edit()
+                .putString(coordsKey, coordsAsString)
+                .putString(addressKey, address)
+                .apply();
+        return address;
     }
 
     // Handles acquiring UV index data for both current and forecast weather
@@ -143,7 +218,8 @@ public class SyncOWMService extends IntentService {
                 jsonError = new JSONObject(currentUVIndexModelResponse.errorBody().string());
                 String errorCode = String.valueOf(jsonError.getInt("cod"));
                 String errorMessage = jsonError.getString("message");
-                String errorLog = errorCode+":"+errorMessage;
+                String errorLog = errorCode+":"+ errorMessage;
+                broadcastError(ServiceErrorContract.ERROR_RESPONSE, errorLog);
                 Log.w(LOG_TAG, errorLog);
             }
 
@@ -166,17 +242,18 @@ public class SyncOWMService extends IntentService {
                 jsonError = new JSONObject(forecastUVIndexModelsResponse.errorBody().string());
                 String errorCode = String.valueOf(jsonError.getInt("cod"));
                 String errorMessage = jsonError.getString("message");
-                String errorLog = errorCode+":"+errorMessage;
+                String errorLog = errorCode+":"+ errorMessage;
+                broadcastError(ServiceErrorContract.ERROR_RESPONSE, errorLog);
                 Log.w(LOG_TAG, errorLog);
             }
 
-        } catch (Exception e) {
+        } catch (JSONException | IOException e) {
             e.printStackTrace();
         }
     }
 
     //Handles acquiring current weather data
-    private void handleCurrentWeatherResponse(Call<CurrentWeatherModel> call, double... coords) throws IOException {
+    private void handleCurrentWeatherResponse(Call<CurrentWeatherModel> call, double... coordinates) throws IOException {
         Response<CurrentWeatherModel> response = call.execute();
         if(response.isSuccessful()){
             CurrentWeatherModel currentWeatherModelResponse = response.body();
@@ -187,7 +264,19 @@ public class SyncOWMService extends IntentService {
             String locationAndIcon;
             //Generate location string to display in UI. The boolean segment indicates current or custom location.
             if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean(this.getString(R.string.pref_curr_location_key), true)) {
-                locationAndIcon = MiscUtils.getAddressFromLatLong(coords[0], coords[1], this) + "/true";
+                try {
+                    String address = getCachedOrReverseGeocodedAddress(coordinates[0], coordinates[1]);
+                    if (address == null) {
+                        broadcastError(ServiceErrorContract.ERROR_REVERSE_GEOCODER, "null");
+                        return;
+                    }
+                    locationAndIcon = address + "/true";
+                } catch (IOException e) {
+                    broadcastError(ServiceErrorContract.ERROR_REVERSE_GEOCODER, "io");
+                    //locationAndIcon="Unknown. Try again";
+                    e.printStackTrace();
+                    return;
+                }
             } else {
                 locationAndIcon = PreferenceManager.getDefaultSharedPreferences(this).getString(getString(R.string.pref_custom_location_key), "") + "/false";
             }
@@ -213,7 +302,8 @@ public class SyncOWMService extends IntentService {
                 jsonError = new JSONObject(response.errorBody().string());
                 String errorCode = String.valueOf(jsonError.getInt("cod"));
                 String errorMessage = jsonError.getString("message");
-                String errorLog = errorCode+":"+errorMessage;
+                String errorLog = errorCode+":"+ errorMessage;
+                broadcastError(ServiceErrorContract.ERROR_RESPONSE, errorLog);
                 Log.w(LOG_TAG, errorLog);
             } catch (JSONException | IOException e) {
                 e.printStackTrace();
@@ -247,11 +337,19 @@ public class SyncOWMService extends IntentService {
                 jsonError = new JSONObject(response.errorBody().string());
                 String errorCode = String.valueOf(jsonError.getInt("cod"));
                 String errorMessage = jsonError.getString("message");
-                String errorLog = errorCode+":"+errorMessage;
+                String errorLog = errorCode+":"+ errorMessage;
+                broadcastError(ServiceErrorContract.ERROR_RESPONSE, errorLog);
                 Log.w(LOG_TAG, errorLog);
             } catch (JSONException | IOException e) {
                 e.printStackTrace();
             }
         }
+    }
+
+    private void broadcastError(String type, String details) {
+        Intent errorIntent = new Intent(ServiceErrorContract.BROADCAST_INTENT_FILTER);
+        errorIntent.putExtra("error_message", type);
+        errorIntent.putExtra("error_details", details);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(errorIntent);
     }
 }

@@ -6,10 +6,10 @@
     <string name="uv_index_title">Ultraviolet Index</string>
 
     <string name="pref_curr_location_key">bool_current_location</string>
-    <string name="pref_curr_location">Use your current location? </string>
+    <string name="pref_curr_location_title">Use your current location? </string>
     <string name="pref_custom_location_def">Delhi</string>
     <string name="pref_custom_location_key">custom_location</string>
-    <string name="pref_custom_location">Custom location</string>
+    <string name="pref_custom_location_title">Custom location</string>
     <string name="pref_metrics_key">bool_use_metrics</string>
     <string name="pref_metrics">Use metric units ?</string>
     <string name="last_update_date_key">LUDOH4F</string>
@@ -33,6 +33,10 @@
     <string name="current_weather_icon_id_key">icon_id_for_back_color</string>
     <string name="current_weather_visibility">visibility_in_m</string>
     <string name="location_name_key">Location in string</string>
+    <string name="cached_custom_location_key">from_custom_location</string>
+    <string name="cached_custom_location_coords_key">to_custom_coords</string>
+    <string name="cached_coords_key">from_coords</string>
+    <string name="cached_address_key">to_address</string>
 
     <string name="date_header_text">Date</string>
     <string name="description_header_text">Description</string>

@@ -44,10 +44,6 @@ public class ForecastWeatherModel {
     public ContentValues getEquivalentCV(int position) {
         ContentValues cv = new ContentValues();
         float netRain3h=0;
-        /*
-        StringBuilder temperatureList = new StringBuilder();
-        StringBuilder iconList = new StringBuilder();
-        */
 
         /*
             This block provides the rain volume information for current weather, as the
@@ -73,19 +69,7 @@ public class ForecastWeatherModel {
         ForecastList fl = forecastList.get(position - 1);
         Weather w = fl.weather.get(0);
         Main m = fl.main;
-        /*
-        for(ForecastList flist : forecastList){
-            if(flist.dtTxt.contains(required)){
-                if (flist.rain != null)
-                    netRain3h += flist.rain._3h;
-                temperatureList.append(Math.round(flist.main.temp)).append("/");
-                iconList.append(flist.weather.get(0).icon).append("/");
-                if(i==7)
-                    break;
-                i++;
-            }
-        }
-        */
+
         if (fl.rain != null)
             netRain3h = fl.rain._3h;
 

@@ -47,15 +47,10 @@ public class MiscUtils {
      * @param context Requesting context
      * @return String containing locality and country
      */
-    public static String getAddressFromLatLong(double lat, double lon, Context context) {
+    public static String getAddressFromLatLong(double lat, double lon, Context context) throws IOException {
         Geocoder geocoder = new Geocoder(context, Locale.getDefault());
-        try {
-            List<Address> addresses = geocoder.getFromLocation(lat, lon, 1);
-            return addresses.get(0).getSubLocality() + ", " + addresses.get(0).getLocality() + ", " + addresses.get(0).getCountryName();
-        } catch (IOException e) {
-            e.printStackTrace();
-            return "";
-        }
+        List<Address> addresses = geocoder.getFromLocation(lat, lon, 1);
+        return addresses.get(0).getSubLocality() + ", " + addresses.get(0).getLocality() + ", " + addresses.get(0).getCountryName();
     }
 
     //Generates a ready to use data binding model for the detail screen from database model
