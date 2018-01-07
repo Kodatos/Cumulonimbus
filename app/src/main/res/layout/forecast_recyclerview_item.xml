@@ -64,7 +64,7 @@
         android:id="@+id/forecast_desc_textview"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="18dp"
+        android:layout_marginTop="4dp"
         android:maxLength="16"
         android:maxLines="1"
         android:text="@{calculateddata.weatherDesc}"
@@ -72,8 +72,8 @@
         android:textAppearance="@android:style/TextAppearance.Material.Medium"
         android:textSize="16sp"
         app:fontFamily="@font/product_sans_regular"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="@+id/forecast_main_textview"
+        app:layout_constraintTop_toBottomOf="@+id/forecast_main_textview"
         tools:text="Description" />
 
     <TextView

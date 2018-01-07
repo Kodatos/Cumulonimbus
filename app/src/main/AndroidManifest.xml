@@ -51,7 +51,7 @@
             android:theme="@style/AppTheme.NoActionBar.ColouredBackground" />
 
         <activity
-            android:name=".utils.UVIndexActivity"
+            android:name=".UVIndexActivity"
             android:launchMode="singleTop"
             android:parentActivityName=".MainActivity"
             android:theme="@style/AppTheme.NoActionBar.ColouredBackground" />

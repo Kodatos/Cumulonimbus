@@ -22,7 +22,6 @@ import com.kodatos.cumulonimbus.apihelper.models.CurrentWeatherModel;
 import com.kodatos.cumulonimbus.apihelper.models.ForecastWeatherModel;
 import com.kodatos.cumulonimbus.apihelper.models.UVIndexModel;
 import com.kodatos.cumulonimbus.datahelper.WeatherDBContract;
-import com.kodatos.cumulonimbus.utils.ServiceErrorContract;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -98,13 +97,14 @@ public class SyncOWMService extends IntentService {
                         handleForecastWeatherResponse(forecastWeatherModelCall);
                         getUVIndex(lat, lon);
                     } else {
-                        broadcastError(ServiceErrorContract.ERROR_LOCATION, "null");
-                        return;
+                        broadcastError(ServiceErrorContract.ERROR_LOCATION, ServiceErrorContract.ERROR_DETAILS_NULL + "/" + mIntent.getAction());
+                        stopSelf();
                     }
-                } catch (InterruptedException e) {
+                } catch (ExecutionException | InterruptedException e) {
                     e.printStackTrace();
-                } catch (ExecutionException | IOException e) {
-                    broadcastError(ServiceErrorContract.ERROR_LOCATION, "io");
+                } catch (IOException e) {
+                    broadcastError(ServiceErrorContract.ERROR_LOCATION, ServiceErrorContract.ERROR_DETAILS_IO);
+                    e.printStackTrace();
                     return;
                 }
             }
@@ -127,11 +127,12 @@ public class SyncOWMService extends IntentService {
                     handleForecastWeatherResponse(forecastWeatherModelCall);
                     getUVIndex(latitude, longitude);
                 } else {
-                    broadcastError(ServiceErrorContract.ERROR_GEOCODER, "null");
+                    broadcastError(ServiceErrorContract.ERROR_GEOCODER, ServiceErrorContract.ERROR_DETAILS_NULL);
                     return;
                 }
             } catch (IOException e) {
-                broadcastError(ServiceErrorContract.ERROR_GEOCODER, "io");
+                broadcastError(ServiceErrorContract.ERROR_GEOCODER, ServiceErrorContract.ERROR_DETAILS_IO);
+                e.printStackTrace();
                 return;
             }
         }
@@ -157,7 +158,7 @@ public class SyncOWMService extends IntentService {
         }
         Geocoder geocoder = new Geocoder(this, Locale.getDefault());
         List<Address> addresses = geocoder.getFromLocationName(custom_location, 1);
-        if (addresses == null)
+        if (addresses == null)  //Location name doesn't exist
             return null;
         String coordsAsString = String.valueOf(addresses.get(0).getLatitude()) + "/" + String.valueOf(addresses.get(0).getLongitude());
         weatherSP.edit()
@@ -188,7 +189,7 @@ public class SyncOWMService extends IntentService {
         }
         Geocoder geocoder = new Geocoder(this, Locale.getDefault());
         List<Address> addresses = geocoder.getFromLocation(lat, lon, 1);
-        if (addresses == null)
+        if (addresses == null)  //No matches were found
             return null;
         String address = addresses.get(0).getSubLocality() + ", " + addresses.get(0).getLocality() + ", " + addresses.get(0).getCountryName();
         weatherSP.edit()
@@ -197,6 +198,7 @@ public class SyncOWMService extends IntentService {
                 .apply();
         return address;
     }
+
 
     // Handles acquiring UV index data for both current and forecast weather
     private void getUVIndex(double lat, double lon){
@@ -261,21 +263,20 @@ public class SyncOWMService extends IntentService {
             SharedPreferences weatherSP = getSharedPreferences("weather_display_pref", MODE_PRIVATE);
 
             //Current weather data that cannot be written in database is saved in shared preferences.
-            String locationAndIcon;
+            String locationAndIcon = "Unknown. Try again";
             //Generate location string to display in UI. The boolean segment indicates current or custom location.
             if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean(this.getString(R.string.pref_curr_location_key), true)) {
                 try {
                     String address = getCachedOrReverseGeocodedAddress(coordinates[0], coordinates[1]);
                     if (address == null) {
                         broadcastError(ServiceErrorContract.ERROR_REVERSE_GEOCODER, "null");
-                        return;
+                        Log.e(LOG_TAG, "location null");
+                    } else {
+                        locationAndIcon = address + "/true";
                     }
-                    locationAndIcon = address + "/true";
                 } catch (IOException e) {
                     broadcastError(ServiceErrorContract.ERROR_REVERSE_GEOCODER, "io");
-                    //locationAndIcon="Unknown. Try again";
                     e.printStackTrace();
-                    return;
                 }
             } else {
                 locationAndIcon = PreferenceManager.getDefaultSharedPreferences(this).getString(getString(R.string.pref_custom_location_key), "") + "/false";
@@ -348,8 +349,8 @@ public class SyncOWMService extends IntentService {
 
     private void broadcastError(String type, String details) {
         Intent errorIntent = new Intent(ServiceErrorContract.BROADCAST_INTENT_FILTER);
-        errorIntent.putExtra("error_message", type);
-        errorIntent.putExtra("error_details", details);
+        errorIntent.putExtra(getString(R.string.service_error_type), type);
+        errorIntent.putExtra(getString(R.string.service_error_details), details);
         LocalBroadcastManager.getInstance(this).sendBroadcast(errorIntent);
     }
 }

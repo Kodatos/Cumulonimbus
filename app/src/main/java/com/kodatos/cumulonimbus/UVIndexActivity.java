@@ -1,4 +1,4 @@
-package com.kodatos.cumulonimbus.utils;
+package com.kodatos.cumulonimbus;
 
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
@@ -6,8 +6,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.transition.Slide;
 import android.view.Gravity;
 import android.view.MenuItem;
-
-import com.kodatos.cumulonimbus.R;
 
 
 public class UVIndexActivity extends AppCompatActivity {

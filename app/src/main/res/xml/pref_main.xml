@@ -5,11 +5,11 @@
         android:key="@string/pref_curr_location_key"
         android:summaryOff="Using Custom Location"
         android:summaryOn="Using Current Location"
-        android:title="@string/pref_curr_location"/>
+        android:title="@string/pref_curr_location_title" />
     <EditTextPreference
         android:defaultValue="@string/pref_custom_location_def"
         android:key="@string/pref_custom_location_key"
-        android:title="@string/pref_custom_location"
+        android:title="@string/pref_custom_location_title"
     />
     <CheckBoxPreference
         android:defaultValue="true"

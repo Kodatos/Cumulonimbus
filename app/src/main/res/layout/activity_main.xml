@@ -13,6 +13,7 @@
     </data>
 
 <android.support.design.widget.CoordinatorLayout
+    android:id="@+id/mainCoordinatorLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.kodatos.cumulonimbus.MainActivity">

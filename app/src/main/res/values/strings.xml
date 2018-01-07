@@ -38,6 +38,9 @@
     <string name="cached_coords_key">from_coords</string>
     <string name="cached_address_key">to_address</string>
 
+    <string name="service_error_type">error_type</string>
+    <string name="service_error_details">error_details</string>
+
     <string name="date_header_text">Date</string>
     <string name="description_header_text">Description</string>
     <string name="temperature_header_text">Temp</string>

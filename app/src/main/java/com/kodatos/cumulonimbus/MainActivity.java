@@ -5,10 +5,13 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ArgbEvaluator;
 import android.animation.ValueAnimator;
+import android.annotation.SuppressLint;
 import android.app.ActivityManager;
 import android.app.ActivityOptions;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -19,16 +22,21 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.support.v4.graphics.ColorUtils;
+import android.support.v4.content.LocalBroadcastManager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.transition.Fade;
+import android.util.Log;
 import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -36,7 +44,13 @@ import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.ImageView;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.location.LocationServices;
 import com.kodatos.cumulonimbus.apihelper.DBModel;
+import com.kodatos.cumulonimbus.apihelper.ServiceErrorContract;
 import com.kodatos.cumulonimbus.apihelper.SyncOWMService;
 import com.kodatos.cumulonimbus.databinding.ActivityMainBinding;
 import com.kodatos.cumulonimbus.datahelper.WeatherDBContract;
@@ -44,7 +58,6 @@ import com.kodatos.cumulonimbus.uihelper.CurrentWeatherLayoutDataModel;
 import com.kodatos.cumulonimbus.uihelper.MainRecyclerViewAdapter;
 import com.kodatos.cumulonimbus.uihelper.TimelineRecyclerViewAdapter;
 import com.kodatos.cumulonimbus.utils.MiscUtils;
-import com.kodatos.cumulonimbus.utils.UVIndexActivity;
 
 import org.parceler.Parcels;
 
@@ -61,6 +74,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     private static final int LOADER_ID = 301;
     private static final int PERMISSION_REQUEST_ID = 140;
+    private boolean locationPermissionEnabled = false;
 
     private ActivityMainBinding mBinding;
     private MainRecyclerViewAdapter forecastAdapter = null;
@@ -68,8 +82,10 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     private SharedPreferences defaultSharedPreferences;
     private SharedPreferences weatherSharedPreferences;
+    private ServiceErrorBroadcastReceiver mErrorReceiver;
 
     private int previousBackgroundColor;
+    private int iconTintColor;
     private int hiddenLayoutHeight;
     private boolean justOpened = true;
     private int todayForecastCount;
@@ -81,6 +97,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         setSupportActionBar(mBinding.toolbarMain);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
+        //Calculate height of hidden layout
         mBinding.currentLayout.currentHiddenLayout.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
             public void onGlobalLayout() {
@@ -93,6 +110,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         Fade fade = new Fade();
         fade.setDuration(1000);
         fade.addTarget(mBinding.currentLayout.currentLayoutAlwaysVisible);
+        fade.addTarget(mBinding.forecastLayout.getRoot());
         getWindow().setEnterTransition(fade);
         getWindow().setExitTransition(fade);
         getWindow().setReturnTransition(fade);
@@ -102,7 +120,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         weatherSharedPreferences = getSharedPreferences("weather_display_pref", MODE_PRIVATE);
 
         previousBackgroundColor = MiscUtils.getBackgroundColorForIconID(this, weatherSharedPreferences.getString(getString(R.string.current_weather_icon_id_key), ""));
-        //changeBackgroundColor(previousBackgroundColor);
 
         LinearLayoutManager lm = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         mBinding.forecastLayout.mainRecyclerview.setLayoutManager(lm);
@@ -111,12 +128,28 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         forecastAdapter = new MainRecyclerViewAdapter(this);
         forecastAdapter.setHasStableIds(true);
         mBinding.forecastLayout.mainRecyclerview.setAdapter(forecastAdapter);
+
+        mErrorReceiver = new ServiceErrorBroadcastReceiver();
+        LocalBroadcastManager.getInstance(this).registerReceiver(mErrorReceiver, new IntentFilter(ServiceErrorContract.BROADCAST_INTENT_FILTER));
+
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_REQUEST_ID);
         } else
             getSupportLoaderManager().initLoader(LOADER_ID, null, this);
 
         setUpUIInteractions();
+    }
+
+    @Override
+    protected void onResume() {
+        LocalBroadcastManager.getInstance(this).registerReceiver(mErrorReceiver, new IntentFilter(ServiceErrorContract.BROADCAST_INTENT_FILTER));
+        super.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mErrorReceiver);
+        super.onPause();
     }
 
     @Override
@@ -132,8 +165,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
         switch (id) {
             case R.id.action_settings:
-                Intent intent = new Intent(this, SettingsActivity.class);
-                startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(this).toBundle());
+                openSettingsActivity();
                 break;
             case R.id.action_refresh:
                 mBinding.mainUISwipeRefreshLayout.setRefreshing(true);
@@ -145,6 +177,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     // Implement necessary listeners to UI elements
     private void setUpUIInteractions() {
+        //Sync on swipe
         mBinding.mainUISwipeRefreshLayout.setOnRefreshListener(() -> startSync(1));
 
         //Enable animated view hiding by clicking on expand arrow
@@ -184,20 +217,23 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         });
 
         mBinding.currentLayout.currentShadesImageView.setOnClickListener(v -> {
+            //Open UV info activity
             Intent intent = new Intent(this, UVIndexActivity.class);
             startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(this).toBundle());
         });
     }
 
+    //Utility method to check internet connection
     public boolean getConnectionStatus() {
         ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo info = cm != null ? cm.getActiveNetworkInfo() : null;
         return info != null && info.isConnectedOrConnecting();
     }
 
+    //Call the service to update data. If action is zero then create rows, else update
     public void startSync(final int action) {
         if (!getConnectionStatus()) {
-            MiscUtils.displayDialogMessage(this, "No Internet Connection Available", "An internet connection is needed for updating. Try again later", action == 0);
+            displayDialogMessage("No Internet Connection Available", "An internet connection is needed for updating. Try again later", action == 0);
             mBinding.mainUISwipeRefreshLayout.setRefreshing(false);
             return;
         }
@@ -209,7 +245,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         startService(intent);
     }
 
-    //LoaderCallback Overrides
+    //region LoaderCallback Overrides
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         if (id == LOADER_ID) {
@@ -221,9 +257,9 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        if (data.getCount() == 0) {
+        if (data.getCount() == 0) { //If database is empty, start sync
             startSync(0);
-        } else if (data.getCount() > 32) {
+        } else if (data.getCount() > 32) {  //Bind new data only when all required rows are updated
             mBinding.mainUISwipeRefreshLayout.setRefreshing(false);
             forecastAdapter.swapCursor(data);
             bindCurrentWeatherData();
@@ -234,14 +270,16 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     public void onLoaderReset(Loader<Cursor> loader) {
         forecastAdapter.swapCursor(null);
     }
+    //endregion
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode == PERMISSION_REQUEST_ID) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                locationPermissionEnabled = true;
                 getSupportLoaderManager().initLoader(LOADER_ID, null, this);
             } else
-                MiscUtils.displayDialogMessage(this, "Location Required", "This app cannot run without location permissions", true);
+                displayDialogMessage("Location Required", "This app cannot run without location permissions", true);
         }
     }
 
@@ -249,11 +287,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     public void onForecastItemClick(int position, ImageView forecastImageView) {
         ArrayList<DBModel> intentModels = new ArrayList<>();
 
-        //Generate string that corresponds to the date
-        /*Calendar calendar = new GregorianCalendar();
-        calendar.setTime(new Date(defaultSharedPreferences.getLong(getString(R.string.last_update_date_key), 0)));
-        calendar.setTimeZone(TimeZone.getTimeZone("UTC"));
-        int startingRow = 8 - (calendar.get(Calendar.HOUR_OF_DAY) / 3);*/
         int startingRow = todayForecastCount + (position * 8);
 
         //Add all 8 models to the list
@@ -263,7 +296,9 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         //Assign a unique transition name to the image
         forecastImageView.setTransitionName(String.valueOf(position) + "forecast_image");
         String imageTransitionName = String.valueOf(position) + "forecast_image";
+
         Intent intent = new Intent(this, WeatherDetailActivity.class);
+        //Enable shared element transitions
         ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(this,
                 Pair.create(forecastImageView, imageTransitionName),
                 Pair.create(mBinding.forecastLayout.mainRecyclerview, mBinding.forecastLayout.mainRecyclerview.getTransitionName()),
@@ -275,13 +310,22 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         startActivity(intent, options.toBundle());
     }
 
+    private void openSettingsActivity() {
+        Intent intent = new Intent(this, SettingsActivity.class);
+        startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(this).toBundle());
+    }
+
+    //region Data Binding
+
     //Evaluate and bind data to layout while changing other UI elements on sync.
     private void bindCurrentWeatherData() {
+        Log.d("main", "current_bound");
         DBModel intermediateModel = forecastAdapter.getDBModelFromCursor(0);
 
         SimpleDateFormat sf = new SimpleDateFormat("H:mm", Locale.getDefault());
         sf.setTimeZone(TimeZone.getDefault());
 
+        //Generate all time related strings
         boolean metric = PreferenceManager.getDefaultSharedPreferences(this).getBoolean(getString(R.string.pref_metrics_key), true);
         long visibility = weatherSharedPreferences.getLong(getString(R.string.current_weather_visibility), 0);
         long sunriseInMillis = weatherSharedPreferences.getLong(getString(R.string.current_weather_sunrise_key), 0) * 1000;
@@ -291,9 +335,11 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         String lastUpdated = MiscUtils.getLastUpdatedStringFromMillis(System.currentTimeMillis(), defaultSharedPreferences.getLong(getString(R.string.last_update_date_key), 0));
         String locationAndBoolean = weatherSharedPreferences.getString(getString(R.string.location_name_key), "Delhi/false");
 
+        //Generate and bind data
         CurrentWeatherLayoutDataModel layoutDataModel = MiscUtils.getCurrentWeatherDataFromDBModel(this, intermediateModel, metric, visibility, sunrise, sunset, lastUpdated, locationAndBoolean);
         mBinding.setCurrentWeatherData(layoutDataModel);
 
+        //Find how many forecast records are for today
         Calendar calendar = new GregorianCalendar();
         calendar.setTime(new Date(defaultSharedPreferences.getLong(getString(R.string.last_update_date_key), 0)));
         calendar.setTimeZone(TimeZone.getTimeZone("UTC"));
@@ -304,18 +350,18 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         if (!justOpened)
             changeBackgroundColorWithAnimation(updatedBackgroundColor);
         else {
+            //If just opened, do not animate
             changeBackgroundColor(updatedBackgroundColor);
             justOpened = false;
         }
 
-        int specialBackgroundColor = ColorUtils.setAlphaComponent(updatedBackgroundColor, 175);
-        specialBackgroundColor = Color.rgb(Color.red(specialBackgroundColor) + 10, Color.green(specialBackgroundColor) + 10, Color.blue(specialBackgroundColor) + 10);
-        mBinding.forecastCard.setCardBackgroundColor(specialBackgroundColor);
-
-        mBinding.mainUISwipeRefreshLayout.setColorSchemeColors(MiscUtils.getIconTint(this, intermediateModel.getIcon_id()));
+        //Change colors of swipe refresh layout and recents menu color
+        iconTintColor = MiscUtils.getIconTint(this, intermediateModel.getIcon_id());
+        mBinding.mainUISwipeRefreshLayout.setColorSchemeColors(iconTintColor);
         ActivityManager.TaskDescription taskDescription = new ActivityManager.TaskDescription(getString(R.string.app_name), null, updatedBackgroundColor);
         setTaskDescription(taskDescription);
 
+        //Fade out splash image at first run
         if (mBinding.placeholderImageView.getVisibility() == View.VISIBLE) {
             mBinding.placeholderImageView.animate().alpha(0.0f).setDuration(300).setListener(new AnimatorListenerAdapter() {
                 @Override
@@ -328,24 +374,30 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     }
 
     private void bindCurrentTimeline() {
+        Log.d("main", "timeline_bound");
         List<String> iconIds = new ArrayList<>();
         List<String> temperatures = new ArrayList<>();
 
+        //Generate timeline data
         for (int i = 1; i < todayForecastCount; i++) {
             DBModel dbModel = forecastAdapter.getDBModelFromCursor(i);
             iconIds.add(dbModel.getIcon_id());
             temperatures.add(dbModel.getTemp());
         }
 
+        //Initialize timeline adapter when needed, and set new data
         if (currentTimelineAdapter == null) {
             currentTimelineAdapter = new TimelineRecyclerViewAdapter(this, iconIds, temperatures, Integer.MIN_VALUE);
+            currentTimelineAdapter.setHasStableIds(true);
             mBinding.forecastLayout.currentTimelineRecyclerView.setAdapter(currentTimelineAdapter);
         } else {
-            currentTimelineAdapter.setIconIds(iconIds);
-            currentTimelineAdapter.setTemperatures(temperatures);
-            currentTimelineAdapter.notifyDataSetChanged();
+            currentTimelineAdapter.setData(iconIds, temperatures);
         }
     }
+
+    //endregion
+
+    //region Color Changers
 
     //Utility method to change background color of the activity
     private void changeBackgroundColor(int updatedBackgroundColor) {
@@ -353,6 +405,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         getWindow().getDecorView().setBackgroundColor(updatedBackgroundColor);
         getWindow().setStatusBarColor(updatedBackgroundColor);
         getWindow().setNavigationBarColor(updatedBackgroundColor);
+        int specialBackgroundColor = Color.rgb(Color.red(updatedBackgroundColor) + 10, Color.green(updatedBackgroundColor) + 10, Color.blue(updatedBackgroundColor) + 10);
+        mBinding.forecastCard.setCardBackgroundColor(specialBackgroundColor);
     }
 
     private void changeBackgroundColorWithAnimation(int updatedBackgroundColor) {
@@ -367,4 +421,167 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         }
         previousBackgroundColor = updatedBackgroundColor;
     }
+    //endregion
+
+    //region Message pop-ups for User
+
+    private void displayDialogMessage(String title, String message, final boolean kill) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(title)
+                .setMessage(message)
+                .setPositiveButton("OK", (dialog, which) -> {
+                    dialog.dismiss();
+                    if (kill) finish();
+                });
+        AlertDialog dialog = builder.create();
+        if (kill) {
+            dialog.setCanceledOnTouchOutside(false);
+        }
+        dialog.show();
+    }
+
+    //Utility method to show snackbar with the given message and an action, if it is not null
+    private void showSnackbarForError(String message, @Nullable String action, @Nullable View.OnClickListener onClickAction) {
+        Log.d("main", "snackbar shown");
+        Snackbar snackbar = Snackbar.make(mBinding.mainCoordinatorLayout, message, Snackbar.LENGTH_LONG);
+        if (action != null)
+            snackbar.setAction(action, onClickAction).setActionTextColor(iconTintColor);
+        snackbar.show();
+    }
+    //endregion
+
+    //region Broadcast Receiver
+
+    /*
+        Custom broadcast receiver that receives resolvable errors from the background service
+        and notifies the user to take action, if any.
+     */
+
+    private class ServiceErrorBroadcastReceiver extends BroadcastReceiver {
+
+        private String errorType;
+        private String errorDetails;
+        private String message;
+
+        private int locationNullErrorCount = 0;
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            errorType = intent.getStringExtra(context.getString(R.string.service_error_type));
+            errorDetails = intent.getStringExtra(context.getString(R.string.service_error_details));
+            Log.d("error_receiver", "error received : " + errorType + " " + errorDetails);
+            switch (errorType) {
+                case ServiceErrorContract.ERROR_LOCATION:
+                    kickStartLocation();
+                    break;
+                case ServiceErrorContract.ERROR_GEOCODER:
+                    handleGeocodingError();
+                    break;
+                case ServiceErrorContract.ERROR_REVERSE_GEOCODER:
+                    handleReverseGeocodingError();
+                    break;
+
+                case ServiceErrorContract.ERROR_RESPONSE:
+                    handleAPIResponseError();
+                    break;
+            }
+            mBinding.mainUISwipeRefreshLayout.setRefreshing(false);
+        }
+
+        private void handleGeocodingError() {
+            if (ServiceErrorContract.ERROR_DETAILS_NULL.equals(errorDetails)) {
+                message = "Couldn't find the custom location you entered. Please try again or change it";
+                showSnackbarForError(message, "Change Location", v -> openSettingsActivity());
+            } else if (ServiceErrorContract.ERROR_DETAILS_IO.equals(errorDetails)) {
+                handleIOError();
+            }
+        }
+
+        private void handleReverseGeocodingError() {
+            if (ServiceErrorContract.ERROR_DETAILS_NULL.equals(errorDetails)) {
+                message = "Couldn't get the name for your coordinates. Try refreshing later";
+                showSnackbarForError(message, null, null);
+            } else if (ServiceErrorContract.ERROR_DETAILS_IO.equals(errorDetails)) {
+                handleIOError();
+            }
+        }
+
+        private void handleAPIResponseError() {
+            int apiErrorCode = Integer.parseInt(errorDetails.split(":")[0]);
+            String title = "Response Error";
+            String message = "Weather data contained an error.";
+            String action = "Show More";
+            String dialogMessage;
+            switch (apiErrorCode) {
+                case 401:
+                    dialogMessage = "Invalid API key. Contact developer to resolve soon";
+                    break;
+                case 404:
+                    dialogMessage = "Couldn't find your city. Change it in settings, if possible";
+                    break;
+                default:
+                    dialogMessage = errorDetails.split(":")[1];
+            }
+            showSnackbarForError(message, action, v -> displayDialogMessage(title, dialogMessage, false));
+        }
+
+        private void handleIOError() {
+            message = "Had an unfortunate network error. Please try again";
+            showSnackbarForError(message, null, null);
+        }
+
+        //Utility error to check if location is enabled
+        private boolean isLocationEnabled() {
+            try {
+                int locationMode = Settings.Secure.getInt(MainActivity.this.getContentResolver(), Settings.Secure.LOCATION_MODE);
+                return locationMode != Settings.Secure.LOCATION_MODE_OFF;
+            } catch (Settings.SettingNotFoundException e) {
+                e.printStackTrace();
+                return false;
+            }
+        }
+
+        @SuppressLint("MissingPermission")
+        private void kickStartLocation() {
+            if (errorDetails.contains(ServiceErrorContract.ERROR_DETAILS_NULL)) {
+                if (isLocationEnabled()) {
+                    FusedLocationProviderClient mFusedClient = LocationServices.getFusedLocationProviderClient(MainActivity.this);
+                    LocationRequest locationRequest = new LocationRequest();
+                    locationRequest.setNumUpdates(1).setInterval(100).setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
+                    mFusedClient.requestLocationUpdates(locationRequest, new LocationCallback() {
+
+                        @Override
+                        public void onLocationResult(LocationResult locationResult) {
+                            if (locationResult.getLocations().size() > 0) {
+                                //Location successfully retrieved
+                                Log.d("main", "location_requested");
+                                message = "Location was not available but issue may be resolved now. Try again";
+                                showSnackbarForError(message, "Refresh", v -> startSync(errorDetails.contains(SyncOWMService.CREATE_ACTION) ? 0 : 1));
+                            } else {
+                                if (locationNullErrorCount < 3) {
+                                    message = "Retrieving your current location gave no results. Please try again";
+                                    showSnackbarForError(message, null, null);
+                                    locationNullErrorCount++;
+                                } else {
+                                    //Ask user to enter a custom location if location couldn't be found for more than 3 times
+                                    message = "Retrieving your current location gave no results. Please try again or set a custom location";
+                                    showSnackbarForError(message, "Set Location", v -> openSettingsActivity());
+                                }
+                            }
+                            mFusedClient.removeLocationUpdates(this);
+                        }
+                    }, null);
+                } else {
+                    message = "Location provider is disabled. Please enable it";
+                    showSnackbarForError(message, "Open Settings", v -> {
+                        Intent locationSettingIntent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                        startActivity(locationSettingIntent);
+                    });
+                }
+            } else if (ServiceErrorContract.ERROR_DETAILS_IO.equals(errorDetails)) {
+                handleIOError();
+            }
+        }
+    }
+    //endregion
 }

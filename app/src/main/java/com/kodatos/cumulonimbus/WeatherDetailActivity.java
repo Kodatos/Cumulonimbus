@@ -1,15 +1,21 @@
 package com.kodatos.cumulonimbus;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.animation.ArgbEvaluator;
 import android.animation.ValueAnimator;
 import android.app.ActivityManager;
 import android.content.SharedPreferences;
 import android.databinding.DataBindingUtil;
+import android.databinding.OnRebindCallback;
+import android.databinding.ViewDataBinding;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.transition.Fade;
+import android.transition.TransitionManager;
+import android.view.ViewGroup;
 
 import com.kodatos.cumulonimbus.apihelper.DBModel;
 import com.kodatos.cumulonimbus.databinding.ActivityWeatherDetailBinding;
@@ -52,6 +58,16 @@ public class WeatherDetailActivity extends AppCompatActivity implements Timeline
 
         setSupportActionBar(mBinding.toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
+
+        //Enable animation on binding data
+        mBinding.addOnRebindCallback(new OnRebindCallback() {
+            @Override
+            public boolean onPreBind(ViewDataBinding binding) {
+                TransitionManager.beginDelayedTransition((ViewGroup) binding.getRoot());
+                return super.onPreBind(binding);
+            }
+        });
+
         mBinding.weatherImageView.setTransitionName(getIntent().getStringExtra(getString(R.string.forecats_image_transistion_key)));
         mModels = Parcels.unwrap(getIntent().getParcelableExtra(getString(R.string.weather_detail_parcel_name)));
         LinearLayoutManager lm = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
@@ -121,6 +137,28 @@ public class WeatherDetailActivity extends AppCompatActivity implements Timeline
 
     @Override
     public void onTimelineItemClick(int position) {
-        bindData(position);
+        //The wind direction icon is rotated through the shortest angle before binding new data
+        float fromAngle = mBinding.windDirectionImageView.getRotation();
+        float toAngle = Float.parseFloat(mModels.get(position).getWind().split("/")[1]);
+        float angleOffset = toAngle - fromAngle;
+        if (angleOffset > 180)
+            angleOffset -= 360;
+        else if (angleOffset < -180)
+            angleOffset += 360;
+        mBinding.windDirectionImageView.animate().rotationBy(angleOffset).setDuration(200).setListener(new AnimatorListenerAdapter() {
+
+            @Override
+            public void onAnimationStart(Animator animation) {
+                //Animate weather image if not the same as previous
+                if (MiscUtils.getResourceIDForIconID(WeatherDetailActivity.this, mModels.get(position).getIcon_id()) != mBinding.getDataModel().weatherImageID)
+                    mBinding.weatherImageView.animate().alpha(0.0f).setDuration(200);
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                bindData(position);
+                mBinding.weatherImageView.animate().alpha(1.0f).setDuration(200); //Harmless if not animated to 0 above
+            }
+        });
     }
 }

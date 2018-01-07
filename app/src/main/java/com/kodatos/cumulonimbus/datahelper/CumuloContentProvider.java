@@ -105,7 +105,7 @@ public class CumuloContentProvider extends ContentProvider {
                                 break;
             default: throw new UnsupportedOperationException("Unknown Uri "+uri.toString());
         }
-        if (selectionArgs != null && ("1".equals(selectionArgs[0]) || "33".equals(selectionArgs[0])))
+        if (selectionArgs != null && values != null && ("33".equals(selectionArgs[0]) && !values.containsKey(WeatherDBEntry.COLUMN_WEATHER_DESC)))
             getContext().getContentResolver().notifyChange(uri, null);
         return retno;
     }

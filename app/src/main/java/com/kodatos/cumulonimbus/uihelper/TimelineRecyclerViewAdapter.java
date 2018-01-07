@@ -63,12 +63,23 @@ public class TimelineRecyclerViewAdapter extends RecyclerView.Adapter<TimelineRe
         return iconIds.size();
     }
 
-    public void setIconIds(List<String> iconIds) {
-        this.iconIds = iconIds;
+    @Override
+    public long getItemId(int position) {
+        return getCalendarHour(position).hashCode();
     }
 
-    public void setTemperatures(List<String> temperatures) {
+    public void setData(List<String> iconIds, List<String> temperatures) {
+        int itemCountChange = iconIds.size() - getItemCount();
+        this.iconIds = iconIds;
         this.temperatures = temperatures;
+        if (itemCountChange > 0) {
+            notifyItemRangeInserted(0, itemCountChange);
+            notifyItemRangeChanged(itemCountChange, iconIds.size());
+        } else if (itemCountChange < 0) {
+            notifyItemRangeRemoved(0, -itemCountChange);
+            notifyItemRangeChanged(0, iconIds.size());
+        } else
+            notifyDataSetChanged();
     }
 
     private Date getCalendarHour(int position) {

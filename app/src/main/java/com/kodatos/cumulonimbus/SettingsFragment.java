@@ -13,20 +13,28 @@ import android.widget.Toast;
  */
 public class SettingsFragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener {
 
+    String currentLocationKey;
+    String customLocationKey;
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.xml.pref_main);
+        currentLocationKey = getString(R.string.pref_curr_location_key);
+        customLocationKey = getString(R.string.pref_custom_location_key);
         getPreferenceScreen().getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
-        findPreference(getString(R.string.pref_custom_location_key)).setSummary(getPreferenceScreen().getSharedPreferences().getString(getString(R.string.pref_custom_location_key), ""));
+        findPreference(customLocationKey).setSummary(getPreferenceScreen().getSharedPreferences().getString(getString(R.string.pref_custom_location_key), ""));
+        findPreference(customLocationKey).setEnabled(!getPreferenceScreen().getSharedPreferences().getBoolean(currentLocationKey, true));
     }
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        if(key.equals(getString(R.string.pref_custom_location_key))){
+        if (key.equals(customLocationKey)) {
             findPreference(key).setSummary(sharedPreferences.getString(key, ""));
-            if (!getPreferenceScreen().getSharedPreferences().getBoolean(getString(R.string.pref_curr_location_key), true))
+            if (!getPreferenceScreen().getSharedPreferences().getBoolean(currentLocationKey, true))
                 Toast.makeText(getActivity(), "Updated location. Please refresh at main screen", Toast.LENGTH_SHORT).show();
+        } else if (key.equals(currentLocationKey)) {
+            findPreference(customLocationKey).setEnabled(!getPreferenceScreen().getSharedPreferences().getBoolean(currentLocationKey, true));
         }
     }
 
