@@ -10,8 +10,10 @@ public class ServiceErrorContract {
     public static final String ERROR_GEOCODER = "geocoding_error";
     public static final String ERROR_REVERSE_GEOCODER = "reverse_geocoding_error";
     public static final String ERROR_RESPONSE = "api_response_error";
-    public static final String ERROR_DETAILS_REQUIRES_SERVICE_RESTART = "restart";
-    public static final String ERROR_DETAILS_LOCATION_DISABLED = "location_disabled";
+    public static final String ERROR_GENERIC = "error";
     public static final String ERROR_DETAILS_NULL = "null";
     public static final String ERROR_DETAILS_IO = "io";
+
+    public static final String SERVICE_ERROR_TYPE = "error_type";
+    public static final String SERVICE_ERROR_DETAILS = "error_details";
 }

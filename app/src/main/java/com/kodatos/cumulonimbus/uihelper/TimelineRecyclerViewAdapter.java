@@ -82,6 +82,7 @@ public class TimelineRecyclerViewAdapter extends RecyclerView.Adapter<TimelineRe
             notifyDataSetChanged();
     }
 
+
     private Date getCalendarHour(int position) {
         int startingPosition = 8 - iconIds.size();
         Calendar calendar = new GregorianCalendar(TimeZone.getTimeZone("GMT"));

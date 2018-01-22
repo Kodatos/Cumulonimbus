@@ -10,6 +10,7 @@
     <color name="textColorPrimaryInverse">#FFFFFFFF</color>
     <color name="whiteOneShadeDarker">#FFF5F5F5</color>
     <color name="textColorSecondaryInverse">#E0FFFFFF</color>
+    <color name="textColorTertiaryInverse">#B0FFFFFF</color>
 
     <color name="_01d_icon_tint">#FFCA28</color>
     <color name="_01n_icon_tint">#cccccc</color>

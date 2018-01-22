@@ -9,6 +9,7 @@
         <variable
             name="dataModel"
             type="com.kodatos.cumulonimbus.uihelper.DetailActivityDataModel" />
+
     </data>
 
     <android.support.design.widget.CoordinatorLayout

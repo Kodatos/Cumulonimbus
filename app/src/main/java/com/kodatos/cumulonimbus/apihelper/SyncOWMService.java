@@ -22,6 +22,7 @@ import com.kodatos.cumulonimbus.apihelper.models.CurrentWeatherModel;
 import com.kodatos.cumulonimbus.apihelper.models.ForecastWeatherModel;
 import com.kodatos.cumulonimbus.apihelper.models.UVIndexModel;
 import com.kodatos.cumulonimbus.datahelper.WeatherDBContract;
+import com.kodatos.cumulonimbus.utils.KeyConstants;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -102,6 +103,7 @@ public class SyncOWMService extends IntentService {
                     }
                 } catch (ExecutionException | InterruptedException e) {
                     e.printStackTrace();
+                    broadcastError(ServiceErrorContract.ERROR_GENERIC, ServiceErrorContract.ERROR_GENERIC);
                 } catch (IOException e) {
                     broadcastError(ServiceErrorContract.ERROR_LOCATION, ServiceErrorContract.ERROR_DETAILS_IO);
                     e.printStackTrace();
@@ -128,7 +130,7 @@ public class SyncOWMService extends IntentService {
                     getUVIndex(latitude, longitude);
                 } else {
                     broadcastError(ServiceErrorContract.ERROR_GEOCODER, ServiceErrorContract.ERROR_DETAILS_NULL);
-                    return;
+                    stopSelf();
                 }
             } catch (IOException e) {
                 broadcastError(ServiceErrorContract.ERROR_GEOCODER, ServiceErrorContract.ERROR_DETAILS_IO);
@@ -136,7 +138,7 @@ public class SyncOWMService extends IntentService {
                 return;
             }
         }
-        sp.edit().putLong(getString(R.string.last_update_date_key), System.currentTimeMillis()).apply();
+        sp.edit().putLong(KeyConstants.LAST_UPDATE_DATE_KEY, System.currentTimeMillis()).apply();
     }
 
     /**
@@ -149,8 +151,8 @@ public class SyncOWMService extends IntentService {
      * @throws IOException If geocoding encountered network errors as specified in official Android documentation.
      */
     private String getCachedOrGeocodedCoords(String custom_location) throws IOException {
-        String customLocationKey = getString(R.string.cached_custom_location_key);
-        String customCoordsKey = getString(R.string.cached_custom_location_coords_key);
+        String customLocationKey = KeyConstants.CACHED_CUSTOM_LOCATION_KEY;
+        String customCoordsKey = KeyConstants.CACHED_CUSTOM_LOCATION_COORDS_KEY;
         SharedPreferences weatherSP = getSharedPreferences("weather_display_pref", MODE_PRIVATE);
         if (weatherSP.contains(customCoordsKey) && weatherSP.contains(customLocationKey)) {
             if (weatherSP.getString(customLocationKey, "").equals(custom_location))
@@ -179,8 +181,8 @@ public class SyncOWMService extends IntentService {
      * @throws IOException If geocoding encountered network errors as specified in official Android documentation.
      */
     private String getCachedOrReverseGeocodedAddress(double lat, double lon) throws IOException {
-        String addressKey = getString(R.string.cached_address_key);
-        String coordsKey = getString(R.string.cached_coords_key);
+        String addressKey = KeyConstants.CACHED_ADDRESS_KEY;
+        String coordsKey = KeyConstants.CACHED_COORDS_KEY;
         String coordsAsString = String.valueOf(lat) + "/" + String.valueOf(lon);
         SharedPreferences weatherSP = getSharedPreferences("weather_display_pref", MODE_PRIVATE);
         if (weatherSP.contains(coordsKey) && weatherSP.contains(addressKey)) {
@@ -247,9 +249,11 @@ public class SyncOWMService extends IntentService {
                 String errorLog = errorCode+":"+ errorMessage;
                 broadcastError(ServiceErrorContract.ERROR_RESPONSE, errorLog);
                 Log.w(LOG_TAG, errorLog);
+                stopSelf();
             }
 
         } catch (JSONException | IOException e) {
+            broadcastError(ServiceErrorContract.ERROR_GENERIC, ServiceErrorContract.ERROR_GENERIC);
             e.printStackTrace();
         }
     }
@@ -271,21 +275,23 @@ public class SyncOWMService extends IntentService {
                     if (address == null) {
                         broadcastError(ServiceErrorContract.ERROR_REVERSE_GEOCODER, "null");
                         Log.e(LOG_TAG, "location null");
+                        stopSelf();
                     } else {
                         locationAndIcon = address + "/true";
                     }
                 } catch (IOException e) {
                     broadcastError(ServiceErrorContract.ERROR_REVERSE_GEOCODER, "io");
                     e.printStackTrace();
+                    stopSelf();
                 }
             } else {
                 locationAndIcon = PreferenceManager.getDefaultSharedPreferences(this).getString(getString(R.string.pref_custom_location_key), "") + "/false";
             }
-            weatherSP.edit().putLong(getString(R.string.current_weather_sunrise_key), currentWeatherModelResponse.sysCurrent.sunrise).
-                    putLong(getString(R.string.current_weather_sunset_key), currentWeatherModelResponse.sysCurrent.sunset).
-                    putString(getString(R.string.current_weather_icon_id_key), currentWeatherModelResponse.weather.get(0).icon).
-                    putLong(getString(R.string.current_weather_visibility), currentWeatherModelResponse.visibility).
-                    putString(getString(R.string.location_name_key), locationAndIcon).apply();
+            weatherSP.edit().putLong(KeyConstants.CURRENT_WEATHER_SUNRISE_KEY, currentWeatherModelResponse.sysCurrent.sunrise).
+                    putLong(KeyConstants.CURRENT_WEATHER_SUNSET_KEY, currentWeatherModelResponse.sysCurrent.sunset).
+                    putString(KeyConstants.CURRENT_WEATHER_ICON_ID_KEY, currentWeatherModelResponse.weather.get(0).icon).
+                    putLong(KeyConstants.CURRENT_WEATHER_VISIBILITY_KEY, currentWeatherModelResponse.visibility).
+                    putString(KeyConstants.LOCATION_NAME_KEY, locationAndIcon).apply();
 
             // Current weather data is stored as 1st ID
             String where = "_ID=?";
@@ -306,7 +312,9 @@ public class SyncOWMService extends IntentService {
                 String errorLog = errorCode+":"+ errorMessage;
                 broadcastError(ServiceErrorContract.ERROR_RESPONSE, errorLog);
                 Log.w(LOG_TAG, errorLog);
+                stopSelf();
             } catch (JSONException | IOException e) {
+                broadcastError(ServiceErrorContract.ERROR_GENERIC, ServiceErrorContract.ERROR_GENERIC);
                 e.printStackTrace();
             }
         }
@@ -341,7 +349,9 @@ public class SyncOWMService extends IntentService {
                 String errorLog = errorCode+":"+ errorMessage;
                 broadcastError(ServiceErrorContract.ERROR_RESPONSE, errorLog);
                 Log.w(LOG_TAG, errorLog);
+                stopSelf();
             } catch (JSONException | IOException e) {
+                broadcastError(ServiceErrorContract.ERROR_GENERIC, ServiceErrorContract.ERROR_GENERIC);
                 e.printStackTrace();
             }
         }
@@ -349,8 +359,8 @@ public class SyncOWMService extends IntentService {
 
     private void broadcastError(String type, String details) {
         Intent errorIntent = new Intent(ServiceErrorContract.BROADCAST_INTENT_FILTER);
-        errorIntent.putExtra(getString(R.string.service_error_type), type);
-        errorIntent.putExtra(getString(R.string.service_error_details), details);
+        errorIntent.putExtra(ServiceErrorContract.SERVICE_ERROR_TYPE, type);
+        errorIntent.putExtra(ServiceErrorContract.SERVICE_ERROR_DETAILS, details);
         LocalBroadcastManager.getInstance(this).sendBroadcast(errorIntent);
     }
 }

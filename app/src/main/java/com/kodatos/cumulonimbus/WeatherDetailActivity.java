@@ -21,6 +21,7 @@ import com.kodatos.cumulonimbus.apihelper.DBModel;
 import com.kodatos.cumulonimbus.databinding.ActivityWeatherDetailBinding;
 import com.kodatos.cumulonimbus.uihelper.DetailActivityDataModel;
 import com.kodatos.cumulonimbus.uihelper.TimelineRecyclerViewAdapter;
+import com.kodatos.cumulonimbus.utils.KeyConstants;
 import com.kodatos.cumulonimbus.utils.MiscUtils;
 
 import org.parceler.Parcels;
@@ -42,12 +43,14 @@ public class WeatherDetailActivity extends AppCompatActivity implements Timeline
     private int day;        // Day for which details are shown
     private boolean metric;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_weather_detail);
         postponeEnterTransition();
 
+        //region Region : enter exit transitions
         Fade fade = new Fade();
         fade.setDuration(1000);
         fade.excludeTarget(mBinding.toolbar, true);
@@ -55,6 +58,7 @@ public class WeatherDetailActivity extends AppCompatActivity implements Timeline
         getWindow().setExitTransition(fade);
         getWindow().setReturnTransition(fade);
         getWindow().setReenterTransition(fade);
+        //endregion
 
         setSupportActionBar(mBinding.toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
@@ -68,15 +72,15 @@ public class WeatherDetailActivity extends AppCompatActivity implements Timeline
             }
         });
 
-        mBinding.weatherImageView.setTransitionName(getIntent().getStringExtra(getString(R.string.forecats_image_transistion_key)));
-        mModels = Parcels.unwrap(getIntent().getParcelableExtra(getString(R.string.weather_detail_parcel_name)));
+        mBinding.weatherImageView.setTransitionName(getIntent().getStringExtra(KeyConstants.FORECAST_IMAGE_TRANSITION_KEY));
+        mModels = Parcels.unwrap(getIntent().getParcelableExtra(KeyConstants.WEATHER_DETAIL_PARCEL_NAME));
         LinearLayoutManager lm = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
         mBinding.timelineRecyclerView.setLayoutManager(lm);
         initialize();
     }
 
     private void initialize() {
-        day = getIntent().getIntExtra(getString(R.string.weather_detail_day_name), 0);
+        day = getIntent().getIntExtra(KeyConstants.WEATHER_DETAIL_DAY_NAME, 0);
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
         metric = sp.getBoolean(getString(R.string.pref_metrics_key), true);
         Calendar calendar = new GregorianCalendar();
@@ -135,6 +139,7 @@ public class WeatherDetailActivity extends AppCompatActivity implements Timeline
         previousBackgroundColor = updatedBackgroundColor;
     }
 
+    //Click listener for timeline recyclerview
     @Override
     public void onTimelineItemClick(int position) {
         //The wind direction icon is rotated through the shortest angle before binding new data
