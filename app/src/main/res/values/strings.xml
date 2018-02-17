@@ -32,4 +32,6 @@
     <string name="detail_forecast">Details at current time</string>
     <string name="today_at_a_glance">Today at a glance</string>
     <string name="next_four_days">Next four days</string>
+    <string name="about_activity_name">About</string>
+    <string name="about_the_app">A simple yet bold open-source weather app made by yours truly.</string>
 </resources>

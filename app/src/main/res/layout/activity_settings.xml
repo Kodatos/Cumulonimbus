@@ -2,9 +2,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <android.support.design.widget.CoordinatorLayout
-    android:layout_width="match_parent"
+        android:layout_width="match_parent"
         android:layout_height="match_parent"
-    android:orientation="vertical">
+        android:orientation="vertical">
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
@@ -40,6 +40,7 @@
             app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
             <android.support.v7.widget.CardView
+                android:id="@+id/settingsCardView"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/common_card_margin_bottom"
@@ -53,6 +54,36 @@
                     android:name="com.kodatos.cumulonimbus.SettingsFragment"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" />
+
+            </android.support.v7.widget.CardView>
+
+            <android.support.v7.widget.CardView
+                android:id="@+id/aboutCard"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/common_card_margin_bottom"
+                android:layout_marginTop="@dimen/mainui_small_category_icon_gap"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/settingsCardView">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_margin="16dp"
+                    android:scaleType="fitXY"
+                    android:src="@drawable/ic_info_outline"
+                    android:tint="@color/textColorSecondaryAlt" />
+
+                <TextView
+                    style="@style/PriorityTwoText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginLeft="56dp"
+                    android:text="About"
+                    android:textSize="16sp" />
 
             </android.support.v7.widget.CardView>
         </android.support.constraint.ConstraintLayout>

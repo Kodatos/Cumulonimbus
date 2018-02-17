@@ -84,7 +84,7 @@ public class WeatherDetailActivity extends AppCompatActivity implements Timeline
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
         metric = sp.getBoolean(getString(R.string.pref_metrics_key), true);
         Calendar calendar = new GregorianCalendar();
-        calendar.setTime(new Date(sp.getLong(getString(R.string.last_update_date_key),0)));
+        calendar.setTime(new Date(sp.getLong(KeyConstants.LAST_UPDATE_DATE_KEY, 0)));
         calendar.setTimeZone(TimeZone.getTimeZone("UTC"));
         int initialExpandedPosition = calendar.get(Calendar.HOUR_OF_DAY) / 3;
         bindData(initialExpandedPosition);

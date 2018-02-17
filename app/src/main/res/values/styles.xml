@@ -29,6 +29,7 @@
     <style name="AppTheme.NoActionBar.ColouredBackground">
         <item name="android:windowBackground">@color/colorPrimary</item>
         <item name="android:listDivider">@null</item>
+        <item name="fontFamily">@font/product_sans_regular</item>
     </style>
 
     <style name="CustomMenuButton" parent="Widget.AppCompat.ActionButton.Overflow">
@@ -40,6 +41,11 @@
         <item name="android:windowBackground">@drawable/placeholder_background</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:actionOverflowButtonStyle">@style/CustomMenuButton</item>
+    </style>
+
+    <style name="AppTheme.NoActionBar.ColouredBackground.About">
+        <item name="android:windowBackground">@drawable/ic_launcher_background</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
     </style>
 
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />

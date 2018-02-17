@@ -11,6 +11,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 import static com.kodatos.cumulonimbus.datahelper.WeatherDBContract.WeatherDBEntry;
 
@@ -100,7 +101,7 @@ public class CumuloContentProvider extends ContentProvider {
         switch(code){
             case WEATHER_DATA : retno = db.update(WeatherDBEntry.TABLE_NAME,values,selection,selectionArgs);
                                 if(retno<=0){
-                                    throw new SQLException("Update Failed!");
+                                    Log.d("CONTENT_PROVIDER", "Update Failed!");
                                 }
                                 break;
             default: throw new UnsupportedOperationException("Unknown Uri "+uri.toString());

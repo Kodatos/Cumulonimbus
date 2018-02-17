@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<notices>
+    <notice>
+        <name>Android Support Libraries</name>
+        <url>https://developer.android.com/topic/libraries/support-library/index.html</url>
+        <copyright>Copyright The Android Open Source Project</copyright>
+        <license>Apache Software License 2.0</license>
+    </notice>
+    <notice>
+        <name>GSON</name>
+        <url>https://github.com/google/gson</url>
+        <copyright>Copyright 2008 Google Inc.</copyright>
+        <license>Apache Software License 2.0</license>
+    </notice>
+    <notice>
+        <name>Retrofit</name>
+        <url>https://github.com/square/retrofit</url>
+        <copyright>Copyright 2013 Square, Inc.</copyright>
+        <license>Apache Software License 2.0</license>
+    </notice>
+    <notice>
+        <name>Parceler</name>
+        <url>https://github.com/johncarl81/parceler</url>
+        <copyright>Copyright 2011-2015 John Ericksen</copyright>
+        <license>Apache Software License 2.0</license>
+    </notice>
+    <notice>
+        <name>Material Design Icons</name>
+        <url>https://github.com/Templarian/MaterialDesign/blob/master/license.txt</url>
+        <copyright>Copyright 2014, Austin Andrews&lt;br/&gt;Copyright 2014, Google</copyright>
+        <license>SIL Open Font License v1.1</license>
+    </notice>
+</notices>

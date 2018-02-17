@@ -15,6 +15,7 @@ import com.kodatos.cumulonimbus.R;
 import com.kodatos.cumulonimbus.apihelper.DBModel;
 import com.kodatos.cumulonimbus.databinding.ForecastRecyclerviewItemBinding;
 import com.kodatos.cumulonimbus.datahelper.WeatherDBContract;
+import com.kodatos.cumulonimbus.utils.KeyConstants;
 import com.kodatos.cumulonimbus.utils.MiscUtils;
 
 import java.util.Calendar;
@@ -72,7 +73,8 @@ public class MainRecyclerViewAdapter extends RecyclerView.Adapter<MainRecyclerVi
     }
 
     /**
-     * Creates and returns a model object from the member Cursor to send to binding.
+     * An exposed method that creates and returns a model object from the member Cursor to send to binding. Only the MainActivity & this
+     * class use this.
      * @param position Position for which data is required
      * @return A DBModel object containing required display data
      */
@@ -107,7 +109,7 @@ public class MainRecyclerViewAdapter extends RecyclerView.Adapter<MainRecyclerVi
 
         private final ForecastRecyclerviewItemBinding binding;
 
-        public MainRecyclerViewHolder(ForecastRecyclerviewItemBinding recycleItemBinding) {
+        MainRecyclerViewHolder(ForecastRecyclerviewItemBinding recycleItemBinding) {
             super(recycleItemBinding.getRoot());
             this.binding = recycleItemBinding;
             binding.getRoot().setOnClickListener(this);
@@ -122,7 +124,7 @@ public class MainRecyclerViewAdapter extends RecyclerView.Adapter<MainRecyclerVi
             String displayDay = calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.SHORT, Locale.getDefault());
             SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(mContext);
             boolean metric = sp.getBoolean(mContext.getString(R.string.pref_metrics_key), true);
-            calendar.setTime(new Date(sp.getLong(mContext.getString(R.string.last_update_date_key), 0)));
+            calendar.setTime(new Date(sp.getLong(KeyConstants.LAST_UPDATE_DATE_KEY, 0)));
             calendar.setTimeZone(TimeZone.getTimeZone("UTC"));
             int imageId = MiscUtils.getResourceIDForIconID(mContext, dbModel.getIcon_id());
             DBModelCalculatedData calculatedData = new DBModelCalculatedData(imageId, MiscUtils.makeTemperaturePretty(dbModel.getTemp(), metric), displayDay, dbModel.getWeather_main(), dbModel.getWeather_desc());

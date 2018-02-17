@@ -55,6 +55,17 @@
             android:launchMode="singleTop"
             android:parentActivityName=".MainActivity"
             android:theme="@style/AppTheme.NoActionBar.ColouredBackground" />
+
+        <activity
+            android:name=".AboutActivity"
+            android:label="About"
+            android:launchMode="singleTop"
+            android:parentActivityName=".SettingsActivity"
+            android:theme="@style/AppTheme.NoActionBar.ColouredBackground">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.kodatos.cumulonimbus.SettingsActivity" />
+        </activity>
     </application>
 
 </manifest>
