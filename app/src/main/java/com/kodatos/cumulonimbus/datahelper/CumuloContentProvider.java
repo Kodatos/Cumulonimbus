@@ -100,8 +100,8 @@ public class CumuloContentProvider extends ContentProvider {
         int retno;
         switch(code){
             case WEATHER_DATA : retno = db.update(WeatherDBEntry.TABLE_NAME,values,selection,selectionArgs);
-                                if(retno<=0){
-                                    Log.d("CONTENT_PROVIDER", "Update Failed!");
+                if (retno < 0) {
+                    Log.w("CONTENT_PROVIDER", "Update Failed!");
                                 }
                                 break;
             default: throw new UnsupportedOperationException("Unknown Uri "+uri.toString());
