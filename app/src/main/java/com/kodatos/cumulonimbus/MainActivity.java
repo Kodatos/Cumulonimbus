@@ -116,7 +116,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
         //region Region : enter exit transitions
         Fade fade = new Fade();
-        fade.setDuration(1000);
+        fade.setDuration(500);
         fade.addTarget(mBinding.currentLayout.currentLayoutAlwaysVisible);
         fade.addTarget(mBinding.forecastLayout.getRoot());
         getWindow().setEnterTransition(fade);

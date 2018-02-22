@@ -8,9 +8,7 @@ import com.google.gson.annotations.SerializedName;
 import com.kodatos.cumulonimbus.datahelper.WeatherDBContract;
 
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.Locale;
 
 public class ForecastWeatherModel {
@@ -49,13 +47,10 @@ public class ForecastWeatherModel {
             This block provides the rain volume information for current weather, as the
             current weather API response almost never includes the rain parameter
          */
-        int i=0;
         if (position == 0) {
+            int i = 0;
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-            Calendar calendar = new GregorianCalendar();
-            calendar.setTime(new Date());
-            calendar.add(Calendar.DATE, (position));
-            String required = sdf.format(calendar.getTime());
+            String required = sdf.format(new Date());
             while(forecastList.get(i).dtTxt.contains(required)){
                 if (forecastList.get(i).rain != null)
                     netRain3h += forecastList.get(i).rain._3h;

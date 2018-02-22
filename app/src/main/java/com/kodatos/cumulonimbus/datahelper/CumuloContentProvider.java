@@ -2,8 +2,11 @@ package com.kodatos.cumulonimbus.datahelper;
 
 
 import android.content.ContentProvider;
+import android.content.ContentProviderOperation;
+import android.content.ContentProviderResult;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.OperationApplicationException;
 import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.SQLException;
@@ -12,6 +15,8 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
+
+import java.util.ArrayList;
 
 import static com.kodatos.cumulonimbus.datahelper.WeatherDBContract.WeatherDBEntry;
 
@@ -31,6 +36,7 @@ public class CumuloContentProvider extends ContentProvider {
         UriMatcher uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
         uriMatcher.addURI(WeatherDBContract.AUTHORITY, WeatherDBContract.PATH_WEATHER_DATA, WEATHER_DATA);
         uriMatcher.addURI(WeatherDBContract.AUTHORITY, WeatherDBContract.PATH_WEATHER_DATA +"/#", WEATHER_WITH_ID);
+        uriMatcher.addURI(WeatherDBContract.AUTHORITY, WeatherDBContract.PATH_WEATHER_DATA + "/uvupdate", WEATHER_DATA);
         return uriMatcher;
     }
 
@@ -74,11 +80,16 @@ public class CumuloContentProvider extends ContentProvider {
         int code = sUriMatcher.match(uri);
         Uri retUri;
         switch (code){
-            case WEATHER_DATA : long id = db.insert(WeatherDBEntry.TABLE_NAME,null,values);
+            case WEATHER_DATA:
+                db.beginTransaction();
+                long id = db.insert(WeatherDBEntry.TABLE_NAME, null, values);
                 if (id>0) {
+                    db.setTransactionSuccessful();
                     retUri = WeatherDBEntry.CONTENT_URI.buildUpon().appendPath(String.valueOf(id)).build();
+                    db.endTransaction();
                 }
                 else {
+                    db.endTransaction();
                     throw new SQLException("Insert Failed!");
                 }
                 break;
@@ -86,6 +97,33 @@ public class CumuloContentProvider extends ContentProvider {
         }
         getContext().getContentResolver().notifyChange(uri,null);
         return retUri;
+    }
+
+    @Override
+    public int bulkInsert(@NonNull Uri uri, @NonNull ContentValues[] values) {
+        SQLiteDatabase db = mDBHelper.getWritableDatabase();
+        int code = sUriMatcher.match(uri);
+        int result;
+        switch (code) {
+            case WEATHER_DATA:
+                db.beginTransaction();
+                try {
+                    for (ContentValues cv : values) {
+                        long id = db.insert(WeatherDBEntry.TABLE_NAME, null, cv);
+                        if (id < 0)
+                            throw new SQLException("Bulk Insert Failed!");
+                    }
+                    result = values.length;
+                    db.setTransactionSuccessful();
+                    getContext().getContentResolver().notifyChange(uri, null);
+                } finally {
+                    db.endTransaction();
+                }
+                break;
+            default:
+                throw new UnsupportedOperationException("Unknown Uri " + uri.toString());
+        }
+        return result;
     }
 
     @Override
@@ -106,8 +144,26 @@ public class CumuloContentProvider extends ContentProvider {
                                 break;
             default: throw new UnsupportedOperationException("Unknown Uri "+uri.toString());
         }
-        if (selectionArgs != null && values != null && ("33".equals(selectionArgs[0]) && !values.containsKey(WeatherDBEntry.COLUMN_WEATHER_DESC)))
-            getContext().getContentResolver().notifyChange(uri, null);
         return retno;
+    }
+
+    @NonNull
+    @Override
+    public ContentProviderResult[] applyBatch(@NonNull ArrayList<ContentProviderOperation> operations) throws OperationApplicationException {
+        SQLiteDatabase db = mDBHelper.getWritableDatabase();
+        db.beginTransaction();
+        try {
+            int size = operations.size();
+            ContentProviderResult[] results = new ContentProviderResult[size];
+            for (int i = 0; i < size; i++) {
+                results[i] = operations.get(i).apply(this, results, i);
+            }
+            db.setTransactionSuccessful();
+            if (operations.get(0).getUri().getLastPathSegment().equals("uvupdate"))
+                getContext().getContentResolver().notifyChange(WeatherDBEntry.CONTENT_URI, null);
+            return results;
+        } finally {
+            db.endTransaction();
+        }
     }
 }

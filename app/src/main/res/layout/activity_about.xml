@@ -86,7 +86,7 @@
                     android:textAlignment="center"
                     android:textColor="@color/textColorSecondaryInverse"
                     android:textSize="16sp"
-                    app:fontFamily="@font/product_sans_regular"
+                    app:fontFamily="@font/product_sans_bold"
                     app:layout_constraintEnd_toEndOf="@id/aboutAppName"
                     app:layout_constraintStart_toStartOf="@id/aboutIcon"
                     app:layout_constraintTop_toBottomOf="@id/aboutIcon" />
@@ -97,7 +97,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="@dimen/common_card_margin_bottom"
                     android:layout_marginRight="@dimen/common_card_margin_bottom"
-                    android:layout_marginTop="52dp"
+                    android:layout_marginTop="60dp"
                     app:cardElevation="4dp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
@@ -129,7 +129,7 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginStart="16dp"
+                                android:layout_marginStart="72dp"
                                 android:layout_marginTop="8dp"
                                 android:text="Feedback"
                                 android:textColor="@color/textColorPrimary"
@@ -143,27 +143,27 @@
                                 android:layout_height="wrap_content"
                                 android:layout_marginBottom="8dp"
                                 android:layout_marginEnd="16dp"
-                                android:layout_marginStart="16dp"
+                                android:layout_marginStart="72dp"
                                 android:layout_marginTop="32dp"
                                 android:text="Send an email to provide me feedback for this app"
                                 android:textColor="@color/textColorSecondaryAlt"
                                 android:textSize="14sp"
                                 app:fontFamily="@font/product_sans_regular"
                                 app:layout_constraintBottom_toBottomOf="parent"
-                                app:layout_constraintEnd_toStartOf="@+id/emailIcon"
+                                app:layout_constraintEnd_toEndOf="parent"
                                 app:layout_constraintStart_toStartOf="parent"
                                 app:layout_constraintTop_toTopOf="parent" />
 
                             <ImageView
                                 android:id="@+id/emailIcon"
-                                android:layout_width="36dp"
-                                android:layout_height="36dp"
-                                android:layout_marginEnd="16dp"
+                                android:layout_width="40dp"
+                                android:layout_height="40dp"
+                                android:layout_marginStart="16dp"
                                 android:scaleType="fitXY"
                                 android:src="@drawable/ic_email"
                                 android:tint="@color/_09d_background"
                                 app:layout_constraintBottom_toBottomOf="parent"
-                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintStart_toStartOf="parent"
                                 app:layout_constraintTop_toTopOf="parent" />
 
                         </android.support.constraint.ConstraintLayout>
@@ -177,7 +177,7 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginStart="16dp"
+                                android:layout_marginStart="72dp"
                                 android:layout_marginTop="8dp"
                                 android:text="Play Store"
                                 android:textColor="@color/textColorPrimary"
@@ -191,27 +191,27 @@
                                 android:layout_height="wrap_content"
                                 android:layout_marginBottom="8dp"
                                 android:layout_marginEnd="16dp"
-                                android:layout_marginStart="16dp"
+                                android:layout_marginStart="72dp"
                                 android:layout_marginTop="32dp"
                                 android:text="Please leave a rating and review"
                                 android:textColor="@color/textColorSecondaryAlt"
                                 android:textSize="14sp"
                                 app:fontFamily="@font/product_sans_regular"
                                 app:layout_constraintBottom_toBottomOf="parent"
-                                app:layout_constraintEnd_toStartOf="@+id/playStoreIcon"
+                                app:layout_constraintEnd_toEndOf="parent"
                                 app:layout_constraintStart_toStartOf="parent"
                                 app:layout_constraintTop_toTopOf="parent" />
 
                             <ImageView
                                 android:id="@+id/playStoreIcon"
-                                android:layout_width="36dp"
-                                android:layout_height="36dp"
-                                android:layout_marginEnd="16dp"
+                                android:layout_width="40dp"
+                                android:layout_height="40dp"
+                                android:layout_marginStart="16dp"
                                 android:scaleType="fitXY"
                                 android:src="@drawable/ic_google_play"
                                 android:tint="@color/_01d_background"
                                 app:layout_constraintBottom_toBottomOf="parent"
-                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintStart_toStartOf="parent"
                                 app:layout_constraintTop_toTopOf="parent" />
 
                         </android.support.constraint.ConstraintLayout>
@@ -225,7 +225,7 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginStart="16dp"
+                                android:layout_marginStart="72dp"
                                 android:layout_marginTop="8dp"
                                 android:text="Source Code"
                                 android:textColor="@color/textColorPrimary"
@@ -239,27 +239,27 @@
                                 android:layout_height="wrap_content"
                                 android:layout_marginBottom="8dp"
                                 android:layout_marginEnd="16dp"
-                                android:layout_marginStart="16dp"
+                                android:layout_marginStart="72dp"
                                 android:layout_marginTop="32dp"
                                 android:text="View the source code on Github"
                                 android:textColor="@color/textColorSecondaryAlt"
                                 android:textSize="14sp"
                                 app:fontFamily="@font/product_sans_regular"
                                 app:layout_constraintBottom_toBottomOf="parent"
-                                app:layout_constraintEnd_toStartOf="@+id/githubIcon"
+                                app:layout_constraintEnd_toEndOf="parent"
                                 app:layout_constraintStart_toStartOf="parent"
                                 app:layout_constraintTop_toTopOf="parent" />
 
                             <ImageView
                                 android:id="@+id/githubIcon"
-                                android:layout_width="36dp"
-                                android:layout_height="36dp"
-                                android:layout_marginEnd="16dp"
+                                android:layout_width="40dp"
+                                android:layout_height="40dp"
+                                android:layout_marginStart="16dp"
                                 android:scaleType="fitXY"
                                 android:src="@drawable/ic_github_circle"
                                 android:tint="@color/_04d_background"
                                 app:layout_constraintBottom_toBottomOf="parent"
-                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintStart_toStartOf="parent"
                                 app:layout_constraintTop_toTopOf="parent" />
 
                         </android.support.constraint.ConstraintLayout>
@@ -274,7 +274,7 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginStart="16dp"
+                                android:layout_marginStart="72dp"
                                 android:layout_marginTop="8dp"
                                 android:text="Licenses"
                                 android:textColor="@color/textColorPrimary"
@@ -288,27 +288,27 @@
                                 android:layout_height="wrap_content"
                                 android:layout_marginBottom="8dp"
                                 android:layout_marginEnd="16dp"
-                                android:layout_marginStart="16dp"
+                                android:layout_marginStart="72dp"
                                 android:layout_marginTop="32dp"
                                 android:text="Attributions for open source libraries used"
                                 android:textColor="@color/textColorSecondaryAlt"
                                 android:textSize="14sp"
                                 app:fontFamily="@font/product_sans_regular"
                                 app:layout_constraintBottom_toBottomOf="parent"
-                                app:layout_constraintEnd_toStartOf="@+id/licenseIcon"
+                                app:layout_constraintEnd_toEndOf="parent"
                                 app:layout_constraintStart_toStartOf="parent"
                                 app:layout_constraintTop_toTopOf="parent" />
 
                             <ImageView
                                 android:id="@+id/licenseIcon"
-                                android:layout_width="36dp"
-                                android:layout_height="36dp"
-                                android:layout_marginEnd="16dp"
+                                android:layout_width="40dp"
+                                android:layout_height="40dp"
+                                android:layout_marginStart="16dp"
                                 android:scaleType="fitXY"
                                 android:src="@drawable/ic_copyright"
                                 android:tint="@color/textColorSecondaryAlt"
                                 app:layout_constraintBottom_toBottomOf="parent"
-                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintStart_toStartOf="parent"
                                 app:layout_constraintTop_toTopOf="parent" />
 
                         </android.support.constraint.ConstraintLayout>
@@ -321,7 +321,7 @@
                     android:id="@+id/authorImage"
                     android:layout_width="80dp"
                     android:layout_height="80dp"
-                    android:layout_marginTop="12dp"
+                    android:layout_marginTop="22dp"
                     app:cardCornerRadius="40dp"
                     app:cardElevation="4dp"
                     app:layout_constraintEnd_toEndOf="parent"

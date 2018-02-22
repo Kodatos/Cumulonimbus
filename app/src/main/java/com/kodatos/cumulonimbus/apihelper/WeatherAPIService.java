@@ -20,17 +20,17 @@ public interface WeatherAPIService {
     Call<CurrentWeatherModel> getCurrentWeatherByString(@Query("q") String q, @Query("appid") String appid, @Query("units") String units);
 
     @GET("data/2.5/weather")
-    Call<CurrentWeatherModel> getCurrentWeatherByCoords(@Query("lat") double lat, @Query("lon") double lon, @Query("appid") String appid, @Query("units") String units);
+    Call<CurrentWeatherModel> getCurrentWeatherByCoords(@Query("lat") String lat, @Query("lon") String lon, @Query("appid") String appid, @Query("units") String units);
 
     @GET("data/2.5/forecast")
     Call<ForecastWeatherModel> getForecastWeatherByString(@Query("q") String q, @Query("appid") String appid, @Query("units") String units);
 
     @GET("data/2.5/forecast")
-    Call<ForecastWeatherModel> getForecastWeatherByCoords(@Query("lat") double lat, @Query("lon") double lon, @Query("appid") String appid, @Query("units") String units);
+    Call<ForecastWeatherModel> getForecastWeatherByCoords(@Query("lat") String lat, @Query("lon") String lon, @Query("appid") String appid, @Query("units") String units);
 
     @GET("data/2.5/uvi")
-    Call<UVIndexModel> getCurrentUVIndex(@Query("lat") double lat, @Query("lon") double lon, @Query("appid") String appid);
+    Call<UVIndexModel> getCurrentUVIndex(@Query("lat") String lat, @Query("lon") String lon, @Query("appid") String appid);
 
     @GET("data/2.5/uvi/forecast")
-    Call<List<UVIndexModel>> getForecastUVIndex(@Query("lat") double lat, @Query("lon") double lon, @Query("appid") String appid, @Query("cont") int cnt);
+    Call<List<UVIndexModel>> getForecastUVIndex(@Query("lat") String lat, @Query("lon") String lon, @Query("appid") String appid, @Query("cont") int cnt);
 }

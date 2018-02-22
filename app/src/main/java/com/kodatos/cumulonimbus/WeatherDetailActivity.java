@@ -52,7 +52,7 @@ public class WeatherDetailActivity extends AppCompatActivity implements Timeline
 
         //region Region : enter exit transitions
         Fade fade = new Fade();
-        fade.setDuration(1000);
+        fade.setDuration(500);
         fade.excludeTarget(mBinding.toolbar, true);
         getWindow().setEnterTransition(fade);
         getWindow().setExitTransition(fade);
