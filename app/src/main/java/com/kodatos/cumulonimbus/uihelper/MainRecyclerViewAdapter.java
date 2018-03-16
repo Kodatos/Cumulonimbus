@@ -3,7 +3,6 @@ package com.kodatos.cumulonimbus.uihelper;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.preference.PreferenceManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -14,7 +13,6 @@ import android.widget.ImageView;
 import com.kodatos.cumulonimbus.R;
 import com.kodatos.cumulonimbus.apihelper.DBModel;
 import com.kodatos.cumulonimbus.databinding.ForecastRecyclerviewItemBinding;
-import com.kodatos.cumulonimbus.datahelper.WeatherDBContract;
 import com.kodatos.cumulonimbus.utils.KeyConstants;
 import com.kodatos.cumulonimbus.utils.MiscUtils;
 
@@ -26,15 +24,15 @@ import java.util.TimeZone;
 
 public class MainRecyclerViewAdapter extends RecyclerView.Adapter<MainRecyclerViewAdapter.MainRecyclerViewHolder> {
 
-    private Cursor mCursor = null;
     private Context mContext;
-    private ForecastItemClickListener itemClickListener;
+    private ParentCallback parentCallback;
+    private int count;
 
 
     public MainRecyclerViewAdapter (Context context){
         mContext = context;
         try {
-            itemClickListener = (ForecastItemClickListener)context;
+            parentCallback = (ParentCallback) context;
         } catch (ClassCastException e) {
             e.printStackTrace();
         }
@@ -49,21 +47,22 @@ public class MainRecyclerViewAdapter extends RecyclerView.Adapter<MainRecyclerVi
 
     @Override
     public void onBindViewHolder(MainRecyclerViewHolder holder, int position) {
-        DBModel dbModel = getDBModelFromCursor((getProperPositionForCursor(position)));
+        DBModel dbModel = parentCallback.getDBModelFromCursor((getProperPositionForCursor(position)));
         holder.bind(dbModel);
     }
 
     @Override
     public int getItemCount() {
-        if (null == mCursor || mCursor.getCount() < 33)
-            return 0;
-        return 4;
+        return count;
+    }
+
+    public void setCount(int count) {
+        this.count = count;
     }
 
     @Override
     public long getItemId(int position) {
-        mCursor.moveToPosition(position);
-        return mCursor.getLong(0);
+        return parentCallback.getDBModelFromCursor(getProperPositionForCursor(position)).getId();
     }
 
     private int getProperPositionForCursor(int position) {
@@ -72,37 +71,10 @@ public class MainRecyclerViewAdapter extends RecyclerView.Adapter<MainRecyclerVi
         return ((position + 1) * 8);
     }
 
-    /**
-     * An exposed method that creates and returns a model object from the member Cursor to send to binding. Only the MainActivity & this
-     * class use this.
-     * @param position Position for which data is required
-     * @return A DBModel object containing required display data
-     */
-    public DBModel getDBModelFromCursor(int position) {
-        mCursor.moveToPosition(position);
-        long id = mCursor.getLong(mCursor.getColumnIndex(WeatherDBContract.WeatherDBEntry._ID));
-        String main = mCursor.getString(mCursor.getColumnIndex(WeatherDBContract.WeatherDBEntry.COLUMN_WEATHER_MAIN));
-        String desc = mCursor.getString(mCursor.getColumnIndex(WeatherDBContract.WeatherDBEntry.COLUMN_WEATHER_DESC));
-        String temp = mCursor.getString(mCursor.getColumnIndex(WeatherDBContract.WeatherDBEntry.COLUMN_TEMP));
-        float temp_min = mCursor.getFloat(mCursor.getColumnIndex(WeatherDBContract.WeatherDBEntry.COLUMN_TEMP_MIN));
-        float temp_max = mCursor.getFloat(mCursor.getColumnIndex(WeatherDBContract.WeatherDBEntry.COLUMN_TEMP_MAX));
-        float pressure = mCursor.getFloat(mCursor.getColumnIndex(WeatherDBContract.WeatherDBEntry.COLUMN_PRESSURE));
-        String wind = mCursor.getString(mCursor.getColumnIndex(WeatherDBContract.WeatherDBEntry.COLUMN_WIND));
-        long humidity = mCursor.getLong(mCursor.getColumnIndex(WeatherDBContract.WeatherDBEntry.COLUMN_HUMIDITY));
-        long clouds = mCursor.getLong(mCursor.getColumnIndex(WeatherDBContract.WeatherDBEntry.COLUMN_CLOUDS));
-        String icon_id = mCursor.getString(mCursor.getColumnIndex(WeatherDBContract.WeatherDBEntry.COLUMN_ICON_ID));
-        double uvIndex = mCursor.getDouble(mCursor.getColumnIndex(WeatherDBContract.WeatherDBEntry.COLUMN_UV_INDEX));
-        double rain_3h = mCursor.getDouble(mCursor.getColumnIndex(WeatherDBContract.WeatherDBEntry.COLUMN_RAIN_3H));
-        return new DBModel(id,main,desc,temp,temp_min,temp_max,pressure,humidity,wind,clouds,icon_id,uvIndex,rain_3h);
-    }
-
-    public void swapCursor(Cursor newCursor){
-        mCursor = newCursor;
-        notifyDataSetChanged();
-    }
-
-    public interface ForecastItemClickListener{
+    public interface ParentCallback {
         void onForecastItemClick(int position, ImageView forecastImageView);
+
+        DBModel getDBModelFromCursor(int position);
     }
 
     public class MainRecyclerViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -134,7 +106,7 @@ public class MainRecyclerViewAdapter extends RecyclerView.Adapter<MainRecyclerVi
 
         @Override
         public void onClick(View view) {
-            itemClickListener.onForecastItemClick(getAdapterPosition(), binding.forecastImage);
+            parentCallback.onForecastItemClick(getAdapterPosition(), binding.forecastImage);
         }
     }
 }

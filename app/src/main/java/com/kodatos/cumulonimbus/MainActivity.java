@@ -18,6 +18,7 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.databinding.DataBindingUtil;
 import android.graphics.Color;
+import android.graphics.drawable.GradientDrawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -77,11 +78,12 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>,
-        MainRecyclerViewAdapter.ForecastItemClickListener {
+        MainRecyclerViewAdapter.ParentCallback {
 
     private static final int LOADER_ID = 301;
     private static final int PERMISSION_REQUEST_ID = 140;
     private static final int ENABLE_LOCATION_REQUEST_ID = 2043;
+    private static final String LOG_TAG = "Main Activity";
 
     private ActivityMainBinding mBinding;
     private MainRecyclerViewAdapter forecastAdapter = null;
@@ -90,6 +92,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     private SharedPreferences defaultSharedPreferences;
     private SharedPreferences weatherSharedPreferences;
     private ServiceErrorBroadcastReceiver mErrorReceiver;
+    private Cursor mCursor = null;
 
     private int previousBackgroundColor;
     private int iconTintColor;
@@ -270,14 +273,19 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             startSync(0);
         } else if (data.getCount() > 32) {  //Bind new data only when all required rows are updated
             mBinding.mainUISwipeRefreshLayout.setRefreshing(false);
-            forecastAdapter.swapCursor(data);
+            mCursor = data;
+            forecastAdapter.notifyDataSetChanged();
+            if (null == mCursor || mCursor.getCount() < 33)
+                forecastAdapter.setCount(0);
+            else
+                forecastAdapter.setCount(4);
             bindCurrentWeatherData();
         }
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-        forecastAdapter.swapCursor(null);
+        mCursor = null;
     }
     //endregion
 
@@ -300,7 +308,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
         //Add all 8 models to the list
         for (int i = startingRow; i < startingRow + 8; i++)
-            intentModels.add(forecastAdapter.getDBModelFromCursor(i));
+            intentModels.add(getDBModelFromCursor(i));
 
         //Assign a unique transition name to the image
         forecastImageView.setTransitionName(String.valueOf(position) + "forecast_image");
@@ -319,6 +327,25 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         startActivity(intent, options.toBundle());
     }
 
+    @Override
+    public DBModel getDBModelFromCursor(int position) {
+        mCursor.moveToPosition(position);
+        long id = mCursor.getLong(mCursor.getColumnIndex(WeatherDBContract.WeatherDBEntry._ID));
+        String main = mCursor.getString(mCursor.getColumnIndex(WeatherDBContract.WeatherDBEntry.COLUMN_WEATHER_MAIN));
+        String desc = mCursor.getString(mCursor.getColumnIndex(WeatherDBContract.WeatherDBEntry.COLUMN_WEATHER_DESC));
+        String temp = mCursor.getString(mCursor.getColumnIndex(WeatherDBContract.WeatherDBEntry.COLUMN_TEMP));
+        float temp_min = mCursor.getFloat(mCursor.getColumnIndex(WeatherDBContract.WeatherDBEntry.COLUMN_TEMP_MIN));
+        float temp_max = mCursor.getFloat(mCursor.getColumnIndex(WeatherDBContract.WeatherDBEntry.COLUMN_TEMP_MAX));
+        float pressure = mCursor.getFloat(mCursor.getColumnIndex(WeatherDBContract.WeatherDBEntry.COLUMN_PRESSURE));
+        String wind = mCursor.getString(mCursor.getColumnIndex(WeatherDBContract.WeatherDBEntry.COLUMN_WIND));
+        long humidity = mCursor.getLong(mCursor.getColumnIndex(WeatherDBContract.WeatherDBEntry.COLUMN_HUMIDITY));
+        long clouds = mCursor.getLong(mCursor.getColumnIndex(WeatherDBContract.WeatherDBEntry.COLUMN_CLOUDS));
+        String icon_id = mCursor.getString(mCursor.getColumnIndex(WeatherDBContract.WeatherDBEntry.COLUMN_ICON_ID));
+        double uvIndex = mCursor.getDouble(mCursor.getColumnIndex(WeatherDBContract.WeatherDBEntry.COLUMN_UV_INDEX));
+        double rain_3h = mCursor.getDouble(mCursor.getColumnIndex(WeatherDBContract.WeatherDBEntry.COLUMN_RAIN_3H));
+        return new DBModel(id, main, desc, temp, temp_min, temp_max, pressure, humidity, wind, clouds, icon_id, uvIndex, rain_3h);
+    }
+
     private void openSettingsActivity() {
         Intent intent = new Intent(this, SettingsActivity.class);
         startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(this).toBundle());
@@ -328,7 +355,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     //Evaluate and bind data to layout while changing other UI elements on sync.
     private void bindCurrentWeatherData() {
-        DBModel intermediateModel = forecastAdapter.getDBModelFromCursor(0);
+        DBModel intermediateModel = getDBModelFromCursor(0);
 
         SimpleDateFormat sf = new SimpleDateFormat("H:mm", Locale.getDefault());
         sf.setTimeZone(TimeZone.getDefault());
@@ -387,7 +414,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
         //Generate timeline data
         for (int i = 1; i < todayForecastCount; i++) {
-            DBModel dbModel = forecastAdapter.getDBModelFromCursor(i);
+            DBModel dbModel = getDBModelFromCursor(i);
             iconIds.add(dbModel.getIcon_id());
             temperatures.add(dbModel.getTemp());
         }
@@ -412,8 +439,13 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         getWindow().getDecorView().setBackgroundColor(updatedBackgroundColor);
         getWindow().setStatusBarColor(updatedBackgroundColor);
         getWindow().setNavigationBarColor(updatedBackgroundColor);
-        int specialBackgroundColor = Color.rgb(Color.red(updatedBackgroundColor) + 10, Color.green(updatedBackgroundColor) + 10, Color.blue(updatedBackgroundColor) + 10);
-        mBinding.forecastCard.setCardBackgroundColor(specialBackgroundColor);
+        int cardLighterColor = Color.rgb(Color.red(updatedBackgroundColor) + 30, Color.green(updatedBackgroundColor) + 30, Color.blue(updatedBackgroundColor) + 30);
+        int cardDarkerColor = Color.rgb(Color.red(updatedBackgroundColor) + 5, Color.green(updatedBackgroundColor) + 5, Color.blue(updatedBackgroundColor) + 5);
+        //mBinding.forecastCard.setCardBackgroundColor(specialBackgroundColor);
+        GradientDrawable gradientDrawable = new GradientDrawable(GradientDrawable.Orientation.BR_TL, new int[]{cardDarkerColor, cardLighterColor});
+        float px = getResources().getDimension(R.dimen.common_card_corner_radius) * (getResources().getDisplayMetrics().density);
+        gradientDrawable.setCornerRadius(px);
+        mBinding.forecastCard.setBackground(gradientDrawable);
     }
 
     private void changeBackgroundColorWithAnimation(int updatedBackgroundColor) {
@@ -449,7 +481,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     //Utility method to show snackbar with the given message and an action, if it is not null
     private void showSnackbarForError(String message, @Nullable String action, @Nullable View.OnClickListener onClickAction) {
-        Log.d("main", "snackbar shown");
+        Log.d(LOG_TAG, "snackbar shown");
         Snackbar snackbar = Snackbar.make(mBinding.mainCoordinatorLayout, message, Snackbar.LENGTH_LONG);
         if (action != null)
             snackbar.setAction(action, onClickAction).setActionTextColor(iconTintColor);
@@ -471,13 +503,12 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         private String errorDetails;
         private String message;
 
-        private int locationNullErrorCount = 0;
 
         @Override
         public void onReceive(Context context, Intent intent) {
             errorType = intent.getStringExtra(ServiceErrorContract.SERVICE_ERROR_TYPE);
             errorDetails = intent.getStringExtra(ServiceErrorContract.SERVICE_ERROR_DETAILS);
-            Log.d("error_receiver", "error received : " + errorType + " " + errorDetails);
+            Log.d(LOG_TAG, "error received : " + errorType + " " + errorDetails);
             switch (errorType) {
                 case ServiceErrorContract.ERROR_LOCATION:
                     handleLocationError();
@@ -549,32 +580,26 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 SettingsClient client = LocationServices.getSettingsClient(MainActivity.this);
                 Task<LocationSettingsResponse> task = client.checkLocationSettings(builder.build());
                 task.addOnSuccessListener(MainActivity.this, locationSettingsResponse -> {
-                    Log.d("location_enabled", "location_enabled");
+                    Log.d(LOG_TAG, "location_enabled");
                     mFusedClient.requestLocationUpdates(locationRequest, new LocationCallback() {
                         @Override
                         public void onLocationResult(LocationResult locationResult) {
                             if (locationResult.getLocations().size() > 0) {
                                 //Location successfully retrieved
-                                Log.d("main", "location_requested");
+                                Log.d(LOG_TAG, "location_requested");
                                 message = "Location was not available but issue may be resolved now. Try again";
                                 showSnackbarForError(message, "Refresh", v -> startSync(errorDetails.contains(SyncOWMService.CREATE_ACTION) ? 0 : 1));
                             } else {
-                                if (locationNullErrorCount < 3) {
-                                    message = "Retrieving your current location gave no results. Please try again";
-                                    showSnackbarForError(message, null, null);
-                                    locationNullErrorCount++;
-                                } else {
-                                    //Ask user to enter a custom location if location couldn't be found for more than 3 times
-                                    message = "Retrieving your current location gave no results. Please try again or set a custom location";
-                                    showSnackbarForError(message, "Set Location", v -> openSettingsActivity());
-                                }
+                                //Ask user to enter a custom location if location couldn't be found
+                                message = "Retrieving your current location gave no results. Please try again or set a custom location";
+                                showSnackbarForError(message, "Set Location", v -> openSettingsActivity());
                             }
                             mFusedClient.removeLocationUpdates(this);
                         }
                     }, null);
                 });
                 task.addOnFailureListener(MainActivity.this, e -> {
-                    Log.d("location_disabled", "location_disabled");
+                    Log.d(LOG_TAG, "location_disabled");
                     if (e instanceof ResolvableApiException) {
                         ResolvableApiException resolvableApiException = (ResolvableApiException) e;
                         message = "Location provider is disabled. Please enable it";
@@ -585,6 +610,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                                 e1.printStackTrace();
                             }
                         });
+                    } else {
+                        Log.d(LOG_TAG, "Location disabled but not resolvable");
                     }
                 });
 

@@ -184,7 +184,8 @@ public class SyncOWMService extends IntentService {
 
             if (forecastUVIndexModelsResponse.isSuccessful()) {
                 List<UVIndexModel> uvIndexModels = forecastUVIndexModelsResponse.body();
-                for(int i = 1; i<=4; i++){
+                int count = Math.min(4, uvIndexModels.size());
+                for (int i = 1; i <= count; i++) {
                     /*
                      * The UV Index API response only has one record per day, in contrast to 8 records per day for weather data.
                      * Hence, it is written at only one row from the 8 rows of that particular day at a position which can be determined
@@ -369,7 +370,7 @@ public class SyncOWMService extends IntentService {
         List<Address> addresses;
         try {
             addresses = geocoder.getFromLocationName(custom_location, 1);
-            if (addresses == null)  //Location name doesn't exist
+            if (addresses == null || addresses.size() == 0)  //Location name doesn't exist
                 return null;
             coordsAsString = String.valueOf(addresses.get(0).getLatitude()) + "/" + String.valueOf(addresses.get(0).getLongitude());
         } catch (IOException e) {

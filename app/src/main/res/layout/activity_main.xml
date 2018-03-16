@@ -63,9 +63,8 @@
             <android.support.constraint.ConstraintLayout
                 android:id="@+id/background_constaintlayout"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:animateLayoutChanges="true"
-                android:paddingBottom="@dimen/common_card_margin_bottom"
                 android:transitionName="@string/background_transition_name"
                 tools:context="com.kodatos.cumulonimbus.MainActivity"
                 tools:showIn="@layout/activity_main">
@@ -82,6 +81,7 @@
                     android:layout_margin="@dimen/common_card_margin_bottom"
                     android:transitionName="@string/cardview_transition_name"
                     app:cardElevation="4dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintHorizontal_bias="0.0"
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintRight_toRightOf="parent"
