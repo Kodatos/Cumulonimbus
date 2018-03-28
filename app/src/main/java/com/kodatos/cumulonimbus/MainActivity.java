@@ -1,3 +1,27 @@
+/*
+ * MIT License
+ *
+ * Copyright (c) 2017 N Abhishek (aka Kodatos)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package com.kodatos.cumulonimbus;
 
 import android.Manifest;
@@ -63,6 +87,7 @@ import com.kodatos.cumulonimbus.datahelper.WeatherDBContract;
 import com.kodatos.cumulonimbus.uihelper.CurrentWeatherLayoutDataModel;
 import com.kodatos.cumulonimbus.uihelper.MainRecyclerViewAdapter;
 import com.kodatos.cumulonimbus.uihelper.TimelineRecyclerViewAdapter;
+import com.kodatos.cumulonimbus.uihelper.welcome.WelcomeActivity;
 import com.kodatos.cumulonimbus.utils.KeyConstants;
 import com.kodatos.cumulonimbus.utils.MiscUtils;
 
@@ -83,6 +108,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     private static final int LOADER_ID = 301;
     private static final int PERMISSION_REQUEST_ID = 140;
     private static final int ENABLE_LOCATION_REQUEST_ID = 2043;
+    private static final int WELCOME_ACTIVITY_REQUEST_ID = 230;
     private static final String LOG_TAG = "Main Activity";
 
     private ActivityMainBinding mBinding;
@@ -107,61 +133,28 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         setSupportActionBar(mBinding.toolbarMain);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
-        //Calculate height of hidden layout
-        mBinding.currentLayout.currentHiddenLayout.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-            @Override
-            public void onGlobalLayout() {
-                hiddenLayoutHeight = mBinding.currentLayout.currentHiddenLayout.getHeight();
-                mBinding.currentLayout.currentHiddenLayout.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-                mBinding.currentLayout.currentHiddenLayout.setVisibility(View.GONE);
-            }
-        });
-
-        //region Region : enter exit transitions
-        Fade fade = new Fade();
-        fade.setDuration(500);
-        fade.addTarget(mBinding.currentLayout.currentLayoutAlwaysVisible);
-        fade.addTarget(mBinding.forecastLayout.getRoot());
-        getWindow().setEnterTransition(fade);
-        getWindow().setExitTransition(fade);
-        getWindow().setReturnTransition(fade);
-        getWindow().setReenterTransition(fade);
-        //endregion
-
         defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         weatherSharedPreferences = getSharedPreferences("weather_display_pref", MODE_PRIVATE);
 
-        previousBackgroundColor = MiscUtils.getBackgroundColorForIconID(this, weatherSharedPreferences.getString(KeyConstants.CURRENT_WEATHER_ICON_ID_KEY, ""));
+        if (defaultSharedPreferences.getBoolean(KeyConstants.FIRST_TIME_RUN, true)) {
+            Intent introActivityIntent = new Intent(this, WelcomeActivity.class);
+            startActivityForResult(introActivityIntent, WELCOME_ACTIVITY_REQUEST_ID);
+        } else {
+            initialize();
+        }
 
-        LinearLayoutManager lm = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
-        mBinding.forecastLayout.mainRecyclerview.setLayoutManager(lm);
-        LinearLayoutManager hlm = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
-        mBinding.forecastLayout.currentTimelineRecyclerView.setLayoutManager(hlm);
-        forecastAdapter = new MainRecyclerViewAdapter(this);
-        forecastAdapter.setHasStableIds(true);
-        mBinding.forecastLayout.mainRecyclerview.setAdapter(forecastAdapter);
-
-        mErrorReceiver = new ServiceErrorBroadcastReceiver();
-        LocalBroadcastManager.getInstance(this).registerReceiver(mErrorReceiver, new IntentFilter(ServiceErrorContract.BROADCAST_INTENT_FILTER));
-
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_REQUEST_ID);
-        } else
-            getSupportLoaderManager().initLoader(LOADER_ID, null, this);
-
-        setUpUIInteractions();
     }
 
     @Override
     protected void onResume() {
-        LocalBroadcastManager.getInstance(this).registerReceiver(mErrorReceiver, new IntentFilter(ServiceErrorContract.BROADCAST_INTENT_FILTER));
         super.onResume();
+        LocalBroadcastManager.getInstance(this).registerReceiver(mErrorReceiver, new IntentFilter(ServiceErrorContract.BROADCAST_INTENT_FILTER));
     }
 
     @Override
     protected void onPause() {
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(mErrorReceiver);
         super.onPause();
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mErrorReceiver);
     }
 
     @Override
@@ -185,6 +178,58 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == WELCOME_ACTIVITY_REQUEST_ID)
+            if (resultCode == RESULT_OK)
+                initialize();
+            else
+                finish();
+    }
+
+    private void initialize() {
+        //Calculate height of hidden layout
+        mBinding.currentLayout.currentHiddenLayout.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                hiddenLayoutHeight = mBinding.currentLayout.currentHiddenLayout.getHeight();
+                mBinding.currentLayout.currentHiddenLayout.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                mBinding.currentLayout.currentHiddenLayout.setVisibility(View.GONE);
+            }
+        });
+
+        //region Region : enter exit transitions
+        Fade fade = new Fade();
+        fade.setDuration(500);
+        fade.addTarget(mBinding.currentLayout.currentLayoutAlwaysVisible);
+        fade.addTarget(mBinding.forecastLayout.getRoot());
+        getWindow().setEnterTransition(fade);
+        getWindow().setExitTransition(fade);
+        getWindow().setReturnTransition(fade);
+        getWindow().setReenterTransition(fade);
+        //endregion
+
+        previousBackgroundColor = MiscUtils.getBackgroundColorForIconID(this, weatherSharedPreferences.getString(KeyConstants.CURRENT_WEATHER_ICON_ID_KEY, ""));
+
+        LinearLayoutManager lm = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+        mBinding.forecastLayout.mainRecyclerview.setLayoutManager(lm);
+        LinearLayoutManager hlm = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
+        mBinding.forecastLayout.currentTimelineRecyclerView.setLayoutManager(hlm);
+        forecastAdapter = new MainRecyclerViewAdapter(this);
+        forecastAdapter.setHasStableIds(true);
+        mBinding.forecastLayout.mainRecyclerview.setAdapter(forecastAdapter);
+
+        mErrorReceiver = new ServiceErrorBroadcastReceiver();
+        LocalBroadcastManager.getInstance(this).registerReceiver(mErrorReceiver, new IntentFilter(ServiceErrorContract.BROADCAST_INTENT_FILTER));
+
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_REQUEST_ID);
+        } else
+            getSupportLoaderManager().initLoader(LOADER_ID, null, this);
+
+        setUpUIInteractions();
     }
 
     // Implement necessary listeners to UI elements
@@ -258,6 +303,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     }
 
     //region LoaderCallback Overrides
+    @NonNull
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         if (id == LOADER_ID) {

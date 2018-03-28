@@ -34,4 +34,13 @@
     <string name="next_four_days">Next four days</string>
     <string name="about_activity_name">About</string>
     <string name="about_the_app">A simple yet bold open-source weather app made by yours truly.</string>
+
+    <string name="welcome_title_1">Welcome to Cumulonimbus!</string>
+    <string name="welcome_title_2">Few permissions first!</string>
+    <string name="welcome_title_3">Lets adapt the app for you</string>
+    <string name="welcome_title_4">All Set!</string>
+    <string name="welcome_description_1">A simple, bold and to the point weather app for your frequent needs. Go through this short
+            initial setup to make this app run better!</string>
+    <string name="welcome_description_2">The app needs to access your location for getting the weather. Nothing more.</string>
+    <string name="welcome_description_4">Enjoy Cumulonimbus and check Settings for more stuff.</string>
 </resources>

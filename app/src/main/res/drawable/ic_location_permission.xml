@@ -1,0 +1,33 @@
+<!--
+  ~ MIT License
+  ~
+  ~ Copyright (c) 2017 N Abhishek (aka Kodatos)
+  ~
+  ~ Permission is hereby granted, free of charge, to any person obtaining a copy
+  ~ of this software and associated documentation files (the "Software"), to deal
+  ~ in the Software without restriction, including without limitation the rights
+  ~ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  ~ copies of the Software, and to permit persons to whom the Software is
+  ~ furnished to do so, subject to the following conditions:
+  ~
+  ~ The above copyright notice and this permission notice shall be included in all
+  ~ copies or substantial portions of the Software.
+  ~
+  ~ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  ~ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  ~ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  ~ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  ~ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  ~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+  ~ SOFTWARE.
+  -->
+
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="100dp"
+    android:height="100dp"
+    android:viewportHeight="100.0"
+    android:viewportWidth="100.0">
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M31.82,28.36A21.82,21.82 0,0 0,10 50.18A21.82,21.82 0,0 0,31.82 72C41.31,72 49.38,65.93 52.36,57.46L68.18,57.46L68.18,72L82.73,72L82.73,57.46L90,57.46L90,42.91L52.36,42.91C49.38,34.44 41.31,28.36 31.82,28.36zM30.37,36.74L32.81,36.74L32.81,39.25C37.91,39.8 41.98,43.86 42.53,48.96L45.03,48.96L45.03,51.4L42.53,51.4C41.98,56.5 37.91,60.57 32.81,61.12L32.81,63.62L30.37,63.62L30.37,61.12C25.28,60.57 21.21,56.5 20.66,51.4L18.15,51.4L18.15,48.96L20.66,48.96C21.21,43.86 25.28,39.8 30.37,39.25L30.37,36.74zM31.59,41.63A8.55,8.55 0,0 0,23.04 50.18A8.55,8.55 0,0 0,31.59 58.73A8.55,8.55 0,0 0,40.15 50.18A8.55,8.55 0,0 0,31.59 41.63zM31.59,45.29A4.89,4.89 0,0 1,36.48 50.18A4.89,4.89 0,0 1,31.59 55.07A4.89,4.89 0,0 1,26.71 50.18A4.89,4.89 0,0 1,31.59 45.29z" />
+</vector>
