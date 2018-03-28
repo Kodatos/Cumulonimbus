@@ -1,0 +1,34 @@
+<!--
+  ~ MIT License
+  ~
+  ~ Copyright (c) 2017 N Abhishek (aka Kodatos)
+  ~
+  ~ Permission is hereby granted, free of charge, to any person obtaining a copy
+  ~ of this software and associated documentation files (the "Software"), to deal
+  ~ in the Software without restriction, including without limitation the rights
+  ~ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  ~ copies of the Software, and to permit persons to whom the Software is
+  ~ furnished to do so, subject to the following conditions:
+  ~
+  ~ The above copyright notice and this permission notice shall be included in all
+  ~ copies or substantial portions of the Software.
+  ~
+  ~ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  ~ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  ~ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  ~ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  ~ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  ~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+  ~ SOFTWARE.
+  -->
+
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="100dp"
+    android:height="100dp"
+    android:viewportHeight="100.0"
+    android:viewportWidth="100.0">
+    <path
+        android:fillAlpha="1"
+        android:fillColor="#ffffff"
+        android:pathData="M50,10A40,40 0,0 0,10 50A40,40 0,0 0,50 90A40,40 0,0 0,90 50A40,40 0,0 0,50 10zM50,23L57.89,30.89L57.89,46.68L73.68,46.68L73.68,73L26.32,73L26.32,36.16L42.11,36.16L42.11,30.89L50,23zM47.37,30.89L47.37,36.16L52.63,36.16L52.63,30.89L47.37,30.89zM31.58,41.42L31.58,46.68L36.84,46.68L36.84,41.42L31.58,41.42zM47.37,41.42L47.37,46.68L52.63,46.68L52.63,41.42L47.37,41.42zM31.58,51.95L31.58,57.21L36.84,57.21L36.84,51.95L31.58,51.95zM47.37,51.95L47.37,57.21L52.63,57.21L52.63,51.95L47.37,51.95zM63.16,51.95L63.16,57.21L68.42,57.21L68.42,51.95L63.16,51.95zM31.58,62.47L31.58,67.74L36.84,67.74L36.84,62.47L31.58,62.47zM47.37,62.47L47.37,67.74L52.63,67.74L52.63,62.47L47.37,62.47zM63.16,62.47L63.16,67.74L68.42,67.74L68.42,62.47L63.16,62.47z" />
+</vector>

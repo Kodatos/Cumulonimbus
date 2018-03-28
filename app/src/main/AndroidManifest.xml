@@ -66,6 +66,11 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.kodatos.cumulonimbus.SettingsActivity" />
         </activity>
+        <activity
+            android:name=".uihelper.welcome.WelcomeActivity"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
     </application>
 
 </manifest>
