@@ -2,10 +2,14 @@
     <dimen name="mainui_small_category_icon_size">56dp</dimen>
     <dimen name="mainui_weather_icon_size">96dp</dimen>
     <dimen name="mainui_small_category_icon_gap">24dp</dimen>
+    <dimen name="mainui_title_text_size">28sp</dimen>
+    <dimen name="mainui_secondary_text_size">16sp</dimen>
 
     <dimen name="detailui_icon_size1">56dp</dimen>
     <dimen name="detailui_icon_size2">64dp</dimen>
     <dimen name="detailui_text_size_secondary">16sp</dimen>
+    <dimen name="detailui_text_size_secondary_caption">18sp</dimen>
+    <dimen name="detailui_title_text_size">30sp</dimen>
 
     <dimen name="common_card_margin_bottom">16dp</dimen>
     <dimen name="common_card_corner_radius">4dp</dimen>

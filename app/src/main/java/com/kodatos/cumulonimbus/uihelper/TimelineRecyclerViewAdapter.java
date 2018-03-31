@@ -26,6 +26,7 @@ package com.kodatos.cumulonimbus.uihelper;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -63,15 +64,16 @@ public class TimelineRecyclerViewAdapter extends RecyclerView.Adapter<TimelineRe
         this.expandedPosition = expandedPosition;
     }
 
+    @NonNull
     @Override
-    public TimelineRecyclerViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public TimelineRecyclerViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         ForecastTimelineRecyclerviewItemBinding binding = ForecastTimelineRecyclerviewItemBinding.inflate(inflater, parent, false);
         return new TimelineRecyclerViewHolder(binding);
     }
 
     @Override
-    public void onBindViewHolder(TimelineRecyclerViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull TimelineRecyclerViewHolder holder, int position) {
         String iconIdAtPosition = iconIds.get(position);
         String temperatureAtPosition = temperatures.get(position);
         int imageId = MiscUtils.getResourceIDForIconID(mContext, iconIdAtPosition);
@@ -125,7 +127,7 @@ public class TimelineRecyclerViewAdapter extends RecyclerView.Adapter<TimelineRe
 
         ForecastTimelineRecyclerviewItemBinding binding;
 
-        public TimelineRecyclerViewHolder(ForecastTimelineRecyclerviewItemBinding binding) {
+        TimelineRecyclerViewHolder(ForecastTimelineRecyclerviewItemBinding binding) {
             super(binding.getRoot());
             this.binding = binding;
             if (expandedPosition != Integer.MIN_VALUE)

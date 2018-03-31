@@ -38,24 +38,24 @@ import com.kodatos.cumulonimbus.databinding.ActivitySettingsBinding;
 
 public class SettingsActivity extends AppCompatActivity {
 
-    private ActivitySettingsBinding mBinding;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mBinding = DataBindingUtil.setContentView(this, R.layout.activity_settings);
+        ActivitySettingsBinding mBinding = DataBindingUtil.setContentView(this, R.layout.activity_settings);
         setSupportActionBar(mBinding.toolbarSettings);
 
         Slide transition = new Slide();
         transition.setDuration(200);
-        transition.setSlideEdge(Gravity.RIGHT);
+        transition.setSlideEdge(Gravity.END);
         getWindow().setEnterTransition(transition);
         getWindow().setExitTransition(transition);
         getWindow().setReturnTransition(transition);
         getWindow().setReenterTransition(transition);
 
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        if(getSupportActionBar()!=null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowTitleEnabled(false);
+        }
 
         mBinding.aboutCard.setOnClickListener(v -> {
             Intent intent = new Intent(this, AboutActivity.class);

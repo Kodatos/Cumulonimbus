@@ -112,7 +112,6 @@
             android:layout_height="@dimen/mainui_small_category_icon_size"
             android:layout_marginLeft="0dp"
             android:layout_marginRight="0dp"
-
             android:src="@drawable/ic_thermometer"
             android:tint="@{currentWeatherData.iconTint}"
             app:layout_constraintLeft_toLeftOf="parent"
@@ -143,7 +142,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="0dp"
             android:layout_marginTop="0dp"
-            android:drawableLeft="@drawable/ic_arrow_drop_up"
+            android:drawableStart="@drawable/ic_arrow_drop_up"
             android:gravity="center"
             android:text="@{currentWeatherData.tempMax}"
             app:layout_constraintBottom_toBottomOf="@+id/currentTemperatureImageView"
@@ -156,7 +155,7 @@
             style="@style/MainUIText.RightSideText"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:drawableLeft="@drawable/ic_arrow_drop_down"
+            android:drawableStart="@drawable/ic_arrow_drop_down"
             android:gravity="center"
             android:text="@{currentWeatherData.tempMin}"
             app:layout_constraintBottom_toBottomOf="@+id/currentTemperatureImageView"
@@ -277,7 +276,7 @@
                 android:layout_width="32dp"
                 android:layout_height="32dp"
                 android:layout_marginBottom="0dp"
-                android:layout_marginRight="8dp"
+                android:layout_marginEnd="8dp"
                 android:layout_marginTop="0dp"
                 android:rotation="@{currentWeatherData.windDirection}"
                 android:scaleType="fitXY"
@@ -309,7 +308,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:text="@string/pressure"
-                android:textSize="16sp"
+                android:textSize="@dimen/mainui_secondary_text_size"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toLeftOf="@+id/currentMeterImageView"
                 app:layout_constraintTop_toTopOf="@+id/currentMeterImageView" />
@@ -332,7 +331,7 @@
                 android:layout_marginTop="8dp"
                 android:text="@string/humidity"
                 android:textColor="@color/textColorPrimaryInverse"
-                android:textSize="16sp"
+                android:textSize="@dimen/mainui_secondary_text_size"
                 app:layout_constraintLeft_toRightOf="@+id/currentMeterImageView"
                 app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/currentMeterImageView" />
@@ -367,7 +366,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:text="@string/rain_volume"
-                android:textSize="16sp"
+                android:textSize="@dimen/mainui_secondary_text_size"
                 app:layout_constraintEnd_toStartOf="@+id/currentRainImageView"
                 app:layout_constraintTop_toTopOf="@+id/currentRainImageView" />
 
@@ -389,7 +388,7 @@
                 android:layout_marginTop="8dp"
                 android:text="@string/cloudiness"
                 android:textColor="@color/textColorPrimaryInverse"
-                android:textSize="16sp"
+                android:textSize="@dimen/mainui_secondary_text_size"
                 app:layout_constraintStart_toEndOf="@+id/currentRainImageView"
                 app:layout_constraintTop_toTopOf="@+id/currentRainImageView" />
 
@@ -423,7 +422,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:text="@string/sunrise"
-                android:textSize="16sp"
+                android:textSize="@dimen/mainui_secondary_text_size"
                 app:layout_constraintEnd_toStartOf="@+id/currentSunImageView"
                 app:layout_constraintTop_toTopOf="@+id/currentSunImageView" />
 
@@ -445,7 +444,7 @@
                 android:layout_marginTop="8dp"
                 android:text="@string/sunset"
                 android:textColor="@color/textColorPrimaryInverse"
-                android:textSize="16sp"
+                android:textSize="@dimen/mainui_secondary_text_size"
                 app:layout_constraintStart_toEndOf="@+id/currentSunImageView"
                 app:layout_constraintTop_toTopOf="@+id/currentSunImageView" />
 
@@ -479,7 +478,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:text="@string/visibility"
-                android:textSize="16sp"
+                android:textSize="@dimen/mainui_secondary_text_size"
                 app:layout_constraintEnd_toStartOf="@+id/currentShadesImageView"
                 app:layout_constraintTop_toTopOf="@+id/currentShadesImageView" />
 
@@ -501,7 +500,7 @@
                 android:layout_marginTop="8dp"
                 android:text="@{currentWeatherData.uvIndexDescription}"
                 android:textColor="@color/textColorPrimaryInverse"
-                android:textSize="16sp"
+                android:textSize="@dimen/mainui_secondary_text_size"
                 app:layout_constraintStart_toEndOf="@+id/currentShadesImageView"
                 app:layout_constraintTop_toTopOf="@+id/currentShadesImageView"
                 tools:text="UV Index: High" />

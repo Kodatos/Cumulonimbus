@@ -55,6 +55,8 @@ public class SimpleSlideFragment extends Fragment implements ISlidePolicy, ISlid
     private SimpleSlideLayoutBinding mBinding;
     private boolean isSafeToProceed = true;
 
+    private Bundle arguments;
+
     public SimpleSlideFragment() {
     }
 
@@ -73,7 +75,7 @@ public class SimpleSlideFragment extends Fragment implements ISlidePolicy, ISlid
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         mBinding = DataBindingUtil.inflate(inflater, R.layout.simple_slide_layout, container, false);
-        Bundle arguments = Objects.requireNonNull(getArguments());
+        arguments = Objects.requireNonNull(getArguments());
         mBinding.simpleSlideTitle.setText(arguments.getString(SLIDE_TITLE));
         mBinding.simpleSlideDescription.setText(arguments.getString(SLIDE_DESC));
         mBinding.simpleSlideImageView.setImageDrawable(getResources().getDrawable(arguments.getInt(SLIDE_DRAWABLE)));
@@ -100,7 +102,7 @@ public class SimpleSlideFragment extends Fragment implements ISlidePolicy, ISlid
 
     @Override
     public int getDefaultBackgroundColor() {
-        return getArguments().getInt(SLIDE_BACKGROUND_COLOR);
+        return arguments.getInt(SLIDE_BACKGROUND_COLOR);
     }
 
     @Override
@@ -124,7 +126,7 @@ public class SimpleSlideFragment extends Fragment implements ISlidePolicy, ISlid
 
     @Override
     public void onSlideSelected() {
-        if (getArguments().getInt(SLIDE_DRAWABLE) == R.drawable.ic_location_permission) {
+        if (arguments.getInt(SLIDE_DRAWABLE) == R.drawable.ic_location_permission) {
             isSafeToProceed = false;
             requestLocationPermission();
         }

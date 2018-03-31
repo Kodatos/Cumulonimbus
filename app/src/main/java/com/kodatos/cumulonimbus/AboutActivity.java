@@ -39,19 +39,18 @@ import de.psdev.licensesdialog.LicensesDialogFragment;
 
 public class AboutActivity extends AppCompatActivity {
 
-    private ActivityAboutBinding mBinding;
-
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mBinding = DataBindingUtil.setContentView(this, R.layout.activity_about);
+        ActivityAboutBinding mBinding = DataBindingUtil.setContentView(this, R.layout.activity_about);
         setSupportActionBar(mBinding.toolbarAbout);
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        if(getSupportActionBar()!=null)
+            getSupportActionBar().setDisplayShowTitleEnabled(false);
         Window window = getWindow();
 
         Slide transition = new Slide();
         transition.setDuration(200);
-        transition.setSlideEdge(Gravity.RIGHT);
+        transition.setSlideEdge(Gravity.END);
         window.setEnterTransition(transition);
         window.setExitTransition(transition);
         window.setReturnTransition(transition);

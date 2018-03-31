@@ -22,9 +22,11 @@
   ~ SOFTWARE.
   -->
 
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:card_view="http://schemas.android.com/apk/res-auto">
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    tools:ignore="ContentDescription">
 
     <android.support.design.widget.CoordinatorLayout
         android:layout_width="match_parent"
@@ -88,7 +90,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="8dp"
-                    android:layout_marginLeft="8dp"
+                    android:layout_marginStart="8dp"
                     android:text="@string/app_name"
                     android:textColor="@color/textColorPrimaryInverse"
                     android:textSize="36sp"
@@ -133,7 +135,7 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_horizontal"
                         android:layout_marginTop="48dp"
-                        android:text="N. Abhishek (Kodatos)"
+                        android:text="@string/about_activity_author_name"
                         android:textSize="20sp" />
 
                     <LinearLayout
@@ -154,7 +156,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_marginStart="72dp"
                                 android:layout_marginTop="8dp"
-                                android:text="Feedback"
+                                android:text="@string/about_activity_feedback"
                                 android:textColor="@color/textColorPrimary"
                                 android:textSize="16sp"
                                 app:fontFamily="@font/product_sans_bold"
@@ -168,7 +170,7 @@
                                 android:layout_marginEnd="16dp"
                                 android:layout_marginStart="72dp"
                                 android:layout_marginTop="32dp"
-                                android:text="Send an email to provide me feedback for this app"
+                                android:text="@string/about_activity_feedback_desc"
                                 android:textColor="@color/textColorSecondaryAlt"
                                 android:textSize="14sp"
                                 app:fontFamily="@font/product_sans_regular"
@@ -202,7 +204,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_marginStart="72dp"
                                 android:layout_marginTop="8dp"
-                                android:text="Play Store"
+                                android:text="@string/about_activity_playstore"
                                 android:textColor="@color/textColorPrimary"
                                 android:textSize="16sp"
                                 app:fontFamily="@font/product_sans_bold"
@@ -216,7 +218,7 @@
                                 android:layout_marginEnd="16dp"
                                 android:layout_marginStart="72dp"
                                 android:layout_marginTop="32dp"
-                                android:text="Please leave a rating and review"
+                                android:text="@string/about_activity_playstore_desc"
                                 android:textColor="@color/textColorSecondaryAlt"
                                 android:textSize="14sp"
                                 app:fontFamily="@font/product_sans_regular"
@@ -250,7 +252,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_marginStart="72dp"
                                 android:layout_marginTop="8dp"
-                                android:text="Source Code"
+                                android:text="@string/about_activity_source_code"
                                 android:textColor="@color/textColorPrimary"
                                 android:textSize="16sp"
                                 app:fontFamily="@font/product_sans_bold"
@@ -264,7 +266,7 @@
                                 android:layout_marginEnd="16dp"
                                 android:layout_marginStart="72dp"
                                 android:layout_marginTop="32dp"
-                                android:text="View the source code on Github"
+                                android:text="@string/about_activity_source_code_desc"
                                 android:textColor="@color/textColorSecondaryAlt"
                                 android:textSize="14sp"
                                 app:fontFamily="@font/product_sans_regular"
@@ -299,7 +301,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_marginStart="72dp"
                                 android:layout_marginTop="8dp"
-                                android:text="Licenses"
+                                android:text="@string/about_activity_licenses"
                                 android:textColor="@color/textColorPrimary"
                                 android:textSize="16sp"
                                 app:fontFamily="@font/product_sans_bold"
@@ -313,7 +315,7 @@
                                 android:layout_marginEnd="16dp"
                                 android:layout_marginStart="72dp"
                                 android:layout_marginTop="32dp"
-                                android:text="Attributions for open source libraries used"
+                                android:text="@string/about_activity_licenses_desc"
                                 android:textColor="@color/textColorSecondaryAlt"
                                 android:textSize="14sp"
                                 app:fontFamily="@font/product_sans_regular"

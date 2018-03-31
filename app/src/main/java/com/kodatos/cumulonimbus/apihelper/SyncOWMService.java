@@ -59,6 +59,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 
 import retrofit2.Call;
@@ -89,7 +90,6 @@ public class SyncOWMService extends IntentService {
     private final String LOG_TAG = getClass().getName();
     private Intent mIntent;
     private WeatherAPIService weatherAPIService;
-    private String units;
 
     //Geocoded location data the weather api itself provides. Serves as a backup if geocoding for more accurate data fails
     private String backupCoordsFromResponse;
@@ -111,7 +111,7 @@ public class SyncOWMService extends IntentService {
         mIntent = intent;
 
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
-        units = sp.getBoolean(getString(R.string.pref_metrics_key), true) ? "metric" : "imperial";
+        String units = sp.getBoolean(getString(R.string.pref_metrics_key), true) ? "metric" : "imperial";
         if (sp.getBoolean(this.getString(R.string.pref_curr_location_key), true)) {
 
             //User expects current location data. Hence, last known co-ordinates are retrieved and the respective url called.
@@ -187,7 +187,7 @@ public class SyncOWMService extends IntentService {
             Response<List<UVIndexModel>> forecastUVIndexModelsResponse = uvIndexModelsCall.execute();
 
             if (currentUVIndexModelResponse.isSuccessful()) {
-                UVIndexModel uvIndexModel = currentUVIndexModelResponse.body();
+                UVIndexModel uvIndexModel = Objects.requireNonNull(currentUVIndexModelResponse.body());
                 ContentValues cv = new ContentValues();
                 cv.put(WeatherDBContract.WeatherDBEntry.COLUMN_UV_INDEX, uvIndexModel.value);
                 String where = "_ID=?";
@@ -198,7 +198,7 @@ public class SyncOWMService extends IntentService {
                         .withSelection(where, selectionArgs).build());
             } else {
                 JSONObject jsonError;
-                jsonError = new JSONObject(currentUVIndexModelResponse.errorBody().string());
+                jsonError = new JSONObject(Objects.requireNonNull(currentUVIndexModelResponse.errorBody()).string());
                 String errorCode = String.valueOf(jsonError.getInt("cod"));
                 String errorMessage = jsonError.getString("message");
                 String errorLog = errorCode+":"+ errorMessage;
@@ -207,7 +207,7 @@ public class SyncOWMService extends IntentService {
             }
 
             if (forecastUVIndexModelsResponse.isSuccessful()) {
-                List<UVIndexModel> uvIndexModels = forecastUVIndexModelsResponse.body();
+                List<UVIndexModel> uvIndexModels = Objects.requireNonNull(forecastUVIndexModelsResponse.body());
                 int count = Math.min(4, uvIndexModels.size());
                 for (int i = 1; i <= count; i++) {
                     /*
@@ -227,7 +227,7 @@ public class SyncOWMService extends IntentService {
                 getContentResolver().applyBatch(WeatherDBContract.AUTHORITY, uvOps);
             } else {
                 JSONObject jsonError;
-                jsonError = new JSONObject(forecastUVIndexModelsResponse.errorBody().string());
+                jsonError = new JSONObject(Objects.requireNonNull(forecastUVIndexModelsResponse.errorBody()).string());
                 String errorCode = String.valueOf(jsonError.getInt("cod"));
                 String errorMessage = jsonError.getString("message");
                 String errorLog = errorCode+":"+ errorMessage;
@@ -250,7 +250,7 @@ public class SyncOWMService extends IntentService {
         if(response.isSuccessful()){
             CurrentWeatherModel currentWeatherModelResponse = response.body();
             ArrayList<ContentProviderOperation> contentProviderOperations = new ArrayList<>();
-            ContentValues cv = currentWeatherModelResponse.getEquivalentCV();
+            ContentValues cv = Objects.requireNonNull(currentWeatherModelResponse).getEquivalentCV();
             SharedPreferences weatherSP = getSharedPreferences("weather_display_pref", MODE_PRIVATE);
 
             backupCoordsFromResponse = String.valueOf(currentWeatherModelResponse.coord.lat) + "/" + String.valueOf(currentWeatherModelResponse.coord.lon);
@@ -299,7 +299,7 @@ public class SyncOWMService extends IntentService {
         } else {
             JSONObject jsonError;
             try {
-                jsonError = new JSONObject(response.errorBody().string());
+                jsonError = new JSONObject(Objects.requireNonNull(response.errorBody()).string());
                 String errorCode = String.valueOf(jsonError.getInt("cod"));
                 String errorMessage = jsonError.getString("message");
                 String errorLog = errorCode+":"+ errorMessage;
@@ -317,7 +317,7 @@ public class SyncOWMService extends IntentService {
     private void handleForecastWeatherResponse(Call<ForecastWeatherModel> call) throws IOException {
         Response<ForecastWeatherModel> response = call.execute();
         if (response.isSuccessful()) {
-            ForecastWeatherModel forecastWeatherModelResponse = response.body();
+            ForecastWeatherModel forecastWeatherModelResponse = Objects.requireNonNull(response.body());
             ArrayList<ContentProviderOperation> contentProviderOperations = new ArrayList<>();
             ArrayList<ContentValues> bulkContentValues = new ArrayList<>();
             //Store all records available
@@ -357,7 +357,7 @@ public class SyncOWMService extends IntentService {
         } else {
             JSONObject jsonError;
             try {
-                jsonError = new JSONObject(response.errorBody().string());
+                jsonError = new JSONObject(Objects.requireNonNull(response.errorBody()).string());
                 String errorCode = String.valueOf(jsonError.getInt("cod"));
                 String errorMessage = jsonError.getString("message");
                 String errorLog = errorCode+":"+ errorMessage;

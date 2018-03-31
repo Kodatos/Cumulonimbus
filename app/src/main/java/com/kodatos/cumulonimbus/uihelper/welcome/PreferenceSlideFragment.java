@@ -86,11 +86,13 @@ public class PreferenceSlideFragment extends Fragment implements ISlideBackgroun
     private boolean isSafeToProceed = false;
     private int LOADER_ID = 3121;
 
+    private Bundle arguments;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         mBinding = DataBindingUtil.inflate(inflater, R.layout.preference_slide_layout, container, false);
-        Bundle arguments = getArguments();
+        arguments = Objects.requireNonNull(getArguments());
         mBinding.getRoot().setBackgroundColor(arguments.getInt(SLIDE_BACKGROUND_COLOR));
         mBinding.preferenceSlideTitle.setText(getString(R.string.welcome_title_3));
         mBinding.preferenceSlideCurrentLocationCheck.setOnClickListener(v -> {
@@ -110,7 +112,7 @@ public class PreferenceSlideFragment extends Fragment implements ISlideBackgroun
 
     @Override
     public int getDefaultBackgroundColor() {
-        return getArguments().getInt(SLIDE_BACKGROUND_COLOR);
+        return arguments.getInt(SLIDE_BACKGROUND_COLOR);
     }
 
     @Override
@@ -152,7 +154,7 @@ public class PreferenceSlideFragment extends Fragment implements ISlideBackgroun
         } else if ("valid".equals(data)) {
             //Check location service
             Log.d(LOG_TAG, "checking_location_services");
-            FusedLocationProviderClient mFusedClient = LocationServices.getFusedLocationProviderClient(getContext());
+            FusedLocationProviderClient mFusedClient = LocationServices.getFusedLocationProviderClient(Objects.requireNonNull(getContext()));
             LocationRequest locationRequest = new LocationRequest();
             locationRequest.setNumUpdates(1).setInterval(100).setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
             LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder().addLocationRequest(locationRequest);
@@ -199,7 +201,7 @@ public class PreferenceSlideFragment extends Fragment implements ISlideBackgroun
         private String custom_location;
         private String api_key;
 
-        public SettingsValidator(Context context, boolean isCustomLocationEnabled, String custom_location, String api_key) {
+        SettingsValidator(Context context, boolean isCustomLocationEnabled, String custom_location, String api_key) {
             super(context);
             this.isCustomLocationEnabled = isCustomLocationEnabled;
             this.custom_location = custom_location;
@@ -234,7 +236,7 @@ public class PreferenceSlideFragment extends Fragment implements ISlideBackgroun
                 try {
                     Response<CurrentWeatherModel> response = currentWeatherModelCall.execute();
                     if (!response.isSuccessful()) {
-                        JSONObject jsonError = new JSONObject(response.errorBody().string());
+                        JSONObject jsonError = new JSONObject(Objects.requireNonNull(response.errorBody()).string());
                         String errorCode = String.valueOf(jsonError.getInt("cod"));
                         if ("404".equals(errorCode) || "400".equals(errorCode)) {
                             Log.d(LOG_TAG, "invalid_city");

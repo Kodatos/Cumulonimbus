@@ -28,6 +28,7 @@ package com.kodatos.cumulonimbus.uihelper;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -62,15 +63,16 @@ public class MainRecyclerViewAdapter extends RecyclerView.Adapter<MainRecyclerVi
         }
     }
 
+    @NonNull
     @Override
-    public MainRecyclerViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public MainRecyclerViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater layoutInflater = LayoutInflater.from(parent.getContext());
         ForecastRecyclerviewItemBinding recycleItemBinding = ForecastRecyclerviewItemBinding.inflate(layoutInflater, parent, false);
         return new MainRecyclerViewHolder(recycleItemBinding);
     }
 
     @Override
-    public void onBindViewHolder(MainRecyclerViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull MainRecyclerViewHolder holder, int position) {
         DBModel dbModel = parentCallback.getDBModelFromCursor((getProperPositionForCursor(position)));
         holder.bind(dbModel);
     }

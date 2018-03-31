@@ -131,7 +131,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         super.onCreate(savedInstanceState);
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_main);
         setSupportActionBar(mBinding.toolbarMain);
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        if(getSupportActionBar()!=null)
+            getSupportActionBar().setDisplayShowTitleEnabled(false);
 
         defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         weatherSharedPreferences = getSharedPreferences("weather_display_pref", MODE_PRIVATE);
@@ -314,7 +315,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     }
 
     @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+    public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor data) {
         if (data.getCount() == 0) { //If database is empty, start sync
             startSync(0);
         } else if (data.getCount() > 32) {  //Bind new data only when all required rows are updated
@@ -330,7 +331,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     }
 
     @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
+    public void onLoaderReset(@NonNull Loader<Cursor> loader) {
         mCursor = null;
     }
     //endregion

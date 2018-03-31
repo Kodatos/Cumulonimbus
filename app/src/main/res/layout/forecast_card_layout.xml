@@ -24,7 +24,8 @@
 
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools">
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:ignore="RtlSymmetry">
 
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
@@ -47,15 +48,10 @@
 
         <TextView
             android:id="@+id/currentTimelineTitle"
+            style="@style/ForecastTitleText"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:paddingBottom="8dp"
-            android:paddingLeft="20dp"
-            android:paddingTop="8dp"
             android:text="@string/today_at_a_glance"
-            android:textColor="@color/textColorPrimaryInverse"
-            android:textSize="18sp"
-            app:fontFamily="@font/product_sans_bold_italic"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/forecastHeading" />
@@ -70,7 +66,7 @@
             android:layout_marginTop="8dp"
             android:padding="4dp"
             android:transitionName="timeline_view"
-            app:cardCornerRadius="4dp"
+            app:cardCornerRadius="@dimen/common_card_corner_radius"
             app:cardElevation="0dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -87,54 +83,15 @@
 
         <TextView
             android:id="@+id/forecastTitle"
+            style="@style/ForecastTitleText"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:paddingBottom="16dp"
-            android:paddingLeft="20dp"
-            android:paddingTop="8dp"
             android:text="@string/next_four_days"
-            android:textColor="@color/textColorPrimaryInverse"
-            android:textSize="18sp"
-            app:fontFamily="@font/product_sans_bold_italic"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/currentTimelineCard" />
-
-        <TextView
-            android:id="@+id/dateHeaderView"
-            style="@style/ForecastHeaderText"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="32dp"
-            android:text="@string/date_header_text"
-            app:layout_constraintEnd_toStartOf="@+id/descriptionHeaderView"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/forecastTitle" />
-
-        <TextView
-            android:id="@+id/descriptionHeaderView"
-            style="@style/ForecastHeaderText"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="96dp"
-            android:layout_marginStart="104dp"
-            android:text="@string/description_header_text"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/forecastTitle" />
-
-        <TextView
-            android:id="@+id/tempHeaderView"
-            style="@style/ForecastHeaderText"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="40dp"
-            android:text="@string/temperature_header_text"
-            android:textAlignment="textEnd"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/descriptionHeaderView"
-            app:layout_constraintTop_toBottomOf="@id/forecastTitle" />
 
         <android.support.v7.widget.CardView
             android:layout_width="0dp"
@@ -145,18 +102,61 @@
             android:layout_marginTop="8dp"
             android:background="#FFFFFF"
             android:padding="4dp"
-            app:cardCornerRadius="4dp"
+            app:cardCornerRadius="@dimen/common_card_corner_radius"
             app:cardElevation="0dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/dateHeaderView">
+            app:layout_constraintTop_toBottomOf="@+id/forecastTitle">
+
+            <android.support.constraint.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/dateHeaderView"
+                style="@style/ForecastHeaderText"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:paddingStart="24dp"
+                android:text="@string/date_header_text"
+                app:layout_constraintEnd_toStartOf="@+id/descriptionHeaderView"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/descriptionHeaderView"
+                    style="@style/ForecastHeaderText"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="96dp"
+                    android:layout_marginStart="96dp"
+                    android:text="@string/description_header_text"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/tempHeaderView"
+                style="@style/ForecastHeaderText"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:paddingEnd="32dp"
+                android:text="@string/temperature_header_text"
+                android:textAlignment="textEnd"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/descriptionHeaderView"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/main_recyclerview"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:transitionName="@string/cardview_transition_name" />
+                android:layout_height="wrap_content"
+                android:transitionName="@string/cardview_transition_name"
+                app:layout_constraintTop_toBottomOf="@id/dateHeaderView"
+                app:layout_constraintStart_toStartOf="parent"/>
+
+            </android.support.constraint.ConstraintLayout>
 
         </android.support.v7.widget.CardView>
 

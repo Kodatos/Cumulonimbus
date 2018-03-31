@@ -85,7 +85,8 @@ public class WeatherDetailActivity extends AppCompatActivity implements Timeline
         //endregion
 
         setSupportActionBar(mBinding.toolbar);
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        if(getSupportActionBar()!=null)
+            getSupportActionBar().setDisplayShowTitleEnabled(false);
 
         //Enable animation on binding data
         mBinding.addOnRebindCallback(new OnRebindCallback() {

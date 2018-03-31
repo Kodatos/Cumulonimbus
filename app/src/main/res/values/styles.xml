@@ -89,9 +89,21 @@
 
     <style name="ForecastHeaderText">
         <item name="android:textAppearance">@android:style/TextAppearance.Material</item>
-        <item name="android:textColor">@color/textColorSecondaryInverse</item>
+        <item name="android:textColor">@color/textColorSecondaryAlt</item>
         <item name="android:textSize">14sp</item>
         <item name="fontFamily">@font/product_sans_bold</item>
+        <item name="android:background">#EEEEEE</item>
+        <item name="android:paddingBottom">8dp</item>
+        <item name="android:paddingTop">8dp</item>
+    </style>
+
+    <style name="ForecastTitleText">
+        <item name="android:paddingBottom">8dp</item>
+        <item name="android:paddingStart">20dp</item>
+        <item name="android:paddingTop">8dp</item>
+        <item name="android:textColor">@color/textColorPrimaryInverse</item>
+        <item name="android:textSize">18sp</item>
+        <item name="fontFamily">@font/product_sans_bold_italic</item>
     </style>
 
     <style name="PriorityOneText">

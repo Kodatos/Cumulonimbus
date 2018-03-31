@@ -32,8 +32,18 @@
     <string name="detail_forecast">Details at current time</string>
     <string name="today_at_a_glance">Today at a glance</string>
     <string name="next_four_days">Next four days</string>
+
     <string name="about_activity_name">About</string>
     <string name="about_the_app">A simple yet bold open-source weather app made by yours truly.</string>
+    <string name="about_activity_author_name">N. Abhishek (Kodatos)</string>
+    <string name="about_activity_feedback">Feedback</string>
+    <string name="about_activity_feedback_desc">Send an email to provide me feedback for this app</string>
+    <string name="about_activity_playstore">Play Store</string>
+    <string name="about_activity_playstore_desc">Please leave a rating and review</string>
+    <string name="about_activity_source_code">Source Code</string>
+    <string name="about_activity_source_code_desc">View the source code on Github</string>
+    <string name="about_activity_licenses">Licenses</string>
+    <string name="about_activity_licenses_desc">Attributions for open source libraries used</string>
 
     <string name="welcome_title_1">Welcome to Cumulonimbus!</string>
     <string name="welcome_title_2">Few permissions first!</string>
@@ -43,4 +53,7 @@
             initial setup to make this app run better!</string>
     <string name="welcome_description_2">The app needs to access your location for getting the weather. Nothing more.</string>
     <string name="welcome_description_4">Enjoy Cumulonimbus and check Settings for more stuff.</string>
+    <string name="welcome_screen_current_location_check">Do you want to use your current location?</string>
+    <string name="welcome_screen_custom_location_hint">Enter the name of your city</string>
+    <string name="welcome_screen_validation_button">Validate Settings</string>
 </resources>

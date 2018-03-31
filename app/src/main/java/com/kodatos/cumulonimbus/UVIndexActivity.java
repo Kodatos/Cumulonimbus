@@ -42,14 +42,16 @@ public class UVIndexActivity extends AppCompatActivity {
 
         Slide transition = new Slide();
         transition.setDuration(200);
-        transition.setSlideEdge(Gravity.RIGHT);
+        transition.setSlideEdge(Gravity.END);
         getWindow().setEnterTransition(transition);
         getWindow().setExitTransition(transition);
         getWindow().setReturnTransition(transition);
         getWindow().setReenterTransition(transition);
 
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        if(getSupportActionBar()!=null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowTitleEnabled(false);
+        }
     }
 
     @Override

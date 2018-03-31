@@ -41,6 +41,7 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 import static com.kodatos.cumulonimbus.datahelper.WeatherDBContract.WeatherDBEntry;
 
@@ -87,7 +88,7 @@ public class CumuloContentProvider extends ContentProvider {
                 break;
             default: throw new UnsupportedOperationException("Unknown Uri "+uri.toString());
         }
-        retCursor.setNotificationUri(getContext().getContentResolver(),uri);
+        retCursor.setNotificationUri(Objects.requireNonNull(getContext()).getContentResolver(),uri);
         return retCursor;
     }
 
@@ -118,7 +119,7 @@ public class CumuloContentProvider extends ContentProvider {
                 break;
             default: throw new UnsupportedOperationException("Unknown Uri "+uri.toString());
         }
-        getContext().getContentResolver().notifyChange(uri,null);
+        Objects.requireNonNull(getContext()).getContentResolver().notifyChange(uri,null);
         return retUri;
     }
 
@@ -138,7 +139,7 @@ public class CumuloContentProvider extends ContentProvider {
                     }
                     result = values.length;
                     db.setTransactionSuccessful();
-                    getContext().getContentResolver().notifyChange(uri, null);
+                    Objects.requireNonNull(getContext()).getContentResolver().notifyChange(uri, null);
                 } finally {
                     db.endTransaction();
                 }
@@ -183,7 +184,7 @@ public class CumuloContentProvider extends ContentProvider {
             }
             db.setTransactionSuccessful();
             if (operations.get(0).getUri().getLastPathSegment().equals("uvupdate"))
-                getContext().getContentResolver().notifyChange(WeatherDBEntry.CONTENT_URI, null);
+                Objects.requireNonNull(getContext()).getContentResolver().notifyChange(WeatherDBEntry.CONTENT_URI, null);
             return results;
         } finally {
             db.endTransaction();

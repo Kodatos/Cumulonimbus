@@ -32,7 +32,7 @@ public class WeatherDBContract {
 
     //Static strings for uri building
     public static final String AUTHORITY = "com.kodatos.cumulonimbus";
-    public static final Uri BASE_URI = Uri.parse("content://"+AUTHORITY);
+    static final Uri BASE_URI = Uri.parse("content://"+AUTHORITY);
     public static final String PATH_WEATHER_DATA = "weatherdata";
 
     public static final class WeatherDBEntry implements BaseColumns{

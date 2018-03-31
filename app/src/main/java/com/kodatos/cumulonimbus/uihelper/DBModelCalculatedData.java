@@ -56,7 +56,7 @@ public class DBModelCalculatedData {
         return weatherDesc;
     }
 
-    public DBModelCalculatedData(int drawable_resource_id, String calculatedTemp, String calculatedDay,String weatherMain, String weatherDesc) {
+    DBModelCalculatedData(int drawable_resource_id, String calculatedTemp, String calculatedDay, String weatherMain, String weatherDesc) {
         this.drawable_resource_id = drawable_resource_id;
         this.calculatedTemp = calculatedTemp;
         this.calculatedDay = calculatedDay.toUpperCase();
