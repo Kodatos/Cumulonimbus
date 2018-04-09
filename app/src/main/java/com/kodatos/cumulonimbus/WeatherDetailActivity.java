@@ -32,7 +32,6 @@ import android.app.ActivityManager;
 import android.content.SharedPreferences;
 import android.databinding.DataBindingUtil;
 import android.databinding.OnRebindCallback;
-import android.databinding.ViewDataBinding;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
@@ -89,9 +88,9 @@ public class WeatherDetailActivity extends AppCompatActivity implements Timeline
             getSupportActionBar().setDisplayShowTitleEnabled(false);
 
         //Enable animation on binding data
-        mBinding.addOnRebindCallback(new OnRebindCallback() {
+        mBinding.addOnRebindCallback(new OnRebindCallback<ActivityWeatherDetailBinding>(){
             @Override
-            public boolean onPreBind(ViewDataBinding binding) {
+            public boolean onPreBind(ActivityWeatherDetailBinding binding) {
                 TransitionManager.beginDelayedTransition((ViewGroup) binding.getRoot());
                 return super.onPreBind(binding);
             }

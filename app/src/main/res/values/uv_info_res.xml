@@ -1,27 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="first_background">#1B5E20</color>
-    <string name="first_range">0.0 – 2.9\nLow</string>
+    <string name="first_range">\u003c 3\nLow</string>
     <string name="first_description">Low danger from the sun\'s UV rays for the average person\n</string>
     <string name="first_suggestion">Wear sunglasses on bright days. If you burn easily, cover up and use broad spectrum SPF 30+ sunscreen. Bright surfaces, such as sand, water and snow, will increase UV exposure</string>
 
     <color name="second_background">#827717</color>
-    <string name="second_range">3.0 – 5.9\nModerate</string>
+    <string name="second_range">\u003c 6\nModerate</string>
     <string name="second_description">Moderate risk of harm from unprotected sun exposure\n</string>
     <string name="second_suggestion">Stay in shade near midday when the sun is strongest. Wear sun protective clothing and sunglasses. Generously apply broad spectrum SPF 30+ sunscreen every 2 hours. All above suggestions apply as well.</string>
 
     <color name="third_background">#E65100</color>
-    <string name="third_range">6.0 – 7.9\nHigh</string>
+    <string name="third_range">\u003c 8\nHigh</string>
     <string name="third_description">High risk of harm from unprotected sun exposure. Protection against skin and eye damage is needed.\n</string>
     <string name="third_suggestion">Reduce time in the sun between 10 a.m. and 4 p.m. All above suggestions apply as well.</string>
 
     <color name="fourth_background">#B71C1C</color>
-    <string name="fourth_range">8.0 – 10.9\nVery High</string>
+    <string name="fourth_range">\u003c 11\nVery High</string>
     <string name="fourth_description">Very high risk of harm from unprotected sun exposure. Take extra precautions because unprotected skin and eyes can be damaged</string>
     <string name="fourth_suggestion">Minimize time in the sun between 10 a.m. and 4 p.m. All above suggestions apply as well.</string>
 
     <color name="fifth_background">#4A148C</color>
-    <string name="fifth_range">11.0+\nExtreme</string>
+    <string name="fifth_range">\u2265 11\nExtreme</string>
     <string name="fifth_description">Extreme risk of harm from unprotected sun exposure. Take all precautions because unprotected skin and eyes can burn in minutes.</string>
     <string name="fifth_suggestion">Try to avoid sun exposure between 10 a.m. and 4 p.m. All above suggestions apply as well.</string>
 </resources>

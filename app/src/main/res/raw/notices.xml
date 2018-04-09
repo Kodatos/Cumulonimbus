@@ -30,4 +30,10 @@
         <copyright>Copyright 2014, Austin Andrews&lt;br/&gt;Copyright 2014, Google</copyright>
         <license>SIL Open Font License v1.1</license>
     </notice>
+    <notice>
+        <name>AppIntro</name>
+        <url>https://github.com/apl-devs/AppIntro</url>
+        <copyright>Copyright 2015 Paolo Rotolo&lt;br/&gt;Copyright 2018 APL Devs</copyright>
+        <license>Apache Software License 2.0</license>
+    </notice>
 </notices>

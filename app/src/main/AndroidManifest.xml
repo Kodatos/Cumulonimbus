@@ -67,7 +67,7 @@
                 android:value="com.kodatos.cumulonimbus.SettingsActivity" />
         </activity>
         <activity
-            android:name=".uihelper.welcome.WelcomeActivity"
+            android:name=".WelcomeActivity"
             android:configChanges="orientation"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />

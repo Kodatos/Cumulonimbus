@@ -25,23 +25,21 @@
 package com.kodatos.cumulonimbus.utils;
 
 import android.content.Context;
-import android.location.Address;
-import android.location.Geocoder;
+import android.content.Intent;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.ColorUtils;
 
 import com.kodatos.cumulonimbus.R;
 import com.kodatos.cumulonimbus.apihelper.DBModel;
+import com.kodatos.cumulonimbus.apihelper.ServiceErrorContract;
 import com.kodatos.cumulonimbus.uihelper.CurrentWeatherLayoutDataModel;
 import com.kodatos.cumulonimbus.uihelper.DetailActivityDataModel;
 
-import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.List;
 import java.util.Locale;
 
 /*
@@ -49,6 +47,8 @@ import java.util.Locale;
  */
 @SuppressWarnings("WeakerAccess")
 public class MiscUtils {
+
+    private MiscUtils(){}
 
     /**
      * Utility method to convert given temperature for display purpose.
@@ -59,20 +59,6 @@ public class MiscUtils {
     public static String makeTemperaturePretty(String usefulTempinString, boolean metric){
         String unit = metric ? "\u2103" : "\u2109";
         return usefulTempinString + unit;
-    }
-
-    /**
-     * Utility method to get user friendly address from co-ordinates
-     *
-     * @param lat     Latitude of location
-     * @param lon     Longitude of location
-     * @param context Requesting context
-     * @return String containing locality and country
-     */
-    public static String getAddressFromLatLong(double lat, double lon, Context context) throws IOException {
-        Geocoder geocoder = new Geocoder(context, Locale.getDefault());
-        List<Address> addresses = geocoder.getFromLocation(lat, lon, 1);
-        return addresses.get(0).getSubLocality() + ", " + addresses.get(0).getLocality() + ", " + addresses.get(0).getCountryName();
     }
 
     //Generates a ready to use data binding model for the detail screen from database model
@@ -132,53 +118,57 @@ public class MiscUtils {
         return sf.format(calendar.getTime());
     }
 
+    //Common method to get an intent for error broadcast between service and activity. Details are provided by caller
+    public static Intent getServiceErrorBroadcastIntent(String type, String details){
+        Intent errorIntent = new Intent(ServiceErrorContract.BROADCAST_INTENT_FILTER);
+        errorIntent.putExtra(ServiceErrorContract.SERVICE_ERROR_TYPE, type);
+        errorIntent.putExtra(ServiceErrorContract.SERVICE_ERROR_DETAILS, details);
+        return errorIntent;
+    }
+
     public static String windClassifier(double speed){
-        double speedInKPH = (18.0/5.0)*speed;
-        if(speedInKPH<2)
+        double speedInKPH = 3.6*speed;
+        if(speedInKPH<1)
             return "Calm";
-        else if(isBetween(speedInKPH,2.0,6.99))
+        else if(speedInKPH<6)
             return "Light Air";
-        else if (isBetween(speedInKPH,7.0,11.99))
+        else if (speedInKPH<12)
             return "Light Breeze";
-        else if(isBetween(speedInKPH,12.0,19.99))
+        else if(speedInKPH<20)
             return "Gentle Breeze";
-        else if(isBetween(speedInKPH,20.0,30.99))
+        else if(speedInKPH<29)
             return "Moderate Breeze";
-        else if(isBetween(speedInKPH,31.0,39.99))
+        else if(speedInKPH<39)
             return "Fresh Breeze";
-        else if(isBetween(speedInKPH,40.0,50.99))
+        else if(speedInKPH<50)
             return "Strong Breeze";
-        else if(isBetween(speedInKPH,51.0,61.99))
+        else if(speedInKPH<62)
             return "Moderate Gale";
-        else if(isBetween(speedInKPH,62.0,74.99))
+        else if(speedInKPH<75)
             return "Fresh Gale";
-        else if(isBetween(speedInKPH,75.0,87.99))
+        else if(speedInKPH<89)
             return "Strong Gale";
-        else if(isBetween(speedInKPH,88.0,102.99))
+        else if(speedInKPH<103)
             return "Whole Gale";
-        else if(isBetween(speedInKPH,103.0,117.99))
+        else if(speedInKPH<118)
             return "Storm";
-        else if(speedInKPH>=118.0)
+        else if(speedInKPH>=118)
             return "Hurricane";
         return "N/A";
     }
 
     public static String UVClassifier(double index){
-        if(isBetween(index,0.0,2.99))
+        if(index<3)
             return "Low";
-        else if(isBetween(index,3.0,5.99))
+        else if(index<6)
             return "Moderate";
-        else if(isBetween(index,6.0,7.99))
+        else if(index<8)
             return "High";
-        else if(isBetween(index,8.0,12.99))
+        else if(index<11)
             return "Very High";
-        else if(index>=13.0)
+        else if(index>=11)
             return "Extreme";
         return "";
-    }
-
-    public static boolean isBetween(double number, double lower, double upper){
-        return number>=lower && number<=upper;
     }
 
     /**

@@ -37,9 +37,9 @@ public class Wind {
     @Expose
     private float deg;
 
-    // A helper method to get a String for database usage
+    // A helper method to get a String for database usage. Speed in km/h is provided
     public String getUsefulWind(){
-        return String.valueOf(speed)+"/"+String.valueOf(deg);
+        return String.valueOf(3.6*speed)+"/"+String.valueOf(deg);
     }
 
 }

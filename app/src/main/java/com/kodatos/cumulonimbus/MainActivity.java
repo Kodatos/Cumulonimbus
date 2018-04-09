@@ -85,9 +85,9 @@ import com.kodatos.cumulonimbus.apihelper.SyncOWMService;
 import com.kodatos.cumulonimbus.databinding.ActivityMainBinding;
 import com.kodatos.cumulonimbus.datahelper.WeatherDBContract;
 import com.kodatos.cumulonimbus.uihelper.CurrentWeatherLayoutDataModel;
+import com.kodatos.cumulonimbus.uihelper.InfoDialogFragment;
 import com.kodatos.cumulonimbus.uihelper.MainRecyclerViewAdapter;
 import com.kodatos.cumulonimbus.uihelper.TimelineRecyclerViewAdapter;
-import com.kodatos.cumulonimbus.uihelper.welcome.WelcomeActivity;
 import com.kodatos.cumulonimbus.utils.KeyConstants;
 import com.kodatos.cumulonimbus.utils.MiscUtils;
 
@@ -282,14 +282,14 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     }
 
     //Utility method to check internet connection
-    public boolean getConnectionStatus() {
+    private boolean getConnectionStatus() {
         ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo info = cm != null ? cm.getActiveNetworkInfo() : null;
         return info != null && info.isConnectedOrConnecting();
     }
 
     //Call the service to update data. If action is 0 then create rows, else update
-    public void startSync(final int action) {
+    private void startSync(final int action) {
         if (!getConnectionStatus()) {
             displayDialogMessage("No Internet Connection Available", "An internet connection is needed for updating. Try again later", action == 0);
             mBinding.mainUISwipeRefreshLayout.setRefreshing(false);
@@ -398,6 +398,64 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(this).toBundle());
     }
 
+    private InfoDialogFragment createInfoDialog(int viewID){
+        String title;
+        String description;
+        int drawableID;
+        int backgroundColor;
+        String positiveText = null;
+        View.OnClickListener positiveAction = null;
+        switch(viewID){
+            case R.id.currentRainImageView :
+                title = getString(R.string.rain_volume_info_title);
+                description = getString(R.string.rain_volume_info_desc);
+                drawableID = R.drawable.ic_umbrella;
+                backgroundColor = R.color.rain_volume_info_color;
+                break;
+            case R.id.currentWindImageView :
+                title = getString(R.string.wind_info_title);
+                description = getString(R.string.wind_info_desc);
+                drawableID = R.drawable.ic_wind_direction_cut;
+                backgroundColor = R.color.wind_info_color;
+                break;
+            case R.id.currentShadesImageView :
+                title = getString(R.string.uv_info_title);
+                description = getString(R.string.uv_info_desc);
+                drawableID = R.drawable.ic_uv_index;
+                backgroundColor = R.color.uv_info_color;
+                positiveText = getString(R.string.uv_info_positive);
+                positiveAction  = v -> {
+                    //Open UV info activity
+                    Intent intent = new Intent(this, UVIndexActivity.class);
+                    startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(this).toBundle());
+                };
+                break;
+            case R.id.locationTextView :
+                title = getString(R.string.location_info_title);
+                description = getString(R.string.location_info_desc);
+                drawableID = R.drawable.ic_location_current;
+                backgroundColor = R.color.location_info_color;
+                positiveText = getString(R.string.location_info_positive);
+                positiveAction = v -> {
+                  if(!mBinding.mainUISwipeRefreshLayout.isRefreshing()){
+                      /*
+                        Generate a location error broadcast typically used by the SyncOWMService, as the actions are similar here.
+                        Also, since this is user invoked, it is safe to assume sync is an update.
+                       */
+                      LocalBroadcastManager.getInstance(this)
+                              .sendBroadcast(MiscUtils.getServiceErrorBroadcastIntent(ServiceErrorContract.ERROR_LOCATION, ServiceErrorContract.ERROR_DETAILS_NULL + "/" + SyncOWMService.UPDATE_ACTION));
+                  }
+                };
+                break;
+            default: return null;
+        }
+        InfoDialogFragment fragment = InfoDialogFragment.newInstance(title, description, drawableID, backgroundColor);
+        if(positiveText != null){
+            fragment.setPositiveAction(positiveText, positiveAction);
+        }
+        return fragment;
+    }
+
     //region Region : Data Binding
 
     //Evaluate and bind data to layout while changing other UI elements on sync.
@@ -488,7 +546,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         getWindow().setNavigationBarColor(updatedBackgroundColor);
         int cardLighterColor = Color.rgb(Color.red(updatedBackgroundColor) + 30, Color.green(updatedBackgroundColor) + 30, Color.blue(updatedBackgroundColor) + 30);
         int cardDarkerColor = Color.rgb(Color.red(updatedBackgroundColor) + 5, Color.green(updatedBackgroundColor) + 5, Color.blue(updatedBackgroundColor) + 5);
-        //mBinding.forecastCard.setCardBackgroundColor(specialBackgroundColor);
         GradientDrawable gradientDrawable = new GradientDrawable(GradientDrawable.Orientation.BR_TL, new int[]{cardDarkerColor, cardLighterColor});
         float px = getResources().getDimension(R.dimen.common_card_corner_radius) * (getResources().getDisplayMetrics().density);
         gradientDrawable.setCornerRadius(px);
@@ -540,7 +597,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     //region Region : Broadcast Receiver
 
     /*
-        Custom broadcast receiver that receives resolvable errors from the background service
+        Custom broadcast receiver that receives resolvable errors from the background service, checks them
         and notifies the user to take action, if any.
      */
 
@@ -549,6 +606,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         private String errorType;
         private String errorDetails;
         private String message;
+
+        private boolean shouldStopRefreshingAnim = true;        //Flag to indicate whether refresh animation should be stopped
 
 
         @Override
@@ -566,12 +625,11 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 case ServiceErrorContract.ERROR_REVERSE_GEOCODER:
                     handleReverseGeocodingError();
                     break;
-
                 case ServiceErrorContract.ERROR_RESPONSE:
                     handleAPIResponseError();
                     break;
             }
-            mBinding.mainUISwipeRefreshLayout.setRefreshing(false);
+            mBinding.mainUISwipeRefreshLayout.setRefreshing(!shouldStopRefreshingAnim);
         }
 
         private void handleGeocodingError() {
@@ -634,8 +692,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                             if (locationResult.getLocations().size() > 0) {
                                 //Location successfully retrieved
                                 Log.d(LOG_TAG, "location_requested");
-                                message = "Location was not available but issue may be resolved now. Try again";
-                                showSnackbarForError(message, "Refresh", v -> startSync(errorDetails.contains(SyncOWMService.CREATE_ACTION) ? 0 : 1));
+                                shouldStopRefreshingAnim = false;               //Another sync is started here. Don't stop refresh animation
+                                startSync(errorDetails.contains(SyncOWMService.CREATE_ACTION) ? 0 : 1);
                             } else {
                                 //Ask user to enter a custom location if location couldn't be found
                                 message = "Retrieving your current location gave no results. Please try again or set a custom location";

@@ -50,6 +50,7 @@ import com.kodatos.cumulonimbus.apihelper.models.ForecastWeatherModel;
 import com.kodatos.cumulonimbus.apihelper.models.UVIndexModel;
 import com.kodatos.cumulonimbus.datahelper.WeatherDBContract;
 import com.kodatos.cumulonimbus.utils.KeyConstants;
+import com.kodatos.cumulonimbus.utils.MiscUtils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -448,9 +449,6 @@ public class SyncOWMService extends IntentService {
     }
 
     private void broadcastError(String type, String details) {
-        Intent errorIntent = new Intent(ServiceErrorContract.BROADCAST_INTENT_FILTER);
-        errorIntent.putExtra(ServiceErrorContract.SERVICE_ERROR_TYPE, type);
-        errorIntent.putExtra(ServiceErrorContract.SERVICE_ERROR_DETAILS, details);
-        LocalBroadcastManager.getInstance(this).sendBroadcast(errorIntent);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(MiscUtils.getServiceErrorBroadcastIntent(type, details));
     }
 }

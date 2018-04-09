@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package com.kodatos.cumulonimbus.uihelper.welcome;
+package com.kodatos.cumulonimbus;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -31,6 +31,9 @@ import android.support.v4.content.ContextCompat;
 
 import com.github.paolorotolo.appintro.AppIntro;
 import com.kodatos.cumulonimbus.R;
+import com.kodatos.cumulonimbus.uihelper.welcome.PreferenceSlideFragment;
+import com.kodatos.cumulonimbus.uihelper.welcome.SimpleSlideFragment;
+import com.kodatos.cumulonimbus.utils.KeyConstants;
 
 public class WelcomeActivity extends AppIntro {
 
@@ -43,7 +46,7 @@ public class WelcomeActivity extends AppIntro {
 
         PreferenceSlideFragment fragment3 = new PreferenceSlideFragment();
         Bundle arguments3 = new Bundle();
-        arguments3.putInt(PreferenceSlideFragment.SLIDE_BACKGROUND_COLOR, ContextCompat.getColor(this, R.color._11d_background));
+        arguments3.putInt(KeyConstants.SLIDE_BACKGROUND_COLOR, ContextCompat.getColor(this, R.color._11d_background));
         fragment3.setArguments(arguments3);
         addSlide(fragment3);
 

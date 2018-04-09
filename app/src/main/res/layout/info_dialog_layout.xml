@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <android.support.constraint.Guideline
+            android:id="@+id/infoDialogGuideline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent=".25" />
+
+        <FrameLayout
+            android:id="@+id/infoDialogImageViewBackground"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="@color/_01d_background"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="@id/infoDialogGuideline"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent">
+
+        <ImageView
+            android:id="@+id/infoDialogImageView"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:layout_gravity="center"
+            android:scaleType="fitXY"
+            tools:src="@drawable/ic_umbrella"
+            android:tint="@color/textColorPrimaryInverse"/>
+
+        </FrameLayout>
+
+        <TextView
+            android:id="@+id/infoDialogTitle"
+            style="@style/PriorityOneText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toTopOf="@id/infoDialogDescription"
+            app:layout_constraintLeft_toLeftOf="@id/infoDialogDescription"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_chainStyle="packed"
+            tools:text="Rain Volume" />
+
+        <TextView
+            android:id="@+id/infoDialogDescription"
+            style="@style/PriorityTwoText"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginTop="8dp"
+            android:textSize="14sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toRightOf="@id/infoDialogImageViewBackground"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/infoDialogTitle"
+            tools:text="The displayed rain volume (in mm) is for the remainder of today" />
+
+        <TextView
+            android:id="@+id/positiveActionText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:layout_marginTop="24dp"
+            android:layout_marginEnd="16dp"
+            android:textAppearance="@style/Base.TextAppearance.AppCompat.Button"
+            android:textColor="@color/colorAccent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/infoDialogDescription"
+            tools:text="OK, Got it" />
+
+        <TextView
+            android:id="@+id/negativeActionText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginTop="8dp"
+            android:textColor="@color/colorAccent"
+            android:textAppearance="@style/Base.TextAppearance.AppCompat.Button"
+            app:layout_constraintBaseline_toBaselineOf="@id/positiveActionText"
+            app:layout_constraintRight_toLeftOf="@id/positiveActionText"
+            tools:text="Nevermind" />
+
+    </android.support.constraint.ConstraintLayout>
+</layout>

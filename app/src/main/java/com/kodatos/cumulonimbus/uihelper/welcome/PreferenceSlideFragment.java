@@ -40,6 +40,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.Loader;
 import android.text.InputType;
 import android.util.Log;
@@ -47,6 +48,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.view.animation.AnimationUtils;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.github.paolorotolo.appintro.ISlideBackgroundColorHolder;
@@ -80,7 +83,6 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class PreferenceSlideFragment extends Fragment implements ISlideBackgroundColorHolder, ISlidePolicy, LoaderManager.LoaderCallbacks<String> {
 
-    public static final String SLIDE_BACKGROUND_COLOR = "slidebackcolor";
     private static String LOG_TAG = "prefernce_slide";
     private PreferenceSlideLayoutBinding mBinding;
     private boolean isSafeToProceed = false;
@@ -93,7 +95,7 @@ public class PreferenceSlideFragment extends Fragment implements ISlideBackgroun
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         mBinding = DataBindingUtil.inflate(inflater, R.layout.preference_slide_layout, container, false);
         arguments = Objects.requireNonNull(getArguments());
-        mBinding.getRoot().setBackgroundColor(arguments.getInt(SLIDE_BACKGROUND_COLOR));
+        mBinding.getRoot().setBackgroundColor(arguments.getInt(KeyConstants.SLIDE_BACKGROUND_COLOR));
         mBinding.preferenceSlideTitle.setText(getString(R.string.welcome_title_3));
         mBinding.preferenceSlideCurrentLocationCheck.setOnClickListener(v -> {
             boolean previousCheck = mBinding.preferenceSlideCurrentLocationCheck.isChecked();
@@ -112,7 +114,7 @@ public class PreferenceSlideFragment extends Fragment implements ISlideBackgroun
 
     @Override
     public int getDefaultBackgroundColor() {
-        return arguments.getInt(SLIDE_BACKGROUND_COLOR);
+        return arguments.getInt(KeyConstants.SLIDE_BACKGROUND_COLOR);
     }
 
     @Override
@@ -132,6 +134,7 @@ public class PreferenceSlideFragment extends Fragment implements ISlideBackgroun
     public void onUserIllegallyRequestedNextPage() {
         if (!isSafeToProceed) {
             Toast.makeText(getContext(), "Please validate settings before continuing", Toast.LENGTH_LONG).show();
+            mBinding.preferenceSlideSyncButton.startAnimation(AnimationUtils.loadAnimation(getContext(), R.anim.shake_effect));
         }
     }
 
@@ -179,12 +182,14 @@ public class PreferenceSlideFragment extends Fragment implements ISlideBackgroun
 
                     Log.d(LOG_TAG, "valid");
                     SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getContext());
-                    sp.edit().putString(getString(R.string.pref_custom_location_key), mBinding.preferenceSlideCustomLocationInput.getText().toString())
+                    sp.edit().putString(getString(R.string.pref_custom_location_key), mBinding.preferenceSlideCurrentLocationCheck.isChecked() ? "Enter City Here" : mBinding.preferenceSlideCustomLocationInput.getText().toString())
                             .putBoolean(getString(R.string.pref_curr_location_key), mBinding.preferenceSlideCurrentLocationCheck.isChecked())
                             .putBoolean(KeyConstants.FIRST_TIME_RUN, false)         //Intro completed successfully
                             .apply();
 
-                    PreferenceSlideFragment.this.mBinding.preferenceSlideSyncButton.setTextColor(Color.parseColor("#2E7D32"));
+                    Button syncButton = PreferenceSlideFragment.this.mBinding.preferenceSlideSyncButton;
+                    syncButton.setBackgroundTintList(ContextCompat.getColorStateList(getContext(), R.color._01d_background));
+                    syncButton.setTextColor(Color.WHITE);
                 }
             }, null));
         }
