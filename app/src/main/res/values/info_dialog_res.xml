@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ MIT License
+  ~
+  ~ Copyright (c) 2017 N Abhishek (aka Kodatos)
+  ~
+  ~ Permission is hereby granted, free of charge, to any person obtaining a copy
+  ~ of this software and associated documentation files (the "Software"), to deal
+  ~ in the Software without restriction, including without limitation the rights
+  ~ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  ~ copies of the Software, and to permit persons to whom the Software is
+  ~ furnished to do so, subject to the following conditions:
+  ~
+  ~ The above copyright notice and this permission notice shall be included in all
+  ~ copies or substantial portions of the Software.
+  ~
+  ~ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  ~ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  ~ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  ~ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  ~ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  ~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+  ~ SOFTWARE.
+  -->
+
+<resources>
+    <string name="rain_volume_info_title">Rain Volume</string>
+    <string name="rain_volume_info_desc">The displayed rain volume is the cumulative amount of rain for the remainder of today. One millimetre of rain is equivalent to one litre
+        of water over an area of one square metre.</string>
+    <color name="rain_volume_info_color">#283593</color>
+
+    <string name="wind_info_title">Wind</string>
+    <string name="wind_info_desc_discarded">The Beaufort Scale classifies wind speeds into observable and relatable conditions :\n
+            \u2022 Below 1 km/h - Calm\n
+            \u2022 Below 6 km/h - Light Air\n
+            \u2022 Below 12 km/h - Light Breeze\n
+            \u2022 Below 20 km/h - Gentle Breeze\n
+            \u2022 Below 29 km/h - Moderate Breeze\n
+            \u2022 Below 39 km/h - Fresh Breeze\n
+            \u2022 Below 50 km/h - Strong Breeze\n
+            \u2022 Below 62 km/h - Moderate Gale\n
+            \u2022 Below 75 km/h - Fresh Gale\n
+            \u2022 Below 89 km/h - Strong Gale\n
+            \u2022 Below 103 km/h - Whole Gale\n
+            \u2022 Below 118 km/h - Storm\n
+            \u2022 Above 118 km/h - Hurricane</string>
+    <string name="wind_info_desc">The Beaufort Scale classifies wind speeds into observable and relatable conditions. Click Know More
+        to access the Wikipedia page for proper information about each wind speed level.</string>
+    <string name="wind_info_wiki_url">https://en.wikipedia.org/wiki/Beaufort_scale#Modern_scale</string>
+    <color name="wind_info_color">#00838F</color>
+
+    <string name="uv_info_title">UV Index</string>
+    <string name="uv_info_desc">The UV Index is a linear scale to measure strength of the ultraviolet radiations that
+        can cause sunburns. Click More Info to know more about what each level indicates.</string>
+    <string name="uv_info_positive">Know More</string>
+    <color name="uv_info_color">#6A1B9A</color>
+
+    <string name="location_info_title">Location</string>
+    <string name="location_info_desc">Feel that the location determined by the app is inaccurate? Or is the app
+        not able to find your location at all? You can force update the location.</string>
+    <string name="location_info_positive">Force Refresh</string>
+    <color name="location_info_color">#4E342E</color>
+
+    <string name="common_positive_text">OK, Got it</string>
+    <string name="common_negative_text">Never mind</string>
+</resources>

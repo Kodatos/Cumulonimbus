@@ -274,11 +274,17 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             });
         });
 
-        mBinding.currentLayout.currentShadesImageView.setOnClickListener(v -> {
-            //Open UV info activity
-            Intent intent = new Intent(this, UVIndexActivity.class);
-            startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(this).toBundle());
-        });
+        View.OnClickListener infoDialogEnabledViewListener = v -> {
+            InfoDialogFragment infoDialogFragment = createInfoDialog(v.getId());
+            if (infoDialogFragment != null)
+                infoDialogFragment.show(getSupportFragmentManager(), "INFO_DIALOG_FRAGMENT");
+        };
+
+        for(View view : new View[]{mBinding.currentLayout.locationTextView, mBinding.currentLayout.currentRainImageView,
+                                    mBinding.currentLayout.currentWindImageView, mBinding.currentLayout.currentShadesImageView}) {
+            view.setOnClickListener(infoDialogEnabledViewListener);
+        }
+
     }
 
     //Utility method to check internet connection
@@ -410,19 +416,26 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 title = getString(R.string.rain_volume_info_title);
                 description = getString(R.string.rain_volume_info_desc);
                 drawableID = R.drawable.ic_umbrella;
-                backgroundColor = R.color.rain_volume_info_color;
+                backgroundColor = ContextCompat.getColor(this, R.color.rain_volume_info_color);
                 break;
             case R.id.currentWindImageView :
                 title = getString(R.string.wind_info_title);
                 description = getString(R.string.wind_info_desc);
                 drawableID = R.drawable.ic_wind_direction_cut;
-                backgroundColor = R.color.wind_info_color;
+                backgroundColor = ContextCompat.getColor(this, R.color.wind_info_color);
+                positiveText = getString(R.string.uv_info_positive);
+                positiveAction = v -> {
+                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.wind_info_wiki_url)));
+                    if(browserIntent.resolveActivity(getPackageManager()) != null){
+                        startActivity(browserIntent);
+                    }
+                };
                 break;
             case R.id.currentShadesImageView :
                 title = getString(R.string.uv_info_title);
                 description = getString(R.string.uv_info_desc);
                 drawableID = R.drawable.ic_uv_index;
-                backgroundColor = R.color.uv_info_color;
+                backgroundColor = ContextCompat.getColor(this, R.color.uv_info_color);
                 positiveText = getString(R.string.uv_info_positive);
                 positiveAction  = v -> {
                     //Open UV info activity
@@ -434,7 +447,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 title = getString(R.string.location_info_title);
                 description = getString(R.string.location_info_desc);
                 drawableID = R.drawable.ic_location_current;
-                backgroundColor = R.color.location_info_color;
+                backgroundColor = ContextCompat.getColor(this, R.color.location_info_color);
                 positiveText = getString(R.string.location_info_positive);
                 positiveAction = v -> {
                   if(!mBinding.mainUISwipeRefreshLayout.isRefreshing()){

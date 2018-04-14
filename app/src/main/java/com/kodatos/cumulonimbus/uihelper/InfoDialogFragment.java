@@ -50,6 +50,7 @@ public class InfoDialogFragment extends DialogFragment {
     private static final String INFO_DIALOG_DRAWABLE = "info_dialog_drawable";
 
     private View.OnClickListener positiveTextClickListener = null;
+    private String positiveText = null;
 
     public static InfoDialogFragment newInstance(String title, String description, int drawableID, int backgroundColor) {
         InfoDialogFragment fragment = new InfoDialogFragment();
@@ -71,8 +72,16 @@ public class InfoDialogFragment extends DialogFragment {
         mBinding.infoDialogDescription.setText(arguments.getString(INFO_DIALOG_DESC));
         mBinding.infoDialogImageView.setImageResource(arguments.getInt(INFO_DIALOG_DRAWABLE));
         mBinding.infoDialogImageViewBackground.setBackgroundColor(arguments.getInt(INFO_DIALOG_COLOR));
-        mBinding.positiveActionText.setText(getString(R.string.common_positive_text));
-        mBinding.negativeActionText.setOnClickListener(v -> {
+        if(positiveText == null) {
+            positiveText = getString(R.string.common_positive_text);
+            mBinding.negativeActionText.setVisibility(View.GONE);
+        }
+        else{
+            mBinding.negativeActionText.setVisibility(View.VISIBLE);
+            mBinding.negativeActionText.setText(getString(R.string.common_negative_text));
+        }
+        mBinding.positiveActionText.setText(positiveText);
+        mBinding.positiveActionText.setOnClickListener(v -> {
             //Perform provided action and dismiss the dialog as well
             if(positiveTextClickListener!=null)
                 positiveTextClickListener.onClick(v);
@@ -80,27 +89,23 @@ public class InfoDialogFragment extends DialogFragment {
         });
         //Negative action is always dismiss the dialog
         mBinding.negativeActionText.setOnClickListener(v -> getDialog().dismiss());
-        mBinding.negativeActionText.setVisibility(View.GONE);
         return mBinding.getRoot();
     }
 
-    @NonNull
     @Override
-    public Dialog onCreateDialog(Bundle savedInstanceState) {
-        Dialog dialog = super.onCreateDialog(savedInstanceState);
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        return dialog;
+    public void onResume() {
+        super.onResume();
+        Objects.requireNonNull(getDialog().getWindow()).setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
     }
 
     //Set a custom positive action
     public void setPositiveAction(String text, View.OnClickListener positiveTextClickListener) {
-        mBinding.positiveActionText.setText(text);
+        positiveText = text;
         this.positiveTextClickListener = positiveTextClickListener;
     }
 
     //Enable negative action if using positive action for something other than dismiss.
     public void showNegativeDismissAction() {
-        mBinding.negativeActionText.setVisibility(View.VISIBLE);
-        mBinding.negativeActionText.setText(getString(R.string.common_negative_text));
+
     }
 }

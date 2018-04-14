@@ -87,7 +87,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:paddingBottom="16dp"
+            android:paddingBottom="8dp"
             android:text="@string/next_four_days"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -113,16 +113,16 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
-            <TextView
-                android:id="@+id/dateHeaderView"
-                style="@style/ForecastHeaderText"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:paddingStart="24dp"
-                android:text="@string/date_header_text"
-                app:layout_constraintEnd_toStartOf="@+id/descriptionHeaderView"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                <TextView
+                    android:id="@+id/dateHeaderView"
+                    style="@style/ForecastHeaderText"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:paddingStart="24dp"
+                    android:text="@string/date_header_text"
+                    app:layout_constraintEnd_toStartOf="@+id/descriptionHeaderView"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
                     android:id="@+id/descriptionHeaderView"
@@ -136,17 +136,17 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
-            <TextView
-                android:id="@+id/tempHeaderView"
-                style="@style/ForecastHeaderText"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:paddingEnd="32dp"
-                android:text="@string/temperature_header_text"
-                android:textAlignment="textEnd"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/descriptionHeaderView"
-                app:layout_constraintTop_toTopOf="parent" />
+                <TextView
+                    android:id="@+id/tempHeaderView"
+                    style="@style/ForecastHeaderText"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:paddingEnd="32dp"
+                    android:text="@string/temperature_header_text"
+                    android:textAlignment="textEnd"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/descriptionHeaderView"
+                    app:layout_constraintTop_toTopOf="parent" />
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/main_recyclerview"

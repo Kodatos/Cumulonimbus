@@ -70,9 +70,12 @@ public class MiscUtils {
         String tempMin = String.valueOf(Math.round(dbModel.getTemp_min()));
         String tempMax = String.valueOf(Math.round(dbModel.getTemp_max()));
         String[] windData = dbModel.getWind().split("/");
-        String windDescription = windClassifier(Double.parseDouble(windData[0]));
+        double windSpeed = Double.parseDouble(windData[0]);
+        String windDescription = windClassifier(windSpeed, metric);
         float windDirection = Float.parseFloat(windData[1]);
-        String windValue = windData[0] + (metric ? " m/s" : " mi/h");
+        if(metric)
+            windSpeed*=3.6;
+        String windValue = String.valueOf((int)windSpeed) + (metric ? " km/h" : " mi/h");
         String humidity = String.valueOf(dbModel.getHumidity())+"%";
         String pressure = String.valueOf(dbModel.getPressure()) + " mb";
         String UV = "UV Index: "+String.valueOf(dbModel.getUvIndex());
@@ -92,9 +95,12 @@ public class MiscUtils {
         String tempMin = String.valueOf(Math.round(dbModel.getTemp_min()));
         String tempMax = String.valueOf(Math.round(dbModel.getTemp_max()));
         String[] windData = dbModel.getWind().split("/");
-        String windDescription = windClassifier(Double.parseDouble(windData[0]));
+        double windSpeed = Double.parseDouble(windData[0]);
+        String windDescription = windClassifier(windSpeed, metric);
+        if(metric)
+            windSpeed*=3.6;         //Convert to km/h for display
         float windDirection = Float.parseFloat(windData[1]);
-        String windValue = windData[0] + (metric ? " m/s" : " mi/h");
+        String windValue = String.valueOf((int)windSpeed) + (metric ? " km/h" : " mi/h");
         String humidity = String.valueOf(dbModel.getHumidity())+"%";
         String pressure = String.valueOf((int) dbModel.getPressure()) + " mb";
         String UVIndexValue = String.valueOf(dbModel.getUvIndex());
@@ -126,8 +132,14 @@ public class MiscUtils {
         return errorIntent;
     }
 
-    public static String windClassifier(double speed){
-        double speedInKPH = 3.6*speed;
+    /**
+     *
+     * @param speed Speed to be classified
+     * @param metric True if speed is in m/s. False for mi/h
+     * @return Category defining wind speed
+     */
+    public static String windClassifier(double speed, boolean metric){
+        double speedInKPH = metric ? 3.6*speed : 1.60*speed;
         if(speedInKPH<1)
             return "Calm";
         else if(speedInKPH<6)

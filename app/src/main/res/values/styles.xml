@@ -94,7 +94,7 @@
         <item name="fontFamily">@font/product_sans_bold</item>
         <item name="android:background">#EEEEEE</item>
         <item name="android:paddingBottom">8dp</item>
-        <item name="android:paddingTop">8dp</item>
+        <item name="android:paddingTop">12dp</item>
     </style>
 
     <style name="ForecastTitleText">
