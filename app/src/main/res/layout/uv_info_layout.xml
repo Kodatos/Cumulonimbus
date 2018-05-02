@@ -64,7 +64,8 @@
     <android.support.v4.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        android:background="@color/colorPrimary">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -100,7 +101,7 @@
                         android:text="@string/first_description" />
 
                     <TextView
-                        style="@style/PriorityTwoText.UVSuggestion"
+                        style="@style/UVSuggestion"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:text="@string/first_suggestion" />
@@ -137,7 +138,7 @@
                         android:text="@string/second_description" />
 
                     <TextView
-                        style="@style/PriorityTwoText.UVSuggestion"
+                        style="@style/UVSuggestion"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:text="@string/second_suggestion" />
@@ -174,7 +175,7 @@
                         android:text="@string/third_description" />
 
                     <TextView
-                        style="@style/PriorityTwoText.UVSuggestion"
+                        style="@style/UVSuggestion"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:text="@string/third_suggestion" />
@@ -211,7 +212,7 @@
                         android:text="@string/fourth_description" />
 
                     <TextView
-                        style="@style/PriorityTwoText.UVSuggestion"
+                        style="@style/UVSuggestion"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:text="@string/fourth_suggestion" />
@@ -249,7 +250,7 @@
                         android:text="@string/fifth_description" />
 
                     <TextView
-                        style="@style/PriorityTwoText.UVSuggestion"
+                        style="@style/UVSuggestion"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:text="@string/fifth_suggestion" />

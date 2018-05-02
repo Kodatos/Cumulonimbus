@@ -111,7 +111,7 @@
                     android:textAlignment="center"
                     android:textColor="@color/textColorSecondaryInverse"
                     android:textSize="16sp"
-                    app:fontFamily="@font/product_sans_bold"
+                    app:fontFamily="@font/poppins_bold"
                     app:layout_constraintEnd_toEndOf="@id/aboutAppName"
                     app:layout_constraintStart_toStartOf="@id/aboutIcon"
                     app:layout_constraintTop_toBottomOf="@id/aboutIcon" />
@@ -159,7 +159,7 @@
                                 android:text="@string/about_activity_feedback"
                                 android:textColor="@color/textColorPrimary"
                                 android:textSize="16sp"
-                                app:fontFamily="@font/product_sans_bold"
+                                app:fontFamily="@font/poppins_bold"
                                 app:layout_constraintStart_toStartOf="parent"
                                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -173,7 +173,7 @@
                                 android:text="@string/about_activity_feedback_desc"
                                 android:textColor="@color/textColorSecondaryAlt"
                                 android:textSize="14sp"
-                                app:fontFamily="@font/product_sans_regular"
+                                app:fontFamily="@font/poppins_medium"
                                 app:layout_constraintBottom_toBottomOf="parent"
                                 app:layout_constraintEnd_toEndOf="parent"
                                 app:layout_constraintStart_toStartOf="parent"
@@ -207,7 +207,7 @@
                                 android:text="@string/about_activity_playstore"
                                 android:textColor="@color/textColorPrimary"
                                 android:textSize="16sp"
-                                app:fontFamily="@font/product_sans_bold"
+                                app:fontFamily="@font/poppins_bold"
                                 app:layout_constraintStart_toStartOf="parent"
                                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -221,7 +221,7 @@
                                 android:text="@string/about_activity_playstore_desc"
                                 android:textColor="@color/textColorSecondaryAlt"
                                 android:textSize="14sp"
-                                app:fontFamily="@font/product_sans_regular"
+                                app:fontFamily="@font/poppins_medium"
                                 app:layout_constraintBottom_toBottomOf="parent"
                                 app:layout_constraintEnd_toEndOf="parent"
                                 app:layout_constraintStart_toStartOf="parent"
@@ -255,7 +255,7 @@
                                 android:text="@string/about_activity_source_code"
                                 android:textColor="@color/textColorPrimary"
                                 android:textSize="16sp"
-                                app:fontFamily="@font/product_sans_bold"
+                                app:fontFamily="@font/poppins_bold"
                                 app:layout_constraintStart_toStartOf="parent"
                                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -269,7 +269,7 @@
                                 android:text="@string/about_activity_source_code_desc"
                                 android:textColor="@color/textColorSecondaryAlt"
                                 android:textSize="14sp"
-                                app:fontFamily="@font/product_sans_regular"
+                                app:fontFamily="@font/poppins_medium"
                                 app:layout_constraintBottom_toBottomOf="parent"
                                 app:layout_constraintEnd_toEndOf="parent"
                                 app:layout_constraintStart_toStartOf="parent"
@@ -304,7 +304,7 @@
                                 android:text="@string/about_activity_licenses"
                                 android:textColor="@color/textColorPrimary"
                                 android:textSize="16sp"
-                                app:fontFamily="@font/product_sans_bold"
+                                app:fontFamily="@font/poppins_bold"
                                 app:layout_constraintStart_toStartOf="parent"
                                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -318,7 +318,7 @@
                                 android:text="@string/about_activity_licenses_desc"
                                 android:textColor="@color/textColorSecondaryAlt"
                                 android:textSize="14sp"
-                                app:fontFamily="@font/product_sans_regular"
+                                app:fontFamily="@font/poppins_medium"
                                 app:layout_constraintBottom_toBottomOf="parent"
                                 app:layout_constraintEnd_toEndOf="parent"
                                 app:layout_constraintStart_toStartOf="parent"

@@ -29,7 +29,7 @@
     <style name="AppTheme.NoActionBar.ColouredBackground">
         <item name="android:windowBackground">@color/colorPrimary</item>
         <item name="android:listDivider">@null</item>
-        <item name="fontFamily">@font/product_sans_regular</item>
+        <item name="fontFamily">@font/poppins_medium</item>
     </style>
 
     <style name="CustomMenuButton" parent="Widget.AppCompat.ActionButton.Overflow">
@@ -61,11 +61,11 @@
         <item name="android:textAlignment">textEnd</item>
         <item name="android:layout_marginStart">8dp</item>
         <item name="android:layout_marginEnd">8dp</item>
-        <item name="fontFamily">@font/product_sans_regular</item>
+        <item name="fontFamily">@font/poppins_medium</item>
     </style>
 
     <style name="MainUIText.LeftSideText.BoldText">
-        <item name="fontFamily">@font/product_sans_bold</item>
+        <item name="fontFamily">@font/poppins_bold</item>
     </style>
 
     <style name="MainUIText.RightSideText">
@@ -73,11 +73,12 @@
         <item name="android:textAlignment">textStart</item>
         <item name="android:layout_marginStart">8dp</item>
         <item name="android:layout_marginEnd">8dp</item>
-        <item name="fontFamily">@font/product_sans_regular</item>
+        <item name="android:layout_marginTop">0dp</item>
+        <item name="fontFamily">@font/poppins_medium</item>
     </style>
 
     <style name="MainUIText.RightSideText.BoldText">
-        <item name="fontFamily">@font/product_sans_bold</item>
+        <item name="fontFamily">@font/poppins_bold</item>
     </style>
 
     <style name="MainUISmallCategoryImageView">
@@ -88,10 +89,9 @@
     </style>
 
     <style name="ForecastHeaderText">
-        <item name="android:textAppearance">@android:style/TextAppearance.Material</item>
         <item name="android:textColor">@color/textColorSecondaryAlt</item>
         <item name="android:textSize">14sp</item>
-        <item name="fontFamily">@font/product_sans_bold</item>
+        <item name="fontFamily">@font/poppins_bold</item>
         <item name="android:background">#EEEEEE</item>
         <item name="android:paddingBottom">8dp</item>
         <item name="android:paddingTop">12dp</item>
@@ -103,21 +103,23 @@
         <item name="android:paddingTop">8dp</item>
         <item name="android:textColor">@color/textColorPrimaryInverse</item>
         <item name="android:textSize">18sp</item>
-        <item name="fontFamily">@font/product_sans_bold_italic</item>
+        <item name="android:textStyle">italic</item>
+        <item name="fontFamily">@font/poppins_bold</item>
     </style>
 
     <style name="PriorityOneText">
-        <item name="fontFamily">@font/product_sans_bold</item>
+        <item name="fontFamily">@font/poppins_bold</item>
         <item name="android:textColor">@color/textColorPrimary</item>
     </style>
 
     <style name="PriorityTwoText">
-        <item name="fontFamily">@font/product_sans_regular</item>
+        <item name="fontFamily">@font/poppins_medium</item>
         <item name="android:textColor">@color/textColorSecondaryAlt</item>
     </style>
 
     <style name="PriorityThreeText">
-        <item name="fontFamily">@font/product_sans_italic</item>
+        <item name="fontFamily">@font/poppins_medium</item>
+        <item name="android:textStyle">italic</item>
         <item name="android:textColor">@color/textColorTertiary</item>
     </style>
 
@@ -145,14 +147,16 @@
         <item name="android:textSize">16sp</item>
     </style>
 
-    <style name="PriorityTwoText.UVSuggestion">
+    <style name="UVSuggestion">
         <item name="android:layout_columnWeight">2</item>
         <item name="android:layout_rowWeight">1</item>
         <item name="android:layout_column">0</item>
         <item name="android:layout_row">1</item>
         <item name="android:layout_columnSpan">2</item>
         <item name="android:layout_margin">8dp</item>
-        <item name="android:textSize">16sp</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">@color/textColorSecondaryAlt</item>
+        <item name="fontFamily">@font/open_sans</item>
     </style>
 
 

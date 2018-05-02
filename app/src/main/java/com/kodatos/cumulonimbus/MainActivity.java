@@ -118,7 +118,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     private SharedPreferences defaultSharedPreferences;
     private SharedPreferences weatherSharedPreferences;
     private ServiceErrorBroadcastReceiver mErrorReceiver;
-    private Cursor mCursor = null;
+
+    private Cursor dataCursor = null;
 
     private int previousBackgroundColor;
     private int iconTintColor;
@@ -280,7 +281,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 infoDialogFragment.show(getSupportFragmentManager(), "INFO_DIALOG_FRAGMENT");
         };
 
-        for(View view : new View[]{mBinding.currentLayout.locationTextView, mBinding.currentLayout.currentRainImageView,
+        for(View view : new View[]{mBinding.currentLayout.currentTemperatureImageView, mBinding.currentLayout.locationTextView, mBinding.currentLayout.currentRainImageView,
                                     mBinding.currentLayout.currentWindImageView, mBinding.currentLayout.currentShadesImageView}) {
             view.setOnClickListener(infoDialogEnabledViewListener);
         }
@@ -326,9 +327,9 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             startSync(0);
         } else if (data.getCount() > 32) {  //Bind new data only when all required rows are updated
             mBinding.mainUISwipeRefreshLayout.setRefreshing(false);
-            mCursor = data;
+            dataCursor = data;
             forecastAdapter.notifyDataSetChanged();
-            if (null == mCursor || mCursor.getCount() < 33)
+            if (null == dataCursor || dataCursor.getCount() < 33)
                 forecastAdapter.setCount(0);
             else
                 forecastAdapter.setCount(4);
@@ -338,7 +339,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     @Override
     public void onLoaderReset(@NonNull Loader<Cursor> loader) {
-        mCursor = null;
+        dataCursor = null;
     }
     //endregion
 
@@ -382,20 +383,20 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     @Override
     public DBModel getDBModelFromCursor(int position) {
-        mCursor.moveToPosition(position);
-        long id = mCursor.getLong(mCursor.getColumnIndex(WeatherDBContract.WeatherDBEntry._ID));
-        String main = mCursor.getString(mCursor.getColumnIndex(WeatherDBContract.WeatherDBEntry.COLUMN_WEATHER_MAIN));
-        String desc = mCursor.getString(mCursor.getColumnIndex(WeatherDBContract.WeatherDBEntry.COLUMN_WEATHER_DESC));
-        String temp = mCursor.getString(mCursor.getColumnIndex(WeatherDBContract.WeatherDBEntry.COLUMN_TEMP));
-        float temp_min = mCursor.getFloat(mCursor.getColumnIndex(WeatherDBContract.WeatherDBEntry.COLUMN_TEMP_MIN));
-        float temp_max = mCursor.getFloat(mCursor.getColumnIndex(WeatherDBContract.WeatherDBEntry.COLUMN_TEMP_MAX));
-        float pressure = mCursor.getFloat(mCursor.getColumnIndex(WeatherDBContract.WeatherDBEntry.COLUMN_PRESSURE));
-        String wind = mCursor.getString(mCursor.getColumnIndex(WeatherDBContract.WeatherDBEntry.COLUMN_WIND));
-        long humidity = mCursor.getLong(mCursor.getColumnIndex(WeatherDBContract.WeatherDBEntry.COLUMN_HUMIDITY));
-        long clouds = mCursor.getLong(mCursor.getColumnIndex(WeatherDBContract.WeatherDBEntry.COLUMN_CLOUDS));
-        String icon_id = mCursor.getString(mCursor.getColumnIndex(WeatherDBContract.WeatherDBEntry.COLUMN_ICON_ID));
-        double uvIndex = mCursor.getDouble(mCursor.getColumnIndex(WeatherDBContract.WeatherDBEntry.COLUMN_UV_INDEX));
-        double rain_3h = mCursor.getDouble(mCursor.getColumnIndex(WeatherDBContract.WeatherDBEntry.COLUMN_RAIN_3H));
+        dataCursor.moveToPosition(position);
+        long id = dataCursor.getLong(dataCursor.getColumnIndex(WeatherDBContract.WeatherDBEntry._ID));
+        String main = dataCursor.getString(dataCursor.getColumnIndex(WeatherDBContract.WeatherDBEntry.COLUMN_WEATHER_MAIN));
+        String desc = dataCursor.getString(dataCursor.getColumnIndex(WeatherDBContract.WeatherDBEntry.COLUMN_WEATHER_DESC));
+        String temp = dataCursor.getString(dataCursor.getColumnIndex(WeatherDBContract.WeatherDBEntry.COLUMN_TEMP));
+        float temp_min = dataCursor.getFloat(dataCursor.getColumnIndex(WeatherDBContract.WeatherDBEntry.COLUMN_TEMP_MIN));
+        float temp_max = dataCursor.getFloat(dataCursor.getColumnIndex(WeatherDBContract.WeatherDBEntry.COLUMN_TEMP_MAX));
+        float pressure = dataCursor.getFloat(dataCursor.getColumnIndex(WeatherDBContract.WeatherDBEntry.COLUMN_PRESSURE));
+        String wind = dataCursor.getString(dataCursor.getColumnIndex(WeatherDBContract.WeatherDBEntry.COLUMN_WIND));
+        long humidity = dataCursor.getLong(dataCursor.getColumnIndex(WeatherDBContract.WeatherDBEntry.COLUMN_HUMIDITY));
+        long clouds = dataCursor.getLong(dataCursor.getColumnIndex(WeatherDBContract.WeatherDBEntry.COLUMN_CLOUDS));
+        String icon_id = dataCursor.getString(dataCursor.getColumnIndex(WeatherDBContract.WeatherDBEntry.COLUMN_ICON_ID));
+        double uvIndex = dataCursor.getDouble(dataCursor.getColumnIndex(WeatherDBContract.WeatherDBEntry.COLUMN_UV_INDEX));
+        double rain_3h = dataCursor.getDouble(dataCursor.getColumnIndex(WeatherDBContract.WeatherDBEntry.COLUMN_RAIN_3H));
         return new DBModel(id, main, desc, temp, temp_min, temp_max, pressure, humidity, wind, clouds, icon_id, uvIndex, rain_3h);
     }
 
@@ -412,6 +413,24 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         String positiveText = null;
         View.OnClickListener positiveAction = null;
         switch(viewID){
+            case R.id.currentTemperatureImageView :
+                title = getString(R.string.apparent_temperature_title);
+                drawableID = R.drawable.ic_thermometer;
+                backgroundColor = ContextCompat.getColor(this, R.color.apparent_temperature_color);
+                DBModel currentDBModel = getDBModelFromCursor(0);
+                double temperatureToConvert = Double.valueOf(currentDBModel.getTemp());
+                boolean metric = defaultSharedPreferences.getBoolean(getString(R.string.pref_metrics_key), true);
+                int windChill = MiscUtils.getWindChill(temperatureToConvert, Double.valueOf(currentDBModel.getWind().split("/")[0]), metric);
+                if(windChill != MiscUtils.IMPOSSIBLE_TEMPERATURE)
+                    description = getString(R.string.wind_chill_desc) + " " + MiscUtils.makeTemperaturePretty(String.valueOf(windChill), metric);
+                else {
+                    int heatIndex = MiscUtils.getHeatIndex(temperatureToConvert, currentDBModel.getHumidity(), metric);
+                    if(heatIndex != MiscUtils.IMPOSSIBLE_TEMPERATURE)
+                        description = getString(R.string.heat_index_desc) + " " + MiscUtils.makeTemperaturePretty(String.valueOf(heatIndex), metric);
+                    else
+                        description = getString(R.string.no_apparent_temperature_desc);
+                }
+                break;
             case R.id.currentRainImageView :
                 title = getString(R.string.rain_volume_info_title);
                 description = getString(R.string.rain_volume_info_desc);
@@ -557,7 +576,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         getWindow().getDecorView().setBackgroundColor(updatedBackgroundColor);
         getWindow().setStatusBarColor(updatedBackgroundColor);
         getWindow().setNavigationBarColor(updatedBackgroundColor);
-        int cardLighterColor = Color.rgb(Color.red(updatedBackgroundColor) + 30, Color.green(updatedBackgroundColor) + 30, Color.blue(updatedBackgroundColor) + 30);
+        int cardLighterColor = Color.rgb(Color.red(updatedBackgroundColor) + 25, Color.green(updatedBackgroundColor) + 25, Color.blue(updatedBackgroundColor) + 25);
         int cardDarkerColor = Color.rgb(Color.red(updatedBackgroundColor) + 5, Color.green(updatedBackgroundColor) + 5, Color.blue(updatedBackgroundColor) + 5);
         GradientDrawable gradientDrawable = new GradientDrawable(GradientDrawable.Orientation.BR_TL, new int[]{cardDarkerColor, cardLighterColor});
         float px = getResources().getDimension(R.dimen.common_card_corner_radius) * (getResources().getDisplayMetrics().density);
@@ -616,18 +635,28 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     private class ServiceErrorBroadcastReceiver extends BroadcastReceiver {
 
+        private String ERROR_LOG_TAG  = "error_receiver";
+
         private String errorType;
         private String errorDetails;
         private String message;
 
-        private boolean shouldStopRefreshingAnim = true;        //Flag to indicate whether refresh animation should be stopped
-
+        //Flag to indicate whether refresh animation should be stopped
+        private boolean shouldStopRefreshingAnim = true;
+        //Flag to check if an error is being resolved so as to suppress new errors for the duration
+        private boolean isResolvingError = false;
 
         @Override
         public void onReceive(Context context, Intent intent) {
             errorType = intent.getStringExtra(ServiceErrorContract.SERVICE_ERROR_TYPE);
             errorDetails = intent.getStringExtra(ServiceErrorContract.SERVICE_ERROR_DETAILS);
-            Log.d(LOG_TAG, "error received : " + errorType + " " + errorDetails);
+            if(isResolvingError) {
+                Log.d(ERROR_LOG_TAG, "suppressing error: " + errorType);
+                return;             //Suppress any errors if already resolving one.
+            }
+            isResolvingError = true;
+            Log.d(ERROR_LOG_TAG, "error received : " + errorType + " " + errorDetails);
+            shouldStopRefreshingAnim = true;
             switch (errorType) {
                 case ServiceErrorContract.ERROR_LOCATION:
                     handleLocationError();
@@ -643,6 +672,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                     break;
             }
             mBinding.mainUISwipeRefreshLayout.setRefreshing(!shouldStopRefreshingAnim);
+            isResolvingError = false;
         }
 
         private void handleGeocodingError() {
@@ -698,7 +728,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 SettingsClient client = LocationServices.getSettingsClient(MainActivity.this);
                 Task<LocationSettingsResponse> task = client.checkLocationSettings(builder.build());
                 task.addOnSuccessListener(MainActivity.this, locationSettingsResponse -> {
-                    Log.d(LOG_TAG, "location_enabled");
+                    Log.d(ERROR_LOG_TAG, "location_enabled");
                     mFusedClient.requestLocationUpdates(locationRequest, new LocationCallback() {
                         @Override
                         public void onLocationResult(LocationResult locationResult) {
@@ -717,7 +747,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                     }, null);
                 });
                 task.addOnFailureListener(MainActivity.this, e -> {
-                    Log.d(LOG_TAG, "location_disabled");
+                    Log.d(ERROR_LOG_TAG, "location_disabled");
                     if (e instanceof ResolvableApiException) {
                         ResolvableApiException resolvableApiException = (ResolvableApiException) e;
                         message = "Location provider is disabled. Please enable it";
@@ -729,7 +759,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                             }
                         });
                     } else {
-                        Log.d(LOG_TAG, "Location disabled but not resolvable");
+                        Log.d(ERROR_LOG_TAG, "Location disabled but not resolvable");
                     }
                 });
 

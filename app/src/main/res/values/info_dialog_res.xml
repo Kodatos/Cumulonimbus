@@ -61,6 +61,15 @@
     <string name="location_info_positive">Force Refresh</string>
     <color name="location_info_color">#4E342E</color>
 
+    <string name="apparent_temperature_title">Apparent Temperature: </string>
+    <string name="heat_index_desc">\<b>Heat Index</b> - The apparent temperature feels more than the actual due to the
+        effects of humidity, as it reduces perspiration that cools your body.\nTemperature adjusted for heat index is : </string>
+    <string name="wind_chill_desc">\<b>Wind Chill</b> - The apparent temperature feels less than the actual due to the
+        effects of wind, as it increases the rate of heat loss from your body.\nTemperature adjusted for wind chill is : </string>
+    <string name="no_apparent_temperature_desc">The current humidity and wind have negligible effect on the temperature. The temperature
+        you feel is more or less the same as the actual</string>
+    <color name="apparent_temperature_color">#D32F2F</color>
+
     <string name="common_positive_text">OK, Got it</string>
     <string name="common_negative_text">Never mind</string>
 </resources>

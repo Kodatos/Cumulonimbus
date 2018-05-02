@@ -48,6 +48,8 @@ import java.util.Locale;
 @SuppressWarnings("WeakerAccess")
 public class MiscUtils {
 
+    public static int IMPOSSIBLE_TEMPERATURE = 2000;
+
     private MiscUtils(){}
 
     /**
@@ -59,6 +61,44 @@ public class MiscUtils {
     public static String makeTemperaturePretty(String usefulTempinString, boolean metric){
         String unit = metric ? "\u2103" : "\u2109";
         return usefulTempinString + unit;
+    }
+
+    public static int getHeatIndex(double temperature, long rHumidity, boolean metric){
+        if(metric)
+            temperature = temperature * 1.8 + 32;           //If metric units, convert to fahrenheit
+        double heatIndex = IMPOSSIBLE_TEMPERATURE;                             //Assign impossible heat index for invalid inputs
+        if(temperature >= 80){
+            heatIndex = -42.739 + (2.0409*temperature) + (10.1433*rHumidity) - (0.2247*temperature*rHumidity)
+                    - (0.0068*temperature*temperature) - (0.0548*rHumidity*rHumidity) + (0.0012*temperature*temperature*rHumidity) + (0.0009*temperature*rHumidity*rHumidity)
+                    - (0.00000199*temperature*temperature*rHumidity*rHumidity);
+            if(rHumidity <= 13 && temperature <= 112){
+                heatIndex -= (13 - rHumidity)/4 * Math.sqrt((17 - Math.abs(temperature - 95))/17);
+            }
+            else if(rHumidity >= 85 && temperature <=87){
+                heatIndex += (rHumidity - 85)/10 * (87 - temperature)/5;
+            }
+
+            if(heatIndex <= temperature)
+                heatIndex = IMPOSSIBLE_TEMPERATURE;                  //The equation may have failed if humidity was too low.
+        }
+        if(metric && heatIndex!= IMPOSSIBLE_TEMPERATURE)
+            heatIndex = (heatIndex - 32)/1.8;               //If metric units, change back to celsius
+        return (int) heatIndex;
+    }
+
+    public static int getWindChill(double temperature, double windSpeed, boolean metric){
+        if(!metric)
+            temperature = (temperature - 32)/1.8;
+        windSpeed = metric ? 3.6*windSpeed : 1.6*windSpeed;   //Convert m/s or mph to kph
+        double windChill = IMPOSSIBLE_TEMPERATURE;                               //Assign impossible wind chill for invalid inputs
+        if(temperature <= 10 && windSpeed >= 4.8){
+            windChill = 13.12 + (0.6215*temperature) - (11.37*Math.pow(windSpeed, 0.16)) + (0.3965*temperature*Math.pow(windSpeed, 0.16));
+            if(windChill >= temperature)
+                windChill = IMPOSSIBLE_TEMPERATURE;              //The equation may have failed if wind speed was too low
+        }
+        if(!metric && windChill!= IMPOSSIBLE_TEMPERATURE)                                     //If not metric, convert back to fahrenheit
+            windChill = windChill*1.8 + 32;
+        return (int) windChill;
     }
 
     //Generates a ready to use data binding model for the detail screen from database model

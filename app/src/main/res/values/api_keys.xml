@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="owm_api_key" translatable="false">replace_this_with_your_own_api_key_from_openweathermap_here</string>
+</resources>

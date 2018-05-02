@@ -54,7 +54,7 @@
             android:name=".UVIndexActivity"
             android:launchMode="singleTop"
             android:parentActivityName=".MainActivity"
-            android:theme="@style/AppTheme.NoActionBar.ColouredBackground" />
+            android:theme="@style/AppTheme.NoActionBar" />
 
         <activity
             android:name=".AboutActivity"
@@ -71,6 +71,10 @@
             android:configChanges="orientation"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
+
+        <meta-data
+            android:name="preloaded_fonts"
+            android:resource="@array/preloaded_fonts" />
     </application>
 
 </manifest>
