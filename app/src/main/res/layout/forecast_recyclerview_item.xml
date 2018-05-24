@@ -78,10 +78,12 @@
         android:text="@{calculateddata.weatherMain}"
         android:textAlignment="textStart"
         android:textAppearance="@android:style/TextAppearance.Material"
-        android:textSize="16sp"
+        android:textSize="14sp"
         app:fontFamily="@font/poppins_medium"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toTopOf="@id/forecast_image"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/forecast_desc_textview"
+        app:layout_constraintVertical_chainStyle="packed"
         tools:text="Main" />
 
     <TextView
@@ -94,10 +96,11 @@
         android:singleLine="true"
         android:text="@{calculateddata.weatherDesc}"
         android:textAlignment="textStart"
-        android:textSize="16sp"
+        android:textSize="14sp"
         app:layout_constraintEnd_toStartOf="@+id/forecast_image"
         app:layout_constraintStart_toStartOf="@+id/forecast_main_textview"
         app:layout_constraintTop_toBottomOf="@+id/forecast_main_textview"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintHorizontal_bias="0"
         tools:text="Scattered Thunderstorm" />
 
@@ -111,7 +114,8 @@
         android:textSize="18sp"
         android:layout_marginEnd="32dp"
         app:fontFamily="@font/poppins_medium"
-        app:layout_constraintBaseline_toBaselineOf="@+id/day_textview"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         tools:text="30" />
 </android.support.constraint.ConstraintLayout>

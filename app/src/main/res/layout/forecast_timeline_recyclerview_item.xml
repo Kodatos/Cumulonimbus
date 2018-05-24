@@ -65,6 +65,7 @@
             android:layout_marginTop="8dp"
             android:textAlignment="center"
             android:textAppearance="@android:style/TextAppearance.Material.Title"
+            android:textSize="16sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/timelineWeatherImageView"

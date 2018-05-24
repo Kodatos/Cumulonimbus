@@ -68,6 +68,7 @@ import com.kodatos.cumulonimbus.R;
 import com.kodatos.cumulonimbus.apihelper.WeatherAPIService;
 import com.kodatos.cumulonimbus.apihelper.models.CurrentWeatherModel;
 import com.kodatos.cumulonimbus.databinding.PreferenceSlideLayoutBinding;
+import com.kodatos.cumulonimbus.utils.CityValidatorUtil;
 import com.kodatos.cumulonimbus.utils.KeyConstants;
 
 import org.json.JSONException;
@@ -231,26 +232,11 @@ public class PreferenceSlideFragment extends Fragment implements ISlideBackgroun
             Log.d(LOG_TAG, "internet_fine");
             //If user entered custom location, validate it.
             if (isCustomLocationEnabled) {
-                Log.d(LOG_TAG, "custom_location");
-                Retrofit currentWeatherRetrofit = new Retrofit.Builder()
-                        .baseUrl("http://api.openweathermap.org/")
-                        .addConverterFactory(GsonConverterFactory.create())
-                        .build();
-                WeatherAPIService checkerService = currentWeatherRetrofit.create(WeatherAPIService.class);
-                Call<CurrentWeatherModel> currentWeatherModelCall = checkerService.getCurrentWeatherByString(custom_location, api_key, "metric");
-                try {
-                    Response<CurrentWeatherModel> response = currentWeatherModelCall.execute();
-                    if (!response.isSuccessful()) {
-                        JSONObject jsonError = new JSONObject(Objects.requireNonNull(response.errorBody()).string());
-                        String errorCode = String.valueOf(jsonError.getInt("cod"));
-                        if ("404".equals(errorCode) || "400".equals(errorCode)) {
-                            Log.d(LOG_TAG, "invalid_city");
-                            return "invalid_city";
-                        }
-                    }
-                } catch (IOException | JSONException e) {
-                    e.printStackTrace();
-                }
+                int city_validity = CityValidatorUtil.checkIfStringValid(custom_location, api_key);
+                if(city_validity == CityValidatorUtil.INVALID)
+                    return "invalid";
+                else
+                    return "valid";
             }
             return "valid";
         }

@@ -587,7 +587,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     private void changeBackgroundColorWithAnimation(int updatedBackgroundColor) {
         if (updatedBackgroundColor != previousBackgroundColor) {
             ValueAnimator backgroundColorAnimator = ValueAnimator.ofObject(new ArgbEvaluator(), previousBackgroundColor, updatedBackgroundColor);
-            backgroundColorAnimator.setDuration(1000);
+            backgroundColorAnimator.setDuration(500);
             backgroundColorAnimator.addUpdateListener(animation -> {
                 int currentColor = (int) animation.getAnimatedValue();
                 changeBackgroundColor(currentColor);

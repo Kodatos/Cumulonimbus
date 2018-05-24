@@ -87,14 +87,14 @@ public class WeatherDetailActivity extends AppCompatActivity implements Timeline
         if(getSupportActionBar()!=null)
             getSupportActionBar().setDisplayShowTitleEnabled(false);
 
-        //Enable animation on binding data
+        /*Enable animation on binding data
         mBinding.addOnRebindCallback(new OnRebindCallback<ActivityWeatherDetailBinding>(){
             @Override
             public boolean onPreBind(ActivityWeatherDetailBinding binding) {
                 TransitionManager.beginDelayedTransition((ViewGroup) binding.getRoot());
                 return super.onPreBind(binding);
             }
-        });
+        });*/
 
         mBinding.weatherImageView.setTransitionName(getIntent().getStringExtra(KeyConstants.FORECAST_IMAGE_TRANSITION_KEY));
         mModels = Parcels.unwrap(getIntent().getParcelableExtra(KeyConstants.WEATHER_DETAIL_PARCEL_NAME));
@@ -153,7 +153,7 @@ public class WeatherDetailActivity extends AppCompatActivity implements Timeline
     private void changeBackgroundColorWithAnimation(int updatedBackgroundColor) {
         if (updatedBackgroundColor != previousBackgroundColor) {
             ValueAnimator backgroundColorAnimator = ValueAnimator.ofObject(new ArgbEvaluator(), previousBackgroundColor, updatedBackgroundColor);
-            backgroundColorAnimator.setDuration(1000);
+            backgroundColorAnimator.setDuration(500);
             backgroundColorAnimator.addUpdateListener(animation -> {
                 int currentColor = (int) animation.getAnimatedValue();
                 changeBackgroundColor(currentColor);

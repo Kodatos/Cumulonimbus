@@ -55,5 +55,5 @@
     <string name="welcome_description_4">Enjoy Cumulonimbus and check Settings for more stuff.</string>
     <string name="welcome_screen_current_location_check">Do you want to use your current location?</string>
     <string name="welcome_screen_custom_location_hint">Enter the name of your city</string>
-    <string name="welcome_screen_validation_button">Validate Settings</string>
+    <string name="welcome_screen_validation_button">VALIDATE SETTINGS</string>
 </resources>

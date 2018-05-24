@@ -181,32 +181,32 @@ public class MiscUtils {
     public static String windClassifier(double speed, boolean metric){
         double speedInKPH = metric ? 3.6*speed : 1.60*speed;
         if(speedInKPH<1)
-            return "Calm";
+            return "Calm ";
         else if(speedInKPH<6)
-            return "Light Air";
+            return "Light Air ";
         else if (speedInKPH<12)
-            return "Light Breeze";
+            return "Light Breeze ";
         else if(speedInKPH<20)
-            return "Gentle Breeze";
+            return "Gentle Breeze ";
         else if(speedInKPH<29)
-            return "Moderate Breeze";
+            return "Moderate Breeze ";
         else if(speedInKPH<39)
-            return "Fresh Breeze";
+            return "Fresh Breeze ";
         else if(speedInKPH<50)
-            return "Strong Breeze";
+            return "Strong Breeze ";
         else if(speedInKPH<62)
-            return "Moderate Gale";
+            return "Moderate Gale ";
         else if(speedInKPH<75)
-            return "Fresh Gale";
+            return "Fresh Gale ";
         else if(speedInKPH<89)
-            return "Strong Gale";
+            return "Strong Gale ";
         else if(speedInKPH<103)
-            return "Whole Gale";
+            return "Whole Gale ";
         else if(speedInKPH<118)
-            return "Storm";
+            return "Storm ";
         else if(speedInKPH>=118)
-            return "Hurricane";
-        return "N/A";
+            return "Hurricane ";
+        return "N/A ";
     }
 
     public static String UVClassifier(double index){

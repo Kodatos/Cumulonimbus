@@ -79,7 +79,7 @@
             android:singleLine="true"
             android:textAlignment="center"
             android:textColor="#FAFAFA"
-            android:textSize="18sp"
+            android:textSize="16sp"
             app:fontFamily="@font/poppins_medium"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -127,8 +127,7 @@
             android:layout_marginBottom="8dp"
             android:layout_marginTop="8dp"
             android:text="@{currentWeatherData.tempMain}"
-            android:textSize="24sp"
-            app:elevation="4dp"
+            android:textSize="22sp"
             app:layout_constraintBottom_toBottomOf="@+id/currentTemperatureImageView"
             app:layout_constraintEnd_toStartOf="@+id/currentTemperatureImageView"
             app:layout_constraintStart_toStartOf="parent"
@@ -224,7 +223,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
-            android:alpha="0.0"
+            android:alpha="1.0"
             app:layout_constraintTop_toBottomOf="@+id/dateImageView">
 
             <ImageView
@@ -248,10 +247,8 @@
                 style="@style/MainUIText.LeftSideText.BoldText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="0dp"
-                android:layout_marginTop="0dp"
                 android:text="@{currentWeatherData.windValue}"
-                android:textSize="20sp"
+                android:textSize="18sp"
                 app:layout_constraintBottom_toBottomOf="@+id/currentWindImageView"
                 app:layout_constraintRight_toLeftOf="@+id/currentWindImageView"
                 app:layout_constraintTop_toTopOf="@+id/currentWindImageView"
@@ -291,10 +288,11 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:text="@string/pressure"
-                android:textSize="@dimen/mainui_secondary_text_size"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toLeftOf="@+id/currentMeterImageView"
-                app:layout_constraintTop_toTopOf="@+id/currentMeterImageView" />
+                app:layout_constraintTop_toTopOf="@+id/currentMeterImageView"
+                app:layout_constraintBottom_toTopOf="@id/currentPressureValue"
+                app:layout_constraintVertical_chainStyle="packed"/>
 
             <TextView
                 android:id="@+id/currentPressureValue"
@@ -304,6 +302,7 @@
                 android:text="@{currentWeatherData.pressureValue}"
                 app:layout_constraintEnd_toStartOf="@+id/currentMeterImageView"
                 app:layout_constraintTop_toBottomOf="@+id/currentPressure"
+                app:layout_constraintBottom_toBottomOf="@id/currentMeterImageView"
                 tools:text="1000 mb" />
 
             <TextView
@@ -313,10 +312,11 @@
                 android:layout_height="wrap_content"
                 android:text="@string/humidity"
                 android:textColor="@color/textColorPrimaryInverse"
-                android:textSize="@dimen/mainui_secondary_text_size"
                 app:layout_constraintLeft_toRightOf="@+id/currentMeterImageView"
                 app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/currentMeterImageView" />
+                app:layout_constraintTop_toTopOf="@+id/currentMeterImageView"
+                app:layout_constraintBottom_toTopOf="@id/currentHumidityValue"
+                app:layout_constraintVertical_chainStyle="packed"/>
 
             <TextView
                 android:id="@+id/currentHumidityValue"
@@ -327,6 +327,7 @@
                 android:textColor="@color/textColorPrimaryInverse"
                 app:layout_constraintStart_toEndOf="@+id/currentMeterImageView"
                 app:layout_constraintTop_toBottomOf="@+id/currentHumidity"
+                app:layout_constraintBottom_toBottomOf="@id/currentMeterImageView"
                 tools:text="60%" />
 
             <ImageView
@@ -347,9 +348,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/rain_volume"
-                android:textSize="@dimen/mainui_secondary_text_size"
+                app:layout_constraintBottom_toTopOf="@id/currentRainVolumeValue"
                 app:layout_constraintEnd_toStartOf="@+id/currentRainImageView"
-                app:layout_constraintTop_toTopOf="@+id/currentRainImageView" />
+                app:layout_constraintTop_toTopOf="@+id/currentRainImageView"
+                app:layout_constraintVertical_chainStyle="packed"/>
 
             <TextView
                 android:id="@+id/currentRainVolumeValue"
@@ -357,6 +359,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@{currentWeatherData.rainValue}"
+                app:layout_constraintBottom_toBottomOf="@id/currentRainImageView"
                 app:layout_constraintEnd_toStartOf="@+id/currentRainImageView"
                 app:layout_constraintTop_toBottomOf="@+id/currentRainVolume"
                 tools:text="20 mm" />
@@ -368,9 +371,10 @@
                 android:layout_height="wrap_content"
                 android:text="@string/cloudiness"
                 android:textColor="@color/textColorPrimaryInverse"
-                android:textSize="@dimen/mainui_secondary_text_size"
+                app:layout_constraintBottom_toTopOf="@id/currentCloudinessValue"
                 app:layout_constraintStart_toEndOf="@+id/currentRainImageView"
-                app:layout_constraintTop_toTopOf="@+id/currentRainImageView" />
+                app:layout_constraintTop_toTopOf="@+id/currentRainImageView"
+                app:layout_constraintVertical_chainStyle="packed"/>
 
             <TextView
                 android:id="@+id/currentCloudinessValue"
@@ -381,6 +385,7 @@
                 android:textColor="@color/textColorPrimaryInverse"
                 app:layout_constraintStart_toEndOf="@+id/currentRainImageView"
                 app:layout_constraintTop_toBottomOf="@+id/currentCloudiness"
+                app:layout_constraintBottom_toBottomOf="@id/currentRainImageView"
                 tools:text="50%" />
 
             <ImageView
@@ -401,9 +406,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/sunrise"
-                android:textSize="@dimen/mainui_secondary_text_size"
+                app:layout_constraintBottom_toTopOf="@id/currentSunriseValue"
                 app:layout_constraintEnd_toStartOf="@+id/currentSunImageView"
-                app:layout_constraintTop_toTopOf="@+id/currentSunImageView" />
+                app:layout_constraintTop_toTopOf="@+id/currentSunImageView"
+                app:layout_constraintVertical_chainStyle="packed"/>
 
             <TextView
                 android:id="@+id/currentSunriseValue"
@@ -413,6 +419,7 @@
                 android:text="@{currentWeatherData.sunrise}"
                 app:layout_constraintEnd_toStartOf="@+id/currentSunImageView"
                 app:layout_constraintTop_toBottomOf="@+id/currentSunrise"
+                app:layout_constraintBottom_toBottomOf="@id/currentSunImageView"
                 tools:text="06:00" />
 
             <TextView
@@ -422,9 +429,10 @@
                 android:layout_height="wrap_content"
                 android:text="@string/sunset"
                 android:textColor="@color/textColorPrimaryInverse"
-                android:textSize="@dimen/mainui_secondary_text_size"
+                app:layout_constraintBottom_toTopOf="@id/currentSunsetValue"
                 app:layout_constraintStart_toEndOf="@+id/currentSunImageView"
-                app:layout_constraintTop_toTopOf="@+id/currentSunImageView" />
+                app:layout_constraintTop_toTopOf="@+id/currentSunImageView"
+                app:layout_constraintVertical_chainStyle="packed"/>
 
             <TextView
                 android:id="@+id/currentSunsetValue"
@@ -435,6 +443,7 @@
                 android:textColor="@color/textColorPrimaryInverse"
                 app:layout_constraintStart_toEndOf="@+id/currentSunImageView"
                 app:layout_constraintTop_toBottomOf="@+id/currentSunset"
+                app:layout_constraintBottom_toBottomOf="@id/currentSunImageView"
                 tools:text="18:00" />
 
             <ImageView
@@ -455,9 +464,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/visibility"
-                android:textSize="@dimen/mainui_secondary_text_size"
+                app:layout_constraintBottom_toTopOf="@id/currentVisibilityValue"
                 app:layout_constraintEnd_toStartOf="@+id/currentShadesImageView"
-                app:layout_constraintTop_toTopOf="@+id/currentShadesImageView" />
+                app:layout_constraintTop_toTopOf="@+id/currentShadesImageView"
+                app:layout_constraintVertical_chainStyle="packed"/>
 
             <TextView
                 android:id="@+id/currentVisibilityValue"
@@ -467,6 +477,7 @@
                 android:text="@{currentWeatherData.visibility}"
                 app:layout_constraintEnd_toStartOf="@+id/currentShadesImageView"
                 app:layout_constraintTop_toBottomOf="@+id/currentVisibility"
+                app:layout_constraintBottom_toBottomOf="@id/currentShadesImageView"
                 tools:text="1 km" />
 
             <TextView
@@ -476,9 +487,10 @@
                 android:layout_height="wrap_content"
                 android:text="@{currentWeatherData.uvIndexDescription}"
                 android:textColor="@color/textColorPrimaryInverse"
-                android:textSize="@dimen/mainui_secondary_text_size"
+                app:layout_constraintBottom_toTopOf="@id/currentUVIndexValue"
                 app:layout_constraintStart_toEndOf="@+id/currentShadesImageView"
                 app:layout_constraintTop_toTopOf="@+id/currentShadesImageView"
+                app:layout_constraintVertical_chainStyle="packed"
                 tools:text="UV Index: High" />
 
             <TextView
@@ -490,6 +502,7 @@
                 android:textColor="@color/textColorPrimaryInverse"
                 app:layout_constraintStart_toEndOf="@+id/currentShadesImageView"
                 app:layout_constraintTop_toBottomOf="@+id/currentUVIndex"
+                app:layout_constraintBottom_toBottomOf="@id/currentShadesImageView"
                 tools:text="9.1" />
 
         </android.support.constraint.ConstraintLayout>

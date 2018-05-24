@@ -89,6 +89,7 @@
                         style="@style/PriorityOneText.UVInfoLeftSide"
                         android:layout_width="0dp"
                         android:layout_height="0dp"
+                        android:textSize="16sp"
                         android:background="@color/first_background"
                         android:text="@string/first_range" />
 
@@ -97,7 +98,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:background="@color/first_background"
-                        android:paddingTop="16dp"
+                        android:paddingTop="24dp"
                         android:text="@string/first_description" />
 
                     <TextView
@@ -126,6 +127,7 @@
                         style="@style/PriorityOneText.UVInfoLeftSide"
                         android:layout_width="0dp"
                         android:layout_height="0dp"
+                        android:textSize="16sp"
                         android:background="@color/second_background"
                         android:text="@string/second_range" />
 
@@ -134,7 +136,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:background="@color/second_background"
-                        android:paddingTop="16dp"
+                        android:paddingTop="24dp"
                         android:text="@string/second_description" />
 
                     <TextView
@@ -163,6 +165,7 @@
                         style="@style/PriorityOneText.UVInfoLeftSide"
                         android:layout_width="0dp"
                         android:layout_height="0dp"
+                        android:textSize="16sp"
                         android:background="@color/third_background"
                         android:text="@string/third_range" />
 
@@ -171,7 +174,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:background="@color/third_background"
-                        android:paddingTop="16dp"
+                        android:paddingTop="24dp"
                         android:text="@string/third_description" />
 
                     <TextView
@@ -200,6 +203,7 @@
                         style="@style/PriorityOneText.UVInfoLeftSide"
                         android:layout_width="0dp"
                         android:layout_height="0dp"
+                        android:textSize="16sp"
                         android:background="@color/fourth_background"
                         android:text="@string/fourth_range" />
 
@@ -238,6 +242,7 @@
                         style="@style/PriorityOneText.UVInfoLeftSide"
                         android:layout_width="0dp"
                         android:layout_height="0dp"
+                        android:textSize="16sp"
                         android:background="@color/fifth_background"
                         android:text="@string/fifth_range" />
 

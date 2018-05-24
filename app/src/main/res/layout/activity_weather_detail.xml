@@ -128,7 +128,7 @@
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toBottomOf="@+id/timelineTitle" />
+                            app:layout_constraintTop_toBottomOf="@+id/timelineTitle"/>
 
                     </android.support.constraint.ConstraintLayout>
                 </android.support.v7.widget.CardView>
@@ -181,12 +181,13 @@
                             style="@style/PriorityTwoText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="20dp"
                             android:text="@{dataModel.date}"
                             android:textAlignment="textStart"
                             android:textSize="@dimen/detailui_text_size_secondary"
                             app:layout_constraintLeft_toLeftOf="@+id/mainWeatherTextView"
                             app:layout_constraintTop_toTopOf="@+id/weatherImageView"
+                            app:layout_constraintBottom_toTopOf="@id/mainWeatherTextView"
+                            app:layout_constraintVertical_chainStyle="packed"
                             tools:text="Tue, 15 Aug" />
 
                         <TextView
@@ -195,12 +196,12 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="24dp"
-                            android:layout_marginTop="4dp"
                             android:text="@{dataModel.weatherMain}"
                             android:textAlignment="textStart"
-                            android:textSize="20sp"
+                            android:textSize="18sp"
                             app:layout_constraintLeft_toLeftOf="@+id/guideline"
                             app:layout_constraintTop_toBottomOf="@+id/dateTextView"
+                            app:layout_constraintBottom_toTopOf="@id/descWeatherTextView"
                             tools:text="Clear" />
 
                         <TextView
@@ -209,7 +210,6 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_marginEnd="8dp"
-                            android:layout_marginTop="4dp"
                             android:text="@{dataModel.weatherDescription}"
                             android:textAlignment="textStart"
                             android:textSize="@dimen/detailui_text_size_secondary"
@@ -217,6 +217,7 @@
                             app:layout_constraintLeft_toLeftOf="@+id/mainWeatherTextView"
                             app:layout_constraintRight_toRightOf="parent"
                             app:layout_constraintTop_toBottomOf="@+id/mainWeatherTextView"
+                            app:layout_constraintBottom_toBottomOf="@id/weatherImageView"
                             tools:text="Scattered Thunderstorm" />
 
                         <TextView
@@ -226,7 +227,8 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="32dp"
                             android:text="@{dataModel.tempMain}"
-                            android:textSize="56sp"
+                            android:textSize="48sp"
+                            android:includeFontPadding="false"
                             app:layout_constraintHorizontal_bias="0.4"
                             app:layout_constraintLeft_toLeftOf="parent"
                             app:layout_constraintRight_toLeftOf="@+id/guideline"
@@ -238,10 +240,10 @@
                             style="@style/PriorityTwoText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginStart="4dp"
+                            android:layout_marginLeft="4dp"
                             android:layout_marginTop="8dp"
                             android:text="@{dataModel.unit}"
-                            android:textSize="24sp"
+                            android:textSize="20sp"
                             app:layout_constraintLeft_toRightOf="@id/temperatureView"
                             app:layout_constraintTop_toTopOf="@id/temperatureView"
                             tools:text="\u2103" />
@@ -253,7 +255,6 @@
                             android:layout_height="wrap_content"
                             android:layout_marginStart="8dp"
                             android:layout_marginEnd="0dp"
-                            android:layout_marginTop="4dp"
                             android:drawableStart="@drawable/ic_arrow_drop_up"
                             android:gravity="center"
                             android:text="@{dataModel.tempMax}"
@@ -261,7 +262,7 @@
                             app:layout_constraintHorizontal_bias="0.271"
                             app:layout_constraintLeft_toLeftOf="@id/temperatureView"
                             app:layout_constraintRight_toLeftOf="parent"
-                            app:layout_constraintTop_toBottomOf="@+id/temperatureView"
+                            app:layout_constraintBaseline_toBaselineOf="@id/windTitle"
                             tools:text="27" />
 
                         <TextView
@@ -312,24 +313,23 @@
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toEndOf="@id/windDirectionImageView"
                             app:layout_constraintTop_toTopOf="@+id/windDirectionImageView"
-                            app:layout_constraintVertical_bias="0.562"
+                            app:layout_constraintVertical_bias="0.6"
                             tools:text="12 m/s" />
 
                         <TextView
                             android:id="@+id/windTitle"
                             style="@style/PriorityThreeText"
                             android:layout_width="wrap_content"
-                            android:layout_height="20dp"
+                            android:layout_height="wrap_content"
                             android:layout_marginEnd="8dp"
                             android:layout_marginStart="8dp"
-                            android:gravity="center"
+                            android:layout_marginTop="16dp"
                             android:text="@{dataModel.windDescription}"
-                            android:textAlignment="center"
                             android:textSize="@dimen/detailui_text_size_secondary"
-                            app:layout_constraintBaseline_toBaselineOf="@+id/minTemperatureView"
+                            app:layout_constraintTop_toBottomOf="@id/windDirectionImageView"
                             app:layout_constraintEnd_toEndOf="@+id/windValueTextView"
                             app:layout_constraintStart_toStartOf="@+id/windDirectionImageView"
-                            tools:text="Moderate Breeze" />
+                            tools:text="Moderate Breeze " />
 
                         <ImageView
                             android:id="@+id/pressureImageView"
@@ -351,11 +351,12 @@
                             style="@style/PriorityTwoText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="6dp"
                             android:text="@string/pressure"
                             android:textSize="@dimen/detailui_text_size_secondary"
+                            app:layout_constraintBottom_toTopOf="@id/pressureTextView"
                             app:layout_constraintRight_toRightOf="@+id/pressureTextView"
-                            app:layout_constraintTop_toTopOf="@+id/pressureImageView" />
+                            app:layout_constraintTop_toTopOf="@+id/pressureImageView"
+                            app:layout_constraintVertical_chainStyle="packed" />
 
                         <TextView
                             android:id="@+id/pressureTextView"
@@ -366,6 +367,7 @@
                             android:layout_marginRight="8dp"
                             android:text="@{dataModel.pressureValue}"
                             android:textAlignment="center"
+                            android:includeFontPadding="false"
                             android:textSize="@dimen/detailui_text_size_secondary_caption"
                             app:layout_constraintBottom_toBottomOf="@+id/pressureImageView"
                             app:layout_constraintLeft_toRightOf="@id/pressureImageView"
@@ -393,12 +395,13 @@
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="16dp"
                             android:layout_marginRight="8dp"
-                            android:layout_marginTop="8dp"
                             android:text="@string/humidity"
                             android:textSize="@dimen/detailui_text_size_secondary"
                             app:layout_constraintLeft_toRightOf="@+id/humidityImageView"
                             app:layout_constraintRight_toRightOf="parent"
-                            app:layout_constraintTop_toTopOf="@+id/humidityImageView" />
+                            app:layout_constraintTop_toTopOf="@+id/humidityImageView"
+                            app:layout_constraintBottom_toTopOf="@id/humidityTextView"
+                            app:layout_constraintVertical_chainStyle="packed"/>
 
                         <TextView
                             android:id="@+id/humidityTextView"
@@ -408,6 +411,7 @@
                             android:text="@{dataModel.humidityValue}"
                             android:textAlignment="center"
                             android:textSize="@dimen/detailui_text_size_secondary_caption"
+                            android:includeFontPadding="false"
                             app:layout_constraintBottom_toBottomOf="@+id/humidityImageView"
                             app:layout_constraintRight_toRightOf="@+id/justHumidityTextView"
                             app:layout_constraintTop_toBottomOf="@+id/justHumidityTextView"
@@ -436,6 +440,7 @@
                             android:layout_height="wrap_content"
                             android:text="@{dataModel.uvIndexValue}"
                             android:textSize="@dimen/detailui_text_size_secondary_caption"
+                            android:includeFontPadding="false"
                             app:layout_constraintHorizontal_bias="0.5"
                             app:layout_constraintLeft_toLeftOf="@+id/uvIndexIcon"
                             app:layout_constraintRight_toRightOf="@+id/uvIndexIcon"
@@ -449,7 +454,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="0dp"
                             android:layout_marginRight="0dp"
-                            android:layout_marginTop="4dp"
+                            android:layout_marginTop="0dp"
                             android:text="@{dataModel.uvIndexDescription}"
                             android:textAlignment="center"
                             android:textSize="@dimen/detailui_text_size_secondary"
@@ -483,6 +488,7 @@
                             android:layout_marginTop="0dp"
                             android:text="@{dataModel.rainValue}"
                             android:textSize="@dimen/detailui_text_size_secondary_caption"
+                            android:includeFontPadding="false"
                             app:layout_constraintHorizontal_bias="0.5"
                             app:layout_constraintLeft_toLeftOf="@+id/rainImageView"
                             app:layout_constraintRight_toRightOf="@+id/rainImageView"
@@ -496,7 +502,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="0dp"
                             android:layout_marginRight="0dp"
-                            android:layout_marginTop="4dp"
+                            android:layout_marginTop="0dp"
                             android:text="@{dataModel.cloudinessValue}"
                             android:textSize="@dimen/detailui_text_size_secondary"
                             app:layout_constraintHorizontal_bias="0.5"
