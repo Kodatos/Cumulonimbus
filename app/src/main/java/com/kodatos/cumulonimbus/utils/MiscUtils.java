@@ -26,6 +26,8 @@ package com.kodatos.cumulonimbus.utils;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.ColorUtils;
 
@@ -33,6 +35,7 @@ import com.kodatos.cumulonimbus.R;
 import com.kodatos.cumulonimbus.apihelper.DBModel;
 import com.kodatos.cumulonimbus.apihelper.ServiceErrorContract;
 import com.kodatos.cumulonimbus.uihelper.CurrentWeatherLayoutDataModel;
+import com.kodatos.cumulonimbus.uihelper.DBModelCalculatedData;
 import com.kodatos.cumulonimbus.uihelper.DetailActivityDataModel;
 
 import java.text.DecimalFormat;
@@ -41,6 +44,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Locale;
+import java.util.TimeZone;
 
 /*
     A utility class containing miscellaneous functions that may be used in other functions.
@@ -154,6 +158,18 @@ public class MiscUtils {
         return new CurrentWeatherLayoutDataModel(date, imageId, dbModel.getWeather_main(), dbModel.getWeather_desc(), tempMain,
                 null, tempMin, tempMax, windDescription, windDirection, iconTint, windValue, pressure, humidity,
                 UVIndexValue, UVWithRisk, rain, clouds, visibilityInKM, sunrise, sunset, lastUpdated, locationAndIcon);
+    }
+
+    public static DBModelCalculatedData getForecastModelfromDBModel(DBModel model, Context context, int position, boolean metric){
+        Calendar calendar = new GregorianCalendar();
+        calendar.setTime(new Date());
+        calendar.add(Calendar.DAY_OF_WEEK, position);
+        String displayDay = calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.SHORT, Locale.getDefault());
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+        calendar.setTime(new Date(sp.getLong(KeyConstants.LAST_UPDATE_DATE_KEY, 0)));
+        calendar.setTimeZone(TimeZone.getTimeZone("UTC"));
+        int imageId = MiscUtils.getResourceIDForIconID(context, model.getIcon_id());
+        return new DBModelCalculatedData(imageId, MiscUtils.makeTemperaturePretty(model.getTemp(), metric), displayDay, model.getWeather_main(), model.getWeather_desc());
     }
 
     public static String getPatternDate(String pattern, int dayOffset){

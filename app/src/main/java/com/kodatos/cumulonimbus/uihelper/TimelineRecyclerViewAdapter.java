@@ -26,8 +26,11 @@ package com.kodatos.cumulonimbus.uihelper;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -35,6 +38,7 @@ import android.view.ViewGroup;
 
 import com.kodatos.cumulonimbus.R;
 import com.kodatos.cumulonimbus.databinding.ForecastTimelineRecyclerviewItemBinding;
+import com.kodatos.cumulonimbus.utils.AdapterDiffUtils;
 import com.kodatos.cumulonimbus.utils.MiscUtils;
 
 import java.text.SimpleDateFormat;
@@ -77,7 +81,7 @@ public class TimelineRecyclerViewAdapter extends RecyclerView.Adapter<TimelineRe
         String iconIdAtPosition = iconIds.get(position);
         String temperatureAtPosition = temperatures.get(position);
         int imageId = MiscUtils.getResourceIDForIconID(mContext, iconIdAtPosition);
-        String displayTemperature = String.valueOf(temperatureAtPosition) + "\u00B0";
+        String displayTemperature = temperatureAtPosition + "\u00B0";
         SimpleDateFormat sdf = new SimpleDateFormat("HH:mm", Locale.getDefault());
         sdf.setTimeZone(TimeZone.getDefault());
         String time = sdf.format(getCalendarHour(position));
@@ -85,27 +89,35 @@ public class TimelineRecyclerViewAdapter extends RecyclerView.Adapter<TimelineRe
     }
 
     @Override
-    public int getItemCount() {
-        return iconIds.size();
+    public void onBindViewHolder(@NonNull TimelineRecyclerViewHolder holder, int position, @NonNull List<Object> payloads) {
+        if(payloads.isEmpty())
+            super.onBindViewHolder(holder, position, payloads);
+        else {
+            int imageId = Integer.MIN_VALUE;
+            String temperature = null;
+            Bundle payload = (Bundle) payloads.get(0);
+            for(String key : payload.keySet()){
+                if("icon_id".equals(key)){
+                    imageId = MiscUtils.getResourceIDForIconID(mContext, payload.getString(key));
+                }
+                else if("temperature".equals(key)){
+                    temperature = payload.getString(key) + "\u00B0";
+                }
+            }
+            holder.partialBind(imageId, temperature);
+        }
     }
 
     @Override
-    public long getItemId(int position) {
-        return getCalendarHour(position).hashCode();
+    public int getItemCount() {
+        return iconIds == null ? 0 : iconIds.size();
     }
 
-    public void setData(List<String> iconIds, List<String> temperatures) {
-        int itemCountChange = iconIds.size() - getItemCount();
+    public void setData(@Nullable List<String> iconIds, @Nullable List<String> temperatures) {
+        DiffUtil.DiffResult result = DiffUtil.calculateDiff(new AdapterDiffUtils.TimelineRVDiffCallback(this.iconIds, this.temperatures, iconIds, temperatures));
         this.iconIds = iconIds;
         this.temperatures = temperatures;
-        if (itemCountChange > 0) {
-            notifyItemRangeInserted(0, itemCountChange);
-            notifyItemRangeChanged(itemCountChange, iconIds.size());
-        } else if (itemCountChange < 0) {
-            notifyItemRangeRemoved(0, -itemCountChange);
-            notifyItemRangeChanged(0, iconIds.size());
-        } else
-            notifyDataSetChanged();
+        result.dispatchUpdatesTo(this);
     }
 
 
@@ -143,6 +155,13 @@ public class TimelineRecyclerViewAdapter extends RecyclerView.Adapter<TimelineRe
             } else {
                 binding.getRoot().setBackgroundColor(Color.WHITE);
             }
+        }
+
+        void partialBind(int imageID, String temperature){
+            if(imageID != Integer.MIN_VALUE)
+                binding.timelineWeatherImageView.setImageDrawable(mContext.getDrawable(imageID));
+            if(temperature != null)
+                binding.timelineTemperatureView.setText(temperature);
         }
 
         @Override

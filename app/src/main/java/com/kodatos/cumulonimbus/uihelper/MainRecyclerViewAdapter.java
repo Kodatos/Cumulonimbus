@@ -25,42 +25,28 @@
 package com.kodatos.cumulonimbus.uihelper;
 
 
-import android.content.Context;
-import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
+import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
-import com.kodatos.cumulonimbus.R;
 import com.kodatos.cumulonimbus.apihelper.DBModel;
 import com.kodatos.cumulonimbus.databinding.ForecastRecyclerviewItemBinding;
-import com.kodatos.cumulonimbus.utils.KeyConstants;
-import com.kodatos.cumulonimbus.utils.MiscUtils;
+import com.kodatos.cumulonimbus.utils.AdapterDiffUtils;
 
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.Locale;
-import java.util.TimeZone;
+import java.util.List;
 
 public class MainRecyclerViewAdapter extends RecyclerView.Adapter<MainRecyclerViewAdapter.MainRecyclerViewHolder> {
 
-    private Context mContext;
     private ParentCallback parentCallback;
-    private int count;
 
+    private List<DBModelCalculatedData> modelList = null;
 
-    public MainRecyclerViewAdapter (Context context){
-        mContext = context;
-        try {
-            parentCallback = (ParentCallback) context;
-        } catch (ClassCastException e) {
-            e.printStackTrace();
-        }
+    public MainRecyclerViewAdapter (ParentCallback callback){
+        parentCallback = callback;
     }
 
     @NonNull
@@ -73,34 +59,29 @@ public class MainRecyclerViewAdapter extends RecyclerView.Adapter<MainRecyclerVi
 
     @Override
     public void onBindViewHolder(@NonNull MainRecyclerViewHolder holder, int position) {
-        DBModel dbModel = parentCallback.getDBModelFromCursor((getProperPositionForCursor(position)));
-        holder.bind(dbModel);
+        DBModelCalculatedData model = modelList.get(position);
+        holder.bind(model);
     }
 
     @Override
     public int getItemCount() {
-        return count;
+        return modelList == null ? 0 : 4;
     }
 
-    public void setCount(int count) {
-        this.count = count;
+    public void setData(List<DBModelCalculatedData> modelList){
+
+        DiffUtil.DiffResult result = DiffUtil.calculateDiff(new AdapterDiffUtils.MainRVDiffCallback(this.modelList, modelList));
+        this.modelList = modelList;
+        result.dispatchUpdatesTo(this);
+        //notifyDataSetChanged();
     }
 
-    @Override
-    public long getItemId(int position) {
-        return parentCallback.getDBModelFromCursor(getProperPositionForCursor(position)).getId();
-    }
-
-    private int getProperPositionForCursor(int position) {
-        //Since current weather is excluded, the first row of cursor is skipped
-        //Also, every 8th row after first row is the required data for the upcoming days to be displayed on main screen
-        return ((position + 1) * 8);
+    public void unregisterCallback(){
+        parentCallback = null;
     }
 
     public interface ParentCallback {
         void onForecastItemClick(int position, ImageView forecastImageView);
-
-        DBModel getDBModelFromCursor(int position);
     }
 
     public class MainRecyclerViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -114,19 +95,8 @@ public class MainRecyclerViewAdapter extends RecyclerView.Adapter<MainRecyclerVi
         }
 
         // Method to create a calculated data model and bind it to the layout
-        public void bind(DBModel dbModel) {
-            int offset = getAdapterPosition() + 1;
-            Calendar calendar = new GregorianCalendar();
-            calendar.setTime(new Date());
-            calendar.add(Calendar.DAY_OF_WEEK, offset);
-            String displayDay = calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.SHORT, Locale.getDefault());
-            SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(mContext);
-            boolean metric = sp.getBoolean(mContext.getString(R.string.pref_metrics_key), true);
-            calendar.setTime(new Date(sp.getLong(KeyConstants.LAST_UPDATE_DATE_KEY, 0)));
-            calendar.setTimeZone(TimeZone.getTimeZone("UTC"));
-            int imageId = MiscUtils.getResourceIDForIconID(mContext, dbModel.getIcon_id());
-            DBModelCalculatedData calculatedData = new DBModelCalculatedData(imageId, MiscUtils.makeTemperaturePretty(dbModel.getTemp(), metric), displayDay, dbModel.getWeather_main(), dbModel.getWeather_desc());
-            binding.setCalculateddata(calculatedData);
+        public void bind(DBModelCalculatedData model) {
+            binding.setCalculateddata(model);
             binding.executePendingBindings();
         }
 

@@ -37,6 +37,8 @@ import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.transition.Fade;
+import android.transition.Transition;
+import android.transition.TransitionInflater;
 import android.transition.TransitionManager;
 import android.view.ViewGroup;
 
@@ -81,6 +83,12 @@ public class WeatherDetailActivity extends AppCompatActivity implements Timeline
         getWindow().setExitTransition(fade);
         getWindow().setReturnTransition(fade);
         getWindow().setReenterTransition(fade);
+
+        Transition sharedElementTransition = TransitionInflater.from(this).inflateTransition(R.transition.detail_shared_transition);
+        getWindow().setSharedElementEnterTransition(sharedElementTransition);
+        getWindow().setSharedElementExitTransition(sharedElementTransition);
+        getWindow().setSharedElementReturnTransition(sharedElementTransition);
+        getWindow().setSharedElementReenterTransition(sharedElementTransition);
         //endregion
 
         setSupportActionBar(mBinding.toolbar);

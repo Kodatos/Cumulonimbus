@@ -119,7 +119,7 @@ public class CumuloContentProvider extends ContentProvider {
                 break;
             default: throw new UnsupportedOperationException("Unknown Uri "+uri.toString());
         }
-        Objects.requireNonNull(getContext()).getContentResolver().notifyChange(uri,null);
+        //Objects.requireNonNull(getContext()).getContentResolver().notifyChange(uri,null);
         return retUri;
     }
 
@@ -139,7 +139,7 @@ public class CumuloContentProvider extends ContentProvider {
                     }
                     result = values.length;
                     db.setTransactionSuccessful();
-                    Objects.requireNonNull(getContext()).getContentResolver().notifyChange(uri, null);
+                    //Objects.requireNonNull(getContext()).getContentResolver().notifyChange(uri, null);
                 } finally {
                     db.endTransaction();
                 }

@@ -24,6 +24,8 @@
 
 package com.kodatos.cumulonimbus.uihelper;
 
+import java.util.Objects;
+
 /*
     A model class that contains calculated data from code for binding in the layout so that the original DBModel object is not touched
  */
@@ -56,11 +58,28 @@ public class DBModelCalculatedData {
         return weatherDesc;
     }
 
-    DBModelCalculatedData(int drawable_resource_id, String calculatedTemp, String calculatedDay, String weatherMain, String weatherDesc) {
+    public DBModelCalculatedData(int drawable_resource_id, String calculatedTemp, String calculatedDay, String weatherMain, String weatherDesc) {
         this.drawable_resource_id = drawable_resource_id;
         this.calculatedTemp = calculatedTemp;
         this.calculatedDay = calculatedDay.toUpperCase();
         this.weatherMain = weatherMain;
         this.weatherDesc = weatherDesc;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        DBModelCalculatedData that = (DBModelCalculatedData) o;
+        return drawable_resource_id == that.drawable_resource_id &&
+                Objects.equals(calculatedTemp, that.calculatedTemp) &&
+                Objects.equals(calculatedDay, that.calculatedDay) &&
+                Objects.equals(weatherMain, that.weatherMain) &&
+                Objects.equals(weatherDesc, that.weatherDesc);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(drawable_resource_id, calculatedTemp, calculatedDay, weatherMain, weatherDesc);
     }
 }
