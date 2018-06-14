@@ -32,7 +32,7 @@
     <data>
         <variable
             name="currentWeatherData"
-            type="com.kodatos.cumulonimbus.uihelper.CurrentWeatherLayoutDataModel"/>
+            type="com.kodatos.cumulonimbus.uihelper.MainActivityDataModel"/>
     </data>
 
 <android.support.design.widget.CoordinatorLayout

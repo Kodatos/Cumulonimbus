@@ -4,7 +4,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.util.DiffUtil;
 
-import com.kodatos.cumulonimbus.uihelper.DBModelCalculatedData;
+import com.kodatos.cumulonimbus.uihelper.ForecastCalculatedData;
 
 import java.util.List;
 import java.util.Objects;
@@ -13,10 +13,10 @@ public class AdapterDiffUtils {
 
     public static class MainRVDiffCallback extends DiffUtil.Callback{
 
-        List<DBModelCalculatedData> oldData;
-        List<DBModelCalculatedData> newData;
+        List<ForecastCalculatedData> oldData;
+        List<ForecastCalculatedData> newData;
 
-        public MainRVDiffCallback(List<DBModelCalculatedData> oldData, List<DBModelCalculatedData> newData) {
+        public MainRVDiffCallback(List<ForecastCalculatedData> oldData, List<ForecastCalculatedData> newData) {
             this.oldData = oldData;
             this.newData = newData;
         }
@@ -63,7 +63,7 @@ public class AdapterDiffUtils {
 
         @Override
         public int getNewListSize() {
-            return oldIconIds != null ? oldIconIds.size() : 0;
+            return newIconIds != null ? newIconIds.size() : 0;
         }
 
         @Override

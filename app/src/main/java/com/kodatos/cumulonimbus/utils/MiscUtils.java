@@ -34,8 +34,8 @@ import android.support.v4.graphics.ColorUtils;
 import com.kodatos.cumulonimbus.R;
 import com.kodatos.cumulonimbus.apihelper.DBModel;
 import com.kodatos.cumulonimbus.apihelper.ServiceErrorContract;
-import com.kodatos.cumulonimbus.uihelper.CurrentWeatherLayoutDataModel;
-import com.kodatos.cumulonimbus.uihelper.DBModelCalculatedData;
+import com.kodatos.cumulonimbus.uihelper.ForecastCalculatedData;
+import com.kodatos.cumulonimbus.uihelper.MainActivityDataModel;
 import com.kodatos.cumulonimbus.uihelper.DetailActivityDataModel;
 
 import java.text.DecimalFormat;
@@ -55,6 +55,22 @@ public class MiscUtils {
     public static int IMPOSSIBLE_TEMPERATURE = 2000;
 
     private MiscUtils(){}
+
+    public static class CurrentWeatherExtraData{
+        long visibility;
+        String sunrise;
+        String sunset;
+        String lastUpdated;
+        String locationAndIcon;
+
+        public CurrentWeatherExtraData(long visibility, String sunrise, String sunset, String lastUpdated, String locationAndIcon) {
+            this.visibility = visibility;
+            this.sunrise = sunrise;
+            this.sunset = sunset;
+            this.lastUpdated = lastUpdated;
+            this.locationAndIcon = locationAndIcon;
+        }
+    }
 
     /**
      * Utility method to convert given temperature for display purpose.
@@ -128,12 +144,19 @@ public class MiscUtils {
         String clouds = "Cloudiness: "+String.valueOf(dbModel.getClouds())+"%";
         int imageId = getResourceIDForIconID(context, dbModel.getIcon_id());
         int iconTint = MiscUtils.getIconTint(context, dbModel.getIcon_id());
-        return new DetailActivityDataModel(date, imageId, dbModel.getWeather_main(), dbModel.getWeather_desc(), tempMain, unit, tempMin,
-                tempMax, windDescription, windDirection, iconTint, windValue, pressure, humidity, UV, UVRisk, rain, clouds);
+        DetailActivityDataModel returnModel = new DetailActivityDataModel();
+        returnModel.setWeatherData(dbModel.getWeather_main(), dbModel.getWeather_desc(), imageId);
+        returnModel.setTemperatureData(tempMain, tempMax, tempMin, unit);
+        returnModel.setWindData(windDescription, windValue, windDirection);
+        returnModel.setMeterData(pressure, humidity);
+        returnModel.setUVData(UV, UVRisk);
+        returnModel.setRainData(rain, clouds);
+        returnModel.setUIData(date, iconTint);
+        return returnModel;
     }
 
     // Generates a ready to use data binding model for main screen from database model and other variables
-    public static CurrentWeatherLayoutDataModel getCurrentWeatherDataFromDBModel(Context context, DBModel dbModel, boolean metric, long visibility, String sunrise, String sunset, String lastUpdated, String locationAndIcon) {
+    public static MainActivityDataModel getCurrentWeatherDataFromDBModel(Context context, DBModel dbModel, boolean metric, CurrentWeatherExtraData currentWeatherExtraData) {
         String date = getPatternDate("dd MMMM, YYYY", 0);
         String tempMain = makeTemperaturePretty(dbModel.getTemp(), metric);
         String tempMin = String.valueOf(Math.round(dbModel.getTemp_min()));
@@ -151,25 +174,33 @@ public class MiscUtils {
         String UVWithRisk = "UV Index: " + UVClassifier(dbModel.getUvIndex());
         String rain = dbModel.getRain_3h() == -1 ? "" : String.valueOf(new DecimalFormat("#.##").format(dbModel.getRain_3h())) + " mm";
         String clouds = String.valueOf(dbModel.getClouds())+"%";
-        double calculatedVisibility = (double) (visibility / 1000) * (metric ? 1 : 0.621);
+        double calculatedVisibility = (double) (currentWeatherExtraData.visibility / 1000) * (metric ? 1 : 0.621);
         String visibilityInKM = String.valueOf(new DecimalFormat("#.#").format(calculatedVisibility)) + (metric ? " km" : " mi");
         int imageId = getResourceIDForIconID(context, dbModel.getIcon_id());
         int iconTint = ColorUtils.setAlphaComponent(getBackgroundColorForIconID(context, dbModel.getIcon_id()), 175);
-        return new CurrentWeatherLayoutDataModel(date, imageId, dbModel.getWeather_main(), dbModel.getWeather_desc(), tempMain,
-                null, tempMin, tempMax, windDescription, windDirection, iconTint, windValue, pressure, humidity,
-                UVIndexValue, UVWithRisk, rain, clouds, visibilityInKM, sunrise, sunset, lastUpdated, locationAndIcon);
+        MainActivityDataModel returnModel = new MainActivityDataModel();
+        returnModel.setWeatherData(dbModel.getWeather_main(), dbModel.getWeather_desc(), imageId);
+        returnModel.setTemperatureData(tempMain, tempMax, tempMin, null);
+        returnModel.setWindData(windDescription, windValue, windDirection);
+        returnModel.setMeterData(pressure, humidity);
+        returnModel.setUVData(UVIndexValue, UVWithRisk);
+        returnModel.setRainData(rain, clouds);
+        returnModel.setUIData(date, iconTint);
+        returnModel.setCurrentWeatherSpecificData(visibilityInKM, currentWeatherExtraData.sunrise, currentWeatherExtraData.sunset,
+                currentWeatherExtraData.lastUpdated, currentWeatherExtraData.locationAndIcon);
+
+        return returnModel;
     }
 
-    public static DBModelCalculatedData getForecastModelfromDBModel(DBModel model, Context context, int position, boolean metric){
+    public static ForecastCalculatedData getForecastModelfromDBModel(DBModel model, Context context, int position, boolean metric, long lastUpdatedInMillis){
         Calendar calendar = new GregorianCalendar();
         calendar.setTime(new Date());
         calendar.add(Calendar.DAY_OF_WEEK, position);
         String displayDay = calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.SHORT, Locale.getDefault());
-        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
-        calendar.setTime(new Date(sp.getLong(KeyConstants.LAST_UPDATE_DATE_KEY, 0)));
+        calendar.setTime(new Date(lastUpdatedInMillis));
         calendar.setTimeZone(TimeZone.getTimeZone("UTC"));
         int imageId = MiscUtils.getResourceIDForIconID(context, model.getIcon_id());
-        return new DBModelCalculatedData(imageId, MiscUtils.makeTemperaturePretty(model.getTemp(), metric), displayDay, model.getWeather_main(), model.getWeather_desc());
+        return new ForecastCalculatedData(imageId, MiscUtils.makeTemperaturePretty(model.getTemp(), metric), displayDay, model.getWeather_main(), model.getWeather_desc());
     }
 
     public static String getPatternDate(String pattern, int dayOffset){
@@ -178,14 +209,6 @@ public class MiscUtils {
         calendar.add(Calendar.DATE, dayOffset);
         SimpleDateFormat sf = new SimpleDateFormat(pattern, Locale.getDefault());
         return sf.format(calendar.getTime());
-    }
-
-    //Common method to get an intent for error broadcast between service and activity. Details are provided by caller
-    public static Intent getServiceErrorBroadcastIntent(String type, String details){
-        Intent errorIntent = new Intent(ServiceErrorContract.BROADCAST_INTENT_FILTER);
-        errorIntent.putExtra(ServiceErrorContract.SERVICE_ERROR_TYPE, type);
-        errorIntent.putExtra(ServiceErrorContract.SERVICE_ERROR_DETAILS, details);
-        return errorIntent;
     }
 
     /**

@@ -25,11 +25,7 @@ public class CityValidatorUtil {
         //Check internet
         String LOG_TAG = "city-validator";
         Log.d(LOG_TAG, "validating");
-            Retrofit currentWeatherRetrofit = new Retrofit.Builder()
-                    .baseUrl("http://api.openweathermap.org/")
-                    .addConverterFactory(GsonConverterFactory.create())
-                    .build();
-            WeatherAPIService checkerService = currentWeatherRetrofit.create(WeatherAPIService.class);
+            WeatherAPIService checkerService = ServiceLocator.getBaseService();
             Call<CurrentWeatherModel> currentWeatherModelCall = checkerService.getCurrentWeatherByString(city, api_key, "metric");
             try {
                 Response<CurrentWeatherModel> response = currentWeatherModelCall.execute();

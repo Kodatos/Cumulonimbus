@@ -28,7 +28,7 @@
     <data>
         <variable
             name="calculateddata"
-            type="com.kodatos.cumulonimbus.uihelper.DBModelCalculatedData" />
+            type="com.kodatos.cumulonimbus.uihelper.ForecastCalculatedData" />
     </data>
 <android.support.constraint.ConstraintLayout
     android:id="@+id/itemConstraintLayout"

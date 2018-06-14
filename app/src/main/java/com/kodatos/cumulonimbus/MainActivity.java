@@ -85,15 +85,15 @@ import com.kodatos.cumulonimbus.apihelper.DBModel;
 import com.kodatos.cumulonimbus.apihelper.ServiceErrorContract;
 import com.kodatos.cumulonimbus.apihelper.SyncOWMService;
 import com.kodatos.cumulonimbus.databinding.ActivityMainBinding;
+import com.kodatos.cumulonimbus.datahelper.DBModelsAndDataPresenter;
 import com.kodatos.cumulonimbus.datahelper.WeatherDBContract;
-import com.kodatos.cumulonimbus.uihelper.CurrentWeatherLayoutDataModel;
-import com.kodatos.cumulonimbus.uihelper.DBModelCalculatedData;
 import com.kodatos.cumulonimbus.uihelper.InfoDialogFragment;
+import com.kodatos.cumulonimbus.uihelper.MainActivityDataModel;
 import com.kodatos.cumulonimbus.uihelper.MainRecyclerViewAdapter;
 import com.kodatos.cumulonimbus.uihelper.TimelineRecyclerViewAdapter;
-import com.kodatos.cumulonimbus.uihelper.UIPromptsUtils;
 import com.kodatos.cumulonimbus.utils.KeyConstants;
 import com.kodatos.cumulonimbus.utils.MiscUtils;
+import com.kodatos.cumulonimbus.utils.ServiceLocator;
 
 import org.parceler.Parcels;
 
@@ -123,13 +123,14 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     private SharedPreferences weatherSharedPreferences;
     private ServiceErrorBroadcastReceiver mErrorReceiver;
 
-    private Cursor dataCursor = null;
+    private DBModelsAndDataPresenter mDataPresenter = null;
 
     private int previousBackgroundColor;
     private int iconTintColor;
     private int hiddenLayoutHeight;
     private boolean justOpened = true;
     private int todayForecastCount;
+    private boolean mIsMetric = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -228,8 +229,11 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
         previousBackgroundColor = MiscUtils.getBackgroundColorForIconID(this, weatherSharedPreferences.getString(KeyConstants.CURRENT_WEATHER_ICON_ID_KEY, ""));
 
+        mDataPresenter = new DBModelsAndDataPresenter();
+
         LinearLayoutManager lm = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
-        mBinding.forecastLayout.mainRecyclerview.setLayoutManager(lm);forecastAdapter = new MainRecyclerViewAdapter(this);
+        mBinding.forecastLayout.mainRecyclerview.setLayoutManager(lm);
+        forecastAdapter = new MainRecyclerViewAdapter(this);
         mBinding.forecastLayout.mainRecyclerview.setAdapter(forecastAdapter);
 
         LinearLayoutManager hlm = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
@@ -302,11 +306,27 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     }
 
+    public InfoDialogFragment createInfoDialog(int viewID) {
+        switch (viewID) {
+            case R.id.currentTemperatureImageView:
+                return ServiceLocator.createFeelsLikeDialog(this, mDataPresenter.getFeelsLikeTemperatureDescription(this, mIsMetric));
+            case R.id.currentRainImageView:
+                return ServiceLocator.createRainInfoDialog(this);
+            case R.id.currentWindImageView:
+                return ServiceLocator.createWindInfoDialog(this);
+            case R.id.currentShadesImageView:
+                return ServiceLocator.createUVInfoDialog(this);
+            case R.id.locationTextView:
+                return ServiceLocator.createLocationInfoDialog(this, mBinding.mainUISwipeRefreshLayout.isRefreshing());
+        }
+        return null;
+    }
+
     //Utility method to check internet connection
     private boolean getConnectionStatus() {
         ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo info = cm != null ? cm.getActiveNetworkInfo() : null;
-        return info != null && info.isConnectedOrConnecting();
+        return info != null && info.isConnected();
     }
 
     //Call the service to update data. If action is 0 then create rows, else update
@@ -340,15 +360,20 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         if (data.getCount() == 0) { //If database is empty, start sync
             startSync(0);
         } else if (data.getCount() > 32) {  //Bind new data only when all required rows are updated
+            Log.d(LOG_TAG, "change_observed");
             mBinding.mainUISwipeRefreshLayout.setRefreshing(false);
-            dataCursor = data;
+            //Check if already traversed Cursor is provided again
+            if(!data.moveToNext())
+                return;
+            data.moveToPrevious();
+            mDataPresenter.populateModelsFromCursor(data);
             bindCurrentWeatherData();
         }
     }
 
     @Override
     public void onLoaderReset(@NonNull Loader<Cursor> loader) {
-        dataCursor = null;
+        mDataPresenter.invalidateModels();
         forecastAdapter.setData(null);
         currentTimelineAdapter.setData(null, null);
     }
@@ -367,14 +392,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     // Click listener for daily forecast recyclerview
     @Override
     public void onForecastItemClick(int position, ImageView forecastImageView) {
-        ArrayList<DBModel> intentModels = new ArrayList<>();
-
-        int startingRow = todayForecastCount + (position * 8);
-
-        //Add all 8 models to the list
-        for (int i = startingRow; i < startingRow + 8; i++)
-            intentModels.add(getDBModelFromCursor(i));
-
+        ArrayList<DBModel> intentModels = mDataPresenter.getAllModelsForOneForecastDay(position, todayForecastCount);
         //Assign a unique transition name to the image
         forecastImageView.setTransitionName(String.valueOf(position) + "forecast_image");
         String imageTransitionName = String.valueOf(position) + "forecast_image";
@@ -392,104 +410,35 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         startActivity(intent, options.toBundle());
     }
 
-    public DBModel getDBModelFromCursor(int position) {
-        dataCursor.moveToPosition(position);
-        long id = dataCursor.getLong(dataCursor.getColumnIndex(WeatherDBContract.WeatherDBEntry._ID));
-        String main = dataCursor.getString(dataCursor.getColumnIndex(WeatherDBContract.WeatherDBEntry.COLUMN_WEATHER_MAIN));
-        String desc = dataCursor.getString(dataCursor.getColumnIndex(WeatherDBContract.WeatherDBEntry.COLUMN_WEATHER_DESC));
-        String temp = dataCursor.getString(dataCursor.getColumnIndex(WeatherDBContract.WeatherDBEntry.COLUMN_TEMP));
-        float temp_min = dataCursor.getFloat(dataCursor.getColumnIndex(WeatherDBContract.WeatherDBEntry.COLUMN_TEMP_MIN));
-        float temp_max = dataCursor.getFloat(dataCursor.getColumnIndex(WeatherDBContract.WeatherDBEntry.COLUMN_TEMP_MAX));
-        float pressure = dataCursor.getFloat(dataCursor.getColumnIndex(WeatherDBContract.WeatherDBEntry.COLUMN_PRESSURE));
-        String wind = dataCursor.getString(dataCursor.getColumnIndex(WeatherDBContract.WeatherDBEntry.COLUMN_WIND));
-        long humidity = dataCursor.getLong(dataCursor.getColumnIndex(WeatherDBContract.WeatherDBEntry.COLUMN_HUMIDITY));
-        long clouds = dataCursor.getLong(dataCursor.getColumnIndex(WeatherDBContract.WeatherDBEntry.COLUMN_CLOUDS));
-        String icon_id = dataCursor.getString(dataCursor.getColumnIndex(WeatherDBContract.WeatherDBEntry.COLUMN_ICON_ID));
-        double uvIndex = dataCursor.getDouble(dataCursor.getColumnIndex(WeatherDBContract.WeatherDBEntry.COLUMN_UV_INDEX));
-        double rain_3h = dataCursor.getDouble(dataCursor.getColumnIndex(WeatherDBContract.WeatherDBEntry.COLUMN_RAIN_3H));
-        return new DBModel(id, main, desc, temp, temp_min, temp_max, pressure, humidity, wind, clouds, icon_id, uvIndex, rain_3h);
-    }
-
     private void openSettingsActivity() {
         Intent intent = new Intent(this, SettingsActivity.class);
         startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(this).toBundle());
-    }
-
-    private InfoDialogFragment createInfoDialog(int viewID){
-        switch (viewID){
-            case R.id.currentTemperatureImageView :
-                String description;
-                DBModel currentDBModel = getDBModelFromCursor(0);
-                double temperatureToConvert = Double.valueOf(currentDBModel.getTemp());
-                boolean metric = defaultSharedPreferences.getBoolean(getString(R.string.pref_metrics_key), true);
-                int windChill = MiscUtils.getWindChill(temperatureToConvert, Double.valueOf(currentDBModel.getWind().split("/")[0]), metric);
-                if(windChill != MiscUtils.IMPOSSIBLE_TEMPERATURE)
-                    description = getString(R.string.wind_chill_desc) + " " + MiscUtils.makeTemperaturePretty(String.valueOf(windChill), metric);
-                else {
-                    int heatIndex = MiscUtils.getHeatIndex(temperatureToConvert, currentDBModel.getHumidity(), metric);
-                    if(heatIndex != MiscUtils.IMPOSSIBLE_TEMPERATURE)
-                        description = getString(R.string.heat_index_desc) + " " + MiscUtils.makeTemperaturePretty(String.valueOf(heatIndex), metric);
-                    else
-                        description = getString(R.string.no_apparent_temperature_desc);
-                }
-                return UIPromptsUtils.createFeelsLikeDialog(this, description);
-            case R.id.currentRainImageView : return UIPromptsUtils.createRainInfoDialog(this);
-            case R.id.currentWindImageView : return UIPromptsUtils.createWindInfoDialog(this);
-            case R.id.currentShadesImageView : return  UIPromptsUtils.createUVInfoDialog(this);
-            case R.id.locationTextView : return UIPromptsUtils.createLocationInfoDialog(this, mBinding.mainUISwipeRefreshLayout.isRefreshing());
-        }
-        return null;
     }
 
     //region Region : Data Binding
 
     //Evaluate and bind data to layout while changing other UI elements on sync.
     private void bindCurrentWeatherData() {
-        DBModel intermediateModel = getDBModelFromCursor(0);
+        DBModel intermediateModel = mDataPresenter.getCurrentWeatherModel();
 
         SimpleDateFormat sf = new SimpleDateFormat("H:mm", Locale.getDefault());
         sf.setTimeZone(TimeZone.getDefault());
 
         //Generate all time related strings
-        boolean metric = PreferenceManager.getDefaultSharedPreferences(this).getBoolean(getString(R.string.pref_metrics_key), true);
+        mIsMetric = PreferenceManager.getDefaultSharedPreferences(this).getBoolean(getString(R.string.pref_metrics_key), true);
         long visibility = weatherSharedPreferences.getLong(KeyConstants.CURRENT_WEATHER_VISIBILITY_KEY, 0);
         long sunriseInMillis = weatherSharedPreferences.getLong(KeyConstants.CURRENT_WEATHER_SUNRISE_KEY, 0) * 1000;
         long sunsetInMillis = weatherSharedPreferences.getLong(KeyConstants.CURRENT_WEATHER_SUNSET_KEY, 0) * 1000;
         String sunrise = sf.format(new Date(sunriseInMillis));
         String sunset = sf.format(new Date(sunsetInMillis));
-        String lastUpdated = MiscUtils.getLastUpdatedStringFromMillis(System.currentTimeMillis(), defaultSharedPreferences.getLong(KeyConstants.LAST_UPDATE_DATE_KEY, 0));
+        long lastUpdatedInMillis = defaultSharedPreferences.getLong(KeyConstants.LAST_UPDATE_DATE_KEY, 0);
+        String lastUpdated = MiscUtils.getLastUpdatedStringFromMillis(System.currentTimeMillis(), lastUpdatedInMillis);
         String locationAndBoolean = weatherSharedPreferences.getString(KeyConstants.LOCATION_NAME_KEY, "Delhi/false");
 
         //Generate and bind data
-        CurrentWeatherLayoutDataModel layoutDataModel = MiscUtils.getCurrentWeatherDataFromDBModel(this, intermediateModel, metric, visibility, sunrise, sunset, lastUpdated, locationAndBoolean);
+        MiscUtils.CurrentWeatherExtraData currentWeatherExtraData = new MiscUtils.CurrentWeatherExtraData(visibility, sunrise, sunset, lastUpdated, locationAndBoolean);
+        MainActivityDataModel layoutDataModel = MiscUtils.getCurrentWeatherDataFromDBModel(this, intermediateModel, mIsMetric, currentWeatherExtraData);
         mBinding.setCurrentWeatherData(layoutDataModel);
-
-        if (dataCursor == null || dataCursor.getCount() < 33)
-            forecastAdapter.setData(null);
-        else {
-            List<DBModelCalculatedData> adapterData = new ArrayList<>();
-            for(int i=0; i<4; i++){
-                DBModel model = getDBModelFromCursor((i+1) * 8);
-                Calendar calendar = new GregorianCalendar();
-                calendar.setTime(new Date());
-                calendar.add(Calendar.DAY_OF_WEEK, i+1);
-                String displayDay = calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.SHORT, Locale.getDefault());
-                SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
-                calendar.setTime(new Date(sp.getLong(KeyConstants.LAST_UPDATE_DATE_KEY, 0)));
-                calendar.setTimeZone(TimeZone.getTimeZone("UTC"));
-                int imageId = MiscUtils.getResourceIDForIconID(this, model.getIcon_id());
-                DBModelCalculatedData calculatedData = new DBModelCalculatedData(imageId, MiscUtils.makeTemperaturePretty(model.getTemp(), metric), displayDay, model.getWeather_main(), model.getWeather_desc());
-                adapterData.add(calculatedData);
-            }
-            forecastAdapter.setData(adapterData);
-        }
-
-        //Find how many forecast records are for today
-        Calendar calendar = new GregorianCalendar();
-        calendar.setTime(new Date(defaultSharedPreferences.getLong(KeyConstants.LAST_UPDATE_DATE_KEY, 0)));
-        calendar.setTimeZone(TimeZone.getTimeZone("UTC"));
-        todayForecastCount = 8 - (calendar.get(Calendar.HOUR_OF_DAY) / 3);
-        bindCurrentTimeline();
 
         int updatedBackgroundColor = MiscUtils.getBackgroundColorForIconID(this, weatherSharedPreferences.getString(KeyConstants.CURRENT_WEATHER_ICON_ID_KEY, "01d"));
         if (!justOpened)
@@ -510,19 +459,30 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         if (mBinding.placeholderImageView.getVisibility() == View.VISIBLE) {
             mBinding.placeholderImageView.setVisibility(View.GONE);
         }
+
+        if (mDataPresenter.isEmpty())
+            forecastAdapter.setData(null);
+        else {
+            forecastAdapter.setData(mDataPresenter.getForecastModelForEachDay(this, mIsMetric, lastUpdatedInMillis));
+        }
+
+        //Find how many forecast records are for today
+        Calendar calendar = new GregorianCalendar();
+        calendar.setTime(new Date(defaultSharedPreferences.getLong(KeyConstants.LAST_UPDATE_DATE_KEY, 0)));
+        calendar.setTimeZone(TimeZone.getTimeZone("UTC"));
+        todayForecastCount = 8 - (calendar.get(Calendar.HOUR_OF_DAY) / 3);
+        bindCurrentTimeline();
+
     }
 
     private void bindCurrentTimeline() {
         List<String> iconIds = new ArrayList<>();
         List<String> temperatures = new ArrayList<>();
-
         //Generate timeline data
-        for (int i = 1; i < todayForecastCount; i++) {
-            DBModel dbModel = getDBModelFromCursor(i);
+        for(DBModel dbModel : mDataPresenter.getAllAvailableModelsForToday(todayForecastCount)){
             iconIds.add(dbModel.getIcon_id());
             temperatures.add(dbModel.getTemp());
         }
-
         currentTimelineAdapter.setData(iconIds, temperatures);
     }
 
@@ -617,19 +577,24 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             isResolvingError = true;
             Log.d(ERROR_LOG_TAG, "error received : " + errorType + " " + errorDetails);
             shouldStopRefreshingAnim = true;
-            switch (errorType) {
-                case ServiceErrorContract.ERROR_LOCATION:
-                    handleLocationError();
-                    break;
-                case ServiceErrorContract.ERROR_GEOCODER:
-                    handleGeocodingError();
-                    break;
-                case ServiceErrorContract.ERROR_REVERSE_GEOCODER:
-                    handleReverseGeocodingError();
-                    break;
-                case ServiceErrorContract.ERROR_RESPONSE:
-                    handleAPIResponseError();
-                    break;
+            if (ServiceErrorContract.ERROR_DETAILS_IO.equals(errorDetails)) {
+                handleIOError();
+            }
+            else {
+                switch (errorType) {
+                    case ServiceErrorContract.ERROR_LOCATION:
+                        handleLocationError();
+                        break;
+                    case ServiceErrorContract.ERROR_GEOCODER:
+                        handleGeocodingError();
+                        break;
+                    case ServiceErrorContract.ERROR_REVERSE_GEOCODER:
+                        handleReverseGeocodingError();
+                        break;
+                    case ServiceErrorContract.ERROR_RESPONSE:
+                        handleAPIResponseError();
+                        break;
+                }
             }
             mBinding.mainUISwipeRefreshLayout.setRefreshing(!shouldStopRefreshingAnim);
             isResolvingError = false;
@@ -639,8 +604,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             if (ServiceErrorContract.ERROR_DETAILS_NULL.equals(errorDetails)) {
                 message = "Couldn't find the custom location you entered. Please try again or change it";
                 showSnackbarForError(message, "Change Location", v -> openSettingsActivity());
-            } else if (ServiceErrorContract.ERROR_DETAILS_IO.equals(errorDetails)) {
-                handleIOError();
             }
         }
 
@@ -648,8 +611,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             if (ServiceErrorContract.ERROR_DETAILS_NULL.equals(errorDetails)) {
                 message = "Couldn't get the name for your coordinates. Try refreshing later";
                 showSnackbarForError(message, null, null);
-            } else if (ServiceErrorContract.ERROR_DETAILS_IO.equals(errorDetails)) {
-                handleIOError();
             }
         }
 
@@ -723,8 +684,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                     }
                 });
 
-            } else if (ServiceErrorContract.ERROR_DETAILS_IO.equals(errorDetails)) {
-                handleIOError();
             }
         }
     }

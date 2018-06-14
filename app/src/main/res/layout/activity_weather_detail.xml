@@ -1,26 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><!--
-  ~ MIT License
-  ~
-  ~ Copyright (c) 2017 N Abhishek (aka Kodatos)
-  ~
-  ~ Permission is hereby granted, free of charge, to any person obtaining a copy
-  ~ of this software and associated documentation files (the "Software"), to deal
-  ~ in the Software without restriction, including without limitation the rights
-  ~ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-  ~ copies of the Software, and to permit persons to whom the Software is
-  ~ furnished to do so, subject to the following conditions:
-  ~
-  ~ The above copyright notice and this permission notice shall be included in all
-  ~ copies or substantial portions of the Software.
-  ~
-  ~ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-  ~ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-  ~ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-  ~ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-  ~ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-  ~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-  ~ SOFTWARE.
-  -->
+<?xml version="1.0" encoding="utf-8"?>
 
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -172,7 +150,7 @@
                             android:layout_marginTop="16dp"
                             android:scaleType="fitXY"
                             app:drawableResource="@{dataModel.weatherImageID}"
-                            app:layout_constraintRight_toLeftOf="@+id/guideline"
+                            app:layout_constraintEnd_toStartOf="@+id/guideline"
                             app:layout_constraintTop_toTopOf="parent"
                             tools:src="@drawable/ic_09d" />
 
@@ -184,7 +162,7 @@
                             android:text="@{dataModel.date}"
                             android:textAlignment="textStart"
                             android:textSize="@dimen/detailui_text_size_secondary"
-                            app:layout_constraintLeft_toLeftOf="@+id/mainWeatherTextView"
+                            app:layout_constraintStart_toStartOf="@+id/mainWeatherTextView"
                             app:layout_constraintTop_toTopOf="@+id/weatherImageView"
                             app:layout_constraintBottom_toTopOf="@id/mainWeatherTextView"
                             app:layout_constraintVertical_chainStyle="packed"
@@ -199,7 +177,7 @@
                             android:text="@{dataModel.weatherMain}"
                             android:textAlignment="textStart"
                             android:textSize="18sp"
-                            app:layout_constraintLeft_toLeftOf="@+id/guideline"
+                            app:layout_constraintStart_toStartOf="@+id/guideline"
                             app:layout_constraintTop_toBottomOf="@+id/dateTextView"
                             app:layout_constraintBottom_toTopOf="@id/descWeatherTextView"
                             tools:text="Clear" />
@@ -214,8 +192,8 @@
                             android:textAlignment="textStart"
                             android:textSize="@dimen/detailui_text_size_secondary"
                             app:layout_constraintHorizontal_bias="0.0"
-                            app:layout_constraintLeft_toLeftOf="@+id/mainWeatherTextView"
-                            app:layout_constraintRight_toRightOf="parent"
+                            app:layout_constraintStart_toStartOf="@+id/mainWeatherTextView"
+                            app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintTop_toBottomOf="@+id/mainWeatherTextView"
                             app:layout_constraintBottom_toBottomOf="@id/weatherImageView"
                             tools:text="Scattered Thunderstorm" />
@@ -230,8 +208,8 @@
                             android:textSize="48sp"
                             android:includeFontPadding="false"
                             app:layout_constraintHorizontal_bias="0.4"
-                            app:layout_constraintLeft_toLeftOf="parent"
-                            app:layout_constraintRight_toLeftOf="@+id/guideline"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintEnd_toStartOf="@+id/guideline"
                             app:layout_constraintTop_toBottomOf="@id/weatherImageView"
                             tools:text="30" />
 
@@ -240,11 +218,11 @@
                             style="@style/PriorityTwoText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginLeft="4dp"
+                            android:layout_marginStart="4dp"
                             android:layout_marginTop="8dp"
                             android:text="@{dataModel.unit}"
                             android:textSize="20sp"
-                            app:layout_constraintLeft_toRightOf="@id/temperatureView"
+                            app:layout_constraintStart_toEndOf="@id/temperatureView"
                             app:layout_constraintTop_toTopOf="@id/temperatureView"
                             tools:text="\u2103" />
 
@@ -260,8 +238,8 @@
                             android:text="@{dataModel.tempMax}"
                             android:textSize="18sp"
                             app:layout_constraintHorizontal_bias="0.271"
-                            app:layout_constraintLeft_toLeftOf="@id/temperatureView"
-                            app:layout_constraintRight_toLeftOf="parent"
+                            app:layout_constraintStart_toStartOf="@id/temperatureView"
+                            app:layout_constraintEnd_toStartOf="parent"
                             app:layout_constraintBaseline_toBaselineOf="@id/windTitle"
                             tools:text="27" />
 
@@ -278,8 +256,8 @@
                             android:textSize="18sp"
                             app:layout_constraintBaseline_toBaselineOf="@+id/maxTemperatureView"
                             app:layout_constraintHorizontal_bias="0.7"
-                            app:layout_constraintLeft_toRightOf="@id/maxTemperatureView"
-                            app:layout_constraintRight_toRightOf="@id/unitTextView"
+                            app:layout_constraintStart_toEndOf="@id/maxTemperatureView"
+                            app:layout_constraintEnd_toEndOf="@id/unitTextView"
                             tools:text="32" />
 
                         <ImageView
@@ -297,7 +275,7 @@
                             app:integerTint="@{dataModel.iconTint}"
                             app:layout_constraintEnd_toStartOf="@+id/windValueTextView"
                             app:layout_constraintHorizontal_chainStyle="packed"
-                            app:layout_constraintLeft_toLeftOf="@+id/guideline"
+                            app:layout_constraintStart_toStartOf="@+id/guideline"
                             app:layout_constraintTop_toTopOf="@+id/temperatureView" />
 
                         <TextView
@@ -305,7 +283,7 @@
                             style="@style/PriorityOneText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginEnd="8dp"
+                            android:layout_marginEnd="16dp"
                             android:layout_marginStart="8dp"
                             android:text="@{dataModel.windValue}"
                             android:textSize="20sp"
@@ -335,14 +313,14 @@
                             android:id="@+id/pressureImageView"
                             android:layout_width="@dimen/detailui_icon_size1"
                             android:layout_height="@dimen/detailui_icon_size1"
-                            android:layout_marginLeft="8dp"
+                            android:layout_marginStart="8dp"
                             android:layout_marginTop="40dp"
                             android:scaleType="fitXY"
                             android:src="@drawable/ic_pressure"
                             app:integerTint="@{dataModel.iconTint}"
                             app:layout_constraintHorizontal_chainStyle="packed"
-                            app:layout_constraintLeft_toLeftOf="parent"
-                            app:layout_constraintRight_toLeftOf="@+id/pressureTextView"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintEnd_toStartOf="@+id/pressureTextView"
                             app:layout_constraintTop_toBottomOf="@+id/maxTemperatureView"
                             tools:tint="#2962FF" />
 
@@ -354,7 +332,7 @@
                             android:text="@string/pressure"
                             android:textSize="@dimen/detailui_text_size_secondary"
                             app:layout_constraintBottom_toTopOf="@id/pressureTextView"
-                            app:layout_constraintRight_toRightOf="@+id/pressureTextView"
+                            app:layout_constraintEnd_toEndOf="@+id/pressureTextView"
                             app:layout_constraintTop_toTopOf="@+id/pressureImageView"
                             app:layout_constraintVertical_chainStyle="packed" />
 
@@ -363,15 +341,15 @@
                             style="@style/PriorityOneText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginLeft="16dp"
-                            android:layout_marginRight="8dp"
+                            android:layout_marginStart="16dp"
+                            android:layout_marginEnd="8dp"
                             android:text="@{dataModel.pressureValue}"
                             android:textAlignment="center"
                             android:includeFontPadding="false"
                             android:textSize="@dimen/detailui_text_size_secondary_caption"
                             app:layout_constraintBottom_toBottomOf="@+id/pressureImageView"
-                            app:layout_constraintLeft_toRightOf="@id/pressureImageView"
-                            app:layout_constraintRight_toLeftOf="@id/guideline"
+                            app:layout_constraintStart_toEndOf="@id/pressureImageView"
+                            app:layout_constraintEnd_toStartOf="@id/guideline"
                             app:layout_constraintTop_toBottomOf="@+id/justPressureTextView"
                             tools:text="1013.12 mb" />
 
@@ -383,8 +361,8 @@
                             android:src="@drawable/ic_humidity_withpercentage"
                             app:integerTint="@{dataModel.iconTint}"
                             app:layout_constraintHorizontal_chainStyle="packed"
-                            app:layout_constraintLeft_toLeftOf="@+id/guideline"
-                            app:layout_constraintRight_toLeftOf="@id/justHumidityTextView"
+                            app:layout_constraintStart_toStartOf="@+id/guideline"
+                            app:layout_constraintEnd_toStartOf="@id/justHumidityTextView"
                             app:layout_constraintTop_toTopOf="@+id/pressureImageView"
                             tools:tint="#7A7A7A" />
 
@@ -393,12 +371,12 @@
                             style="@style/PriorityTwoText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginLeft="16dp"
-                            android:layout_marginRight="8dp"
+                            android:layout_marginStart="16dp"
+                            android:layout_marginEnd="8dp"
                             android:text="@string/humidity"
                             android:textSize="@dimen/detailui_text_size_secondary"
-                            app:layout_constraintLeft_toRightOf="@+id/humidityImageView"
-                            app:layout_constraintRight_toRightOf="parent"
+                            app:layout_constraintStart_toEndOf="@+id/humidityImageView"
+                            app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintTop_toTopOf="@+id/humidityImageView"
                             app:layout_constraintBottom_toTopOf="@id/humidityTextView"
                             app:layout_constraintVertical_chainStyle="packed"/>
@@ -413,7 +391,7 @@
                             android:textSize="@dimen/detailui_text_size_secondary_caption"
                             android:includeFontPadding="false"
                             app:layout_constraintBottom_toBottomOf="@+id/humidityImageView"
-                            app:layout_constraintRight_toRightOf="@+id/justHumidityTextView"
+                            app:layout_constraintEnd_toEndOf="@+id/justHumidityTextView"
                             app:layout_constraintTop_toBottomOf="@+id/justHumidityTextView"
                             app:layout_constraintVertical_bias="0.454"
                             tools:text="65%" />
@@ -422,14 +400,14 @@
                             android:id="@+id/uvIndexIcon"
                             android:layout_width="@dimen/detailui_icon_size2"
                             android:layout_height="@dimen/detailui_icon_size2"
-                            android:layout_marginLeft="8dp"
-                            android:layout_marginRight="8dp"
+                            android:layout_marginStart="8dp"
+                            android:layout_marginEnd="8dp"
                             android:layout_marginTop="32dp"
                             android:scaleType="fitXY"
                             android:src="@drawable/ic_uv_index"
                             app:integerTint="@{dataModel.iconTint}"
-                            app:layout_constraintLeft_toLeftOf="parent"
-                            app:layout_constraintRight_toLeftOf="@+id/guideline"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintEnd_toStartOf="@+id/guideline"
                             app:layout_constraintTop_toBottomOf="@+id/pressureImageView"
                             tools:tint="#7A7A7A" />
 
@@ -442,8 +420,8 @@
                             android:textSize="@dimen/detailui_text_size_secondary_caption"
                             android:includeFontPadding="false"
                             app:layout_constraintHorizontal_bias="0.5"
-                            app:layout_constraintLeft_toLeftOf="@+id/uvIndexIcon"
-                            app:layout_constraintRight_toRightOf="@+id/uvIndexIcon"
+                            app:layout_constraintStart_toStartOf="@+id/uvIndexIcon"
+                            app:layout_constraintEnd_toEndOf="@+id/uvIndexIcon"
                             app:layout_constraintTop_toBottomOf="@+id/uvIndexIcon"
                             tools:text="UV Index: 13.02" />
 
@@ -452,15 +430,15 @@
                             style="@style/PriorityThreeText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginLeft="0dp"
-                            android:layout_marginRight="0dp"
+                            android:layout_marginStart="0dp"
+                            android:layout_marginEnd="0dp"
                             android:layout_marginTop="0dp"
                             android:text="@{dataModel.uvIndexDescription}"
                             android:textAlignment="center"
                             android:textSize="@dimen/detailui_text_size_secondary"
                             app:layout_constraintHorizontal_bias="0.5"
-                            app:layout_constraintLeft_toLeftOf="@+id/uvIndexTextView"
-                            app:layout_constraintRight_toRightOf="@+id/uvIndexTextView"
+                            app:layout_constraintStart_toStartOf="@+id/uvIndexTextView"
+                            app:layout_constraintEnd_toEndOf="@+id/uvIndexTextView"
                             app:layout_constraintTop_toBottomOf="@+id/uvIndexTextView"
                             tools:text="Risk: Very High" />
 
@@ -468,13 +446,13 @@
                             android:id="@+id/rainImageView"
                             android:layout_width="@dimen/detailui_icon_size2"
                             android:layout_height="@dimen/detailui_icon_size2"
-                            android:layout_marginLeft="8dp"
-                            android:layout_marginRight="8dp"
+                            android:layout_marginStart="8dp"
+                            android:layout_marginEnd="8dp"
                             android:layout_marginTop="0dp"
                             android:src="@drawable/ic_umbrella"
                             app:integerTint="@{dataModel.iconTint}"
-                            app:layout_constraintLeft_toLeftOf="@+id/guideline"
-                            app:layout_constraintRight_toRightOf="parent"
+                            app:layout_constraintStart_toStartOf="@+id/guideline"
+                            app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintTop_toTopOf="@+id/uvIndexIcon"
                             tools:tint="#7A7A7A" />
 
@@ -483,15 +461,15 @@
                             style="@style/PriorityOneText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginLeft="0dp"
-                            android:layout_marginRight="0dp"
+                            android:layout_marginStart="0dp"
+                            android:layout_marginEnd="0dp"
                             android:layout_marginTop="0dp"
                             android:text="@{dataModel.rainValue}"
                             android:textSize="@dimen/detailui_text_size_secondary_caption"
                             android:includeFontPadding="false"
                             app:layout_constraintHorizontal_bias="0.5"
-                            app:layout_constraintLeft_toLeftOf="@+id/rainImageView"
-                            app:layout_constraintRight_toRightOf="@+id/rainImageView"
+                            app:layout_constraintStart_toStartOf="@+id/rainImageView"
+                            app:layout_constraintEnd_toEndOf="@+id/rainImageView"
                             app:layout_constraintTop_toBottomOf="@+id/rainImageView"
                             tools:text="Rain: 10.31mm" />
 
@@ -500,14 +478,14 @@
                             style="@style/PriorityThreeText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginLeft="0dp"
-                            android:layout_marginRight="0dp"
+                            android:layout_marginStart="0dp"
+                            android:layout_marginEnd="0dp"
                             android:layout_marginTop="0dp"
                             android:text="@{dataModel.cloudinessValue}"
                             android:textSize="@dimen/detailui_text_size_secondary"
                             app:layout_constraintHorizontal_bias="0.5"
-                            app:layout_constraintLeft_toLeftOf="@+id/rainImageView"
-                            app:layout_constraintRight_toRightOf="@+id/rainImageView"
+                            app:layout_constraintStart_toStartOf="@+id/rainImageView"
+                            app:layout_constraintEnd_toEndOf="@+id/rainImageView"
                             app:layout_constraintTop_toBottomOf="@+id/rainVolumeTextView"
                             tools:text="Cloudiness: 35%" />
 

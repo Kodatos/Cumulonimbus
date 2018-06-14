@@ -31,7 +31,7 @@
 
         <variable
             name="currentWeatherData"
-            type="com.kodatos.cumulonimbus.uihelper.CurrentWeatherLayoutDataModel" />
+            type="com.kodatos.cumulonimbus.uihelper.MainActivityDataModel" />
     </data>
 
     <android.support.constraint.ConstraintLayout
@@ -147,7 +147,7 @@
             app:layout_constraintBottom_toBottomOf="@+id/currentTemperatureImageView"
             app:layout_constraintLeft_toRightOf="@+id/currentTemperatureImageView"
             app:layout_constraintTop_toTopOf="@+id/currentTemperatureImageView"
-            tools:text="32 ℃" />
+            tools:text="32" />
 
         <TextView
             android:id="@+id/currentTempMin"
@@ -158,10 +158,9 @@
             android:gravity="center"
             android:text="@{currentWeatherData.tempMin}"
             app:layout_constraintBottom_toBottomOf="@+id/currentTemperatureImageView"
-            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintLeft_toRightOf="@+id/currentTempMax"
             app:layout_constraintTop_toTopOf="@+id/currentTemperatureImageView"
-            tools:text="29 ℃" />
+            tools:text="29" />
 
         <ImageView
             android:id="@+id/dateImageView"
@@ -223,7 +222,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
-            android:alpha="1.0"
+            android:alpha="0.0"
             app:layout_constraintTop_toBottomOf="@+id/dateImageView">
 
             <ImageView

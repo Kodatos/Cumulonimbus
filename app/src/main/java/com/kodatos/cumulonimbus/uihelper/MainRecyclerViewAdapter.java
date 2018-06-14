@@ -33,7 +33,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
-import com.kodatos.cumulonimbus.apihelper.DBModel;
 import com.kodatos.cumulonimbus.databinding.ForecastRecyclerviewItemBinding;
 import com.kodatos.cumulonimbus.utils.AdapterDiffUtils;
 
@@ -43,7 +42,7 @@ public class MainRecyclerViewAdapter extends RecyclerView.Adapter<MainRecyclerVi
 
     private ParentCallback parentCallback;
 
-    private List<DBModelCalculatedData> modelList = null;
+    private List<ForecastCalculatedData> modelList = null;
 
     public MainRecyclerViewAdapter (ParentCallback callback){
         parentCallback = callback;
@@ -59,7 +58,7 @@ public class MainRecyclerViewAdapter extends RecyclerView.Adapter<MainRecyclerVi
 
     @Override
     public void onBindViewHolder(@NonNull MainRecyclerViewHolder holder, int position) {
-        DBModelCalculatedData model = modelList.get(position);
+        ForecastCalculatedData model = modelList.get(position);
         holder.bind(model);
     }
 
@@ -68,7 +67,7 @@ public class MainRecyclerViewAdapter extends RecyclerView.Adapter<MainRecyclerVi
         return modelList == null ? 0 : 4;
     }
 
-    public void setData(List<DBModelCalculatedData> modelList){
+    public void setData(List<ForecastCalculatedData> modelList){
 
         DiffUtil.DiffResult result = DiffUtil.calculateDiff(new AdapterDiffUtils.MainRVDiffCallback(this.modelList, modelList));
         this.modelList = modelList;
@@ -95,7 +94,7 @@ public class MainRecyclerViewAdapter extends RecyclerView.Adapter<MainRecyclerVi
         }
 
         // Method to create a calculated data model and bind it to the layout
-        public void bind(DBModelCalculatedData model) {
+        public void bind(ForecastCalculatedData model) {
             binding.setCalculateddata(model);
             binding.executePendingBindings();
         }
