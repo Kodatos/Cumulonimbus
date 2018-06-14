@@ -53,7 +53,6 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.LoaderManager;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.content.LocalBroadcastManager;
@@ -244,10 +243,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         mErrorReceiver = new ServiceErrorBroadcastReceiver();
         LocalBroadcastManager.getInstance(this).registerReceiver(mErrorReceiver, new IntentFilter(ServiceErrorContract.BROADCAST_INTENT_FILTER));
 
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_REQUEST_ID);
-        } else
-            getSupportLoaderManager().initLoader(LOADER_ID, null, this);
+        getSupportLoaderManager().initLoader(LOADER_ID, null, this);
 
         setUpUIInteractions();
     }
@@ -383,9 +379,9 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode == PERMISSION_REQUEST_ID) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                getSupportLoaderManager().initLoader(LOADER_ID, null, this);
+                startSync(1);
             } else
-                displayDialogMessage("Location Required", "This app cannot run without location permissions", true);
+                displayDialogMessage("Permission Required", "Location permission is required for accessing current location", false);
         }
     }
 
@@ -593,6 +589,9 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                         break;
                     case ServiceErrorContract.ERROR_RESPONSE:
                         handleAPIResponseError();
+                        break;
+                    case ServiceErrorContract.ERROR_NO_PERMISSION:
+                        ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_REQUEST_ID);
                         break;
                 }
             }

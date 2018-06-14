@@ -21,18 +21,13 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class ServiceLocator {
 
-    private static WeatherAPIService baseService = null;
-
     public static WeatherAPIService getBaseService(){
-        if(baseService == null) {
-            final String WEATHER_BASE_URL = "http://api.openweathermap.org/";
-            Retrofit weatherRetrofit = new Retrofit.Builder()
-                    .baseUrl(WEATHER_BASE_URL)
-                    .addConverterFactory(GsonConverterFactory.create())
-                    .build();
-            baseService =  weatherRetrofit.create(WeatherAPIService.class);
-        }
-        return baseService;
+        final String WEATHER_BASE_URL = "http://api.openweathermap.org/";
+        Retrofit weatherRetrofit = new Retrofit.Builder()
+                .baseUrl(WEATHER_BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+        return weatherRetrofit.create(WeatherAPIService.class);
     }
 
     public static InfoDialogFragment createFeelsLikeDialog(Activity activity, String feelsLikeDescription){

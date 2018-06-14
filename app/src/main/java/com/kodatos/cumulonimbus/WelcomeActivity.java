@@ -30,10 +30,8 @@ import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 
 import com.github.paolorotolo.appintro.AppIntro;
-import com.kodatos.cumulonimbus.R;
 import com.kodatos.cumulonimbus.uihelper.welcome.PreferenceSlideFragment;
 import com.kodatos.cumulonimbus.uihelper.welcome.SimpleSlideFragment;
-import com.kodatos.cumulonimbus.utils.KeyConstants;
 
 public class WelcomeActivity extends AppIntro {
 
@@ -44,11 +42,7 @@ public class WelcomeActivity extends AppIntro {
         addSlide(SimpleSlideFragment.newInstance(getString(R.string.welcome_title_1), getString(R.string.welcome_description_1), R.drawable.ic_launcher_foreground, ContextCompat.getColor(this, R.color._01n_background)));
         addSlide(SimpleSlideFragment.newInstance(getString(R.string.welcome_title_2), getString(R.string.welcome_description_2), R.drawable.ic_location_permission, ContextCompat.getColor(this, R.color._04d_background)));
 
-        PreferenceSlideFragment fragment3 = new PreferenceSlideFragment();
-        Bundle arguments3 = new Bundle();
-        arguments3.putInt(KeyConstants.SLIDE_BACKGROUND_COLOR, ContextCompat.getColor(this, R.color._11d_background));
-        fragment3.setArguments(arguments3);
-        addSlide(fragment3);
+        addSlide(PreferenceSlideFragment.newInstance(ContextCompat.getColor(this, R.color._11d_background)));
 
         addSlide(SimpleSlideFragment.newInstance(getString(R.string.welcome_title_4), getString(R.string.welcome_description_4), R.drawable.ic_sun_emoticon, ContextCompat.getColor(this, R.color._01d_background)));
         //askForPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 2);

@@ -50,6 +50,4 @@ public class KeyConstants {
     //First time run preference key
     public static final String FIRST_TIME_RUN = "boolean_first_time";
 
-    //Welcome screen fragment argument keys
-    public static final String SLIDE_BACKGROUND_COLOR = "slidebackcolor";
 }

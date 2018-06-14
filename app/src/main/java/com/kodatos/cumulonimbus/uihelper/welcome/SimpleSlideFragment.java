@@ -29,9 +29,11 @@ import android.content.pm.PackageManager;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -94,9 +96,7 @@ public class SimpleSlideFragment extends Fragment implements ISlidePolicy, ISlid
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode == 9987) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                isSafeToProceed = true;
-            }
+            isSafeToProceed = grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED;
         }
     }
 
@@ -127,13 +127,30 @@ public class SimpleSlideFragment extends Fragment implements ISlidePolicy, ISlid
     @Override
     public void onSlideSelected() {
         if (arguments.getInt(SLIDE_DRAWABLE) == R.drawable.ic_location_permission) {
-            isSafeToProceed = false;
-            requestLocationPermission();
+            //Assume user doesn't want to provide custom location
+            isSafeToProceed = true;
+            mBinding.permissionSlideCurrentLocationCheck.setVisibility(View.VISIBLE);
+            mBinding.permissionSlideCurrentLocationCheck.setOnClickListener(v -> {
+                boolean previousCheck = mBinding.permissionSlideCurrentLocationCheck.isChecked();
+                mBinding.permissionSlideCurrentLocationCheck.setChecked(!previousCheck);
+                //If location permission provided or no current location required, safe to proceed
+                isSafeToProceed = !previousCheck || ContextCompat.checkSelfPermission(Objects.requireNonNull(getContext()), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
+                if (!isSafeToProceed)
+                    //If not safe to proceed, request location permission
+                    requestLocationPermission();
+            });
         }
     }
 
     @Override
     public void onSlideDeselected() {
-
+        if (arguments.getInt(SLIDE_DRAWABLE) == R.drawable.ic_location_permission) {
+            //Save to preferences once proceeded to next slide
+            PreferenceManager.
+                    getDefaultSharedPreferences(getContext())
+                    .edit()
+                    .putBoolean(getString(R.string.pref_curr_location_key), !mBinding.permissionSlideCurrentLocationCheck.isChecked())
+                    .apply();
+        }
     }
 }

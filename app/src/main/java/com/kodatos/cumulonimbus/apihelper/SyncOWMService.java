@@ -37,7 +37,7 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.os.RemoteException;
 import android.preference.PreferenceManager;
-import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
@@ -114,10 +114,12 @@ public class SyncOWMService extends IntentService {
 
         String units = defaultSharedPreferences.getBoolean(getString(R.string.pref_metrics_key), true) ? "metric" : "imperial";
         if (defaultSharedPreferences.getBoolean(this.getString(R.string.pref_curr_location_key), true)) {
-
             //User expects current location data. Hence, last known co-ordinates are retrieved and the respective url called.
             FusedLocationProviderClient mFusedClient = LocationServices.getFusedLocationProviderClient(this);
-            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                broadcastError(ServiceErrorContract.ERROR_NO_PERMISSION, null);
+                return;
+            } else {
                 try {
                     Location location = Tasks.await(mFusedClient.getLastLocation());
                     if (location != null) {
@@ -221,7 +223,7 @@ public class SyncOWMService extends IntentService {
                 }
                 getContentResolver().applyBatch(WeatherDBContract.AUTHORITY, uvOps);
             } else {
-                Objects.requireNonNull(forecastUVIndexModelsResponse.errorBody()).string();
+                broadCastJSONError(Objects.requireNonNull(forecastUVIndexModelsResponse.errorBody()).string());
                 stopSelf();
             }
 

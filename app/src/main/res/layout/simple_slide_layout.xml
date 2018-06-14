@@ -28,24 +28,24 @@
 
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        tools:background="@color/_11d_background">
 
         <TextView
             android:id="@+id/simpleSlideTitle"
             style="@style/PriorityOneText"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="32dp"
+            android:layout_marginBottom="16dp"
             android:layout_marginEnd="48dp"
             android:layout_marginStart="48dp"
-            android:text="@string/welcome_title_3"
             android:textAlignment="center"
             android:textColor="@color/textColorSecondaryInverse"
-            android:textSize="32sp"
+            android:textSize="24sp"
             app:layout_constraintBottom_toTopOf="@+id/simpleSlideImageView"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            tools:text="@string/welcome_title_1" />
+            tools:text="@string/welcome_title_2" />
 
         <ImageView
             android:id="@+id/simpleSlideImageView"
@@ -57,7 +57,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.39"
-            tools:src="@drawable/ic_launcher_foreground"
+            tools:src="@drawable/ic_location_permission"
             tools:ignore="ContentDescription" />
 
         <TextView
@@ -65,16 +65,36 @@
             style="@style/PriorityTwoText"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="48dp"
-            android:layout_marginStart="48dp"
-            android:layout_marginTop="32dp"
+            android:layout_marginEnd="24dp"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="16dp"
             android:textAlignment="center"
             android:textColor="@color/textColorSecondaryInverse"
-            android:textSize="20sp"
+            android:textSize="18sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/simpleSlideImageView"
-            tools:text="@string/welcome_description_1" />
+            tools:text="@string/welcome_description_2" />
+
+        <CheckedTextView
+            android:id="@+id/permissionSlideCurrentLocationCheck"
+            style="@style/PriorityTwoText"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="24dp"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="16dp"
+            android:checkMark="?android:attr/listChoiceIndicatorMultiple"
+            android:checkMarkTint="@color/textColorSecondaryInverse"
+            android:checked="true"
+            android:gravity="center"
+            android:text="@string/permission_required"
+            android:textColor="@color/textColorSecondaryInverse"
+            android:textSize="16sp"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/simpleSlideDescription" />
 
     </android.support.constraint.ConstraintLayout>
 

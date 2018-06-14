@@ -24,10 +24,12 @@
 
 package com.kodatos.cumulonimbus.uihelper.welcome;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.IntentSender;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.databinding.DataBindingUtil;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
@@ -54,6 +56,7 @@ import android.widget.Toast;
 
 import com.github.paolorotolo.appintro.ISlideBackgroundColorHolder;
 import com.github.paolorotolo.appintro.ISlidePolicy;
+import com.github.paolorotolo.appintro.ISlideSelectionListener;
 import com.google.android.gms.common.api.ResolvableApiException;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
@@ -65,57 +68,87 @@ import com.google.android.gms.location.LocationSettingsResponse;
 import com.google.android.gms.location.SettingsClient;
 import com.google.android.gms.tasks.Task;
 import com.kodatos.cumulonimbus.R;
-import com.kodatos.cumulonimbus.apihelper.WeatherAPIService;
-import com.kodatos.cumulonimbus.apihelper.models.CurrentWeatherModel;
 import com.kodatos.cumulonimbus.databinding.PreferenceSlideLayoutBinding;
 import com.kodatos.cumulonimbus.utils.CityValidatorUtil;
 import com.kodatos.cumulonimbus.utils.KeyConstants;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.IOException;
 import java.util.Objects;
 
-import retrofit2.Call;
-import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
-
-public class PreferenceSlideFragment extends Fragment implements ISlideBackgroundColorHolder, ISlidePolicy, LoaderManager.LoaderCallbacks<String> {
+public class PreferenceSlideFragment extends Fragment implements ISlideBackgroundColorHolder, ISlideSelectionListener, ISlidePolicy, LoaderManager.LoaderCallbacks<String> {
 
     private static String LOG_TAG = "prefernce_slide";
     private PreferenceSlideLayoutBinding mBinding;
     private boolean isSafeToProceed = false;
     private int LOADER_ID = 3121;
 
+    private static final String SLIDE_BACKGROUND_COLOR = "back_color";
+
+    private SharedPreferences defaultSharedPreferences;
+
     private Bundle arguments;
+
+    public PreferenceSlideFragment() {
+    }
+
+    public static PreferenceSlideFragment newInstance(int color) {
+        PreferenceSlideFragment preferenceSlideFragment = new PreferenceSlideFragment();
+        Bundle arguments = new Bundle();
+        arguments.putInt(SLIDE_BACKGROUND_COLOR, color);
+        preferenceSlideFragment.setArguments(arguments);
+        return preferenceSlideFragment;
+    }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         mBinding = DataBindingUtil.inflate(inflater, R.layout.preference_slide_layout, container, false);
         arguments = Objects.requireNonNull(getArguments());
-        mBinding.getRoot().setBackgroundColor(arguments.getInt(KeyConstants.SLIDE_BACKGROUND_COLOR));
+        mBinding.getRoot().setBackgroundColor(arguments.getInt(SLIDE_BACKGROUND_COLOR));
         mBinding.preferenceSlideTitle.setText(getString(R.string.welcome_title_3));
+        defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+        return mBinding.getRoot();
+    }
+
+    private void setUpInteractions() {
+        boolean currentLocationEnabled = defaultSharedPreferences.getBoolean(getString(R.string.pref_curr_location_key), false);
+        mBinding.preferenceSlideCurrentLocationCheck.setChecked(currentLocationEnabled);
+        if (currentLocationEnabled)
+            mBinding.preferenceSlideCustomLocationInput.setInputType(InputType.TYPE_NULL);
+        else
+            mBinding.preferenceSlideCustomLocationInput.setInputType(InputType.TYPE_TEXT_FLAG_AUTO_CORRECT);
+
         mBinding.preferenceSlideCurrentLocationCheck.setOnClickListener(v -> {
             boolean previousCheck = mBinding.preferenceSlideCurrentLocationCheck.isChecked();
             mBinding.preferenceSlideCurrentLocationCheck.setChecked(!previousCheck);
             if (previousCheck)
                 mBinding.preferenceSlideCustomLocationInput.setInputType(InputType.TYPE_TEXT_FLAG_AUTO_CORRECT);
-            else
+            else {
+                if (ContextCompat.checkSelfPermission(Objects.requireNonNull(getContext()),
+                        Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                    requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 9981);
+                }
                 mBinding.preferenceSlideCustomLocationInput.setInputType(InputType.TYPE_NULL);
+            }
         });
         mBinding.preferenceSlideSyncButton.setOnClickListener(v -> {
             mBinding.preferenceSlideValidatingProgressBar.setVisibility(View.VISIBLE);
             getLoaderManager().initLoader(LOADER_ID, null, this);
         });
-        return mBinding.getRoot();
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (!(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
+            Toast.makeText(getContext(), "Please provide location permission for current location access", Toast.LENGTH_SHORT)
+                    .show();
+            mBinding.preferenceSlideCurrentLocationCheck.setChecked(false);
+            mBinding.preferenceSlideCustomLocationInput.setInputType(InputType.TYPE_TEXT_FLAG_AUTO_CORRECT);
+        }
     }
 
     @Override
     public int getDefaultBackgroundColor() {
-        return arguments.getInt(KeyConstants.SLIDE_BACKGROUND_COLOR);
+        return arguments.getInt(SLIDE_BACKGROUND_COLOR);
     }
 
     @Override
@@ -129,6 +162,15 @@ public class PreferenceSlideFragment extends Fragment implements ISlideBackgroun
     @Override
     public boolean isPolicyRespected() {
         return isSafeToProceed;
+    }
+
+    private void setNowSafeToProceed() {
+        isSafeToProceed = true;         //Everything is valid. User can now finish intro.
+        Log.d(LOG_TAG, "valid");
+        Button syncButton = PreferenceSlideFragment.this.mBinding.preferenceSlideSyncButton;
+        syncButton.setBackgroundTintList(ContextCompat.getColorStateList(Objects.requireNonNull(getContext()), R.color._01d_background));
+        syncButton.setTextColor(Color.WHITE);
+        mBinding.preferenceSlideValidatingProgressBar.setVisibility(View.GONE);
     }
 
     @Override
@@ -156,6 +198,17 @@ public class PreferenceSlideFragment extends Fragment implements ISlideBackgroun
         } else if ("invalid_city".equals(data)) {
             Snackbar.make(mBinding.getRoot(), "You may have entered a non-existing city. Try again", Snackbar.LENGTH_SHORT).show();
         } else if ("valid".equals(data)) {
+            //Save to preferences
+            defaultSharedPreferences.edit()
+                    .putString(getString(R.string.pref_custom_location_key), mBinding.preferenceSlideCurrentLocationCheck.isChecked() ? "Enter City Here" : mBinding.preferenceSlideCustomLocationInput.getText().toString())
+                    .putBoolean(getString(R.string.pref_curr_location_key), mBinding.preferenceSlideCurrentLocationCheck.isChecked())
+                    .putBoolean(KeyConstants.FIRST_TIME_RUN, false)         //Intro completed successfully
+                    .apply();
+            //Current location not required, so no need to check location service
+            if (!mBinding.preferenceSlideCurrentLocationCheck.isChecked()) {
+                setNowSafeToProceed();
+                return;
+            }
             //Check location service
             Log.d(LOG_TAG, "checking_location_services");
             FusedLocationProviderClient mFusedClient = LocationServices.getFusedLocationProviderClient(Objects.requireNonNull(getContext()));
@@ -179,26 +232,24 @@ public class PreferenceSlideFragment extends Fragment implements ISlideBackgroun
                 @Override
                 public void onLocationResult(LocationResult locationResult) {
                     mFusedClient.removeLocationUpdates(this);
-                    isSafeToProceed = true;         //Everything is valid. User can now finish intro.
-
-                    Log.d(LOG_TAG, "valid");
-                    SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getContext());
-                    sp.edit().putString(getString(R.string.pref_custom_location_key), mBinding.preferenceSlideCurrentLocationCheck.isChecked() ? "Enter City Here" : mBinding.preferenceSlideCustomLocationInput.getText().toString())
-                            .putBoolean(getString(R.string.pref_curr_location_key), mBinding.preferenceSlideCurrentLocationCheck.isChecked())
-                            .putBoolean(KeyConstants.FIRST_TIME_RUN, false)         //Intro completed successfully
-                            .apply();
-
-                    Button syncButton = PreferenceSlideFragment.this.mBinding.preferenceSlideSyncButton;
-                    syncButton.setBackgroundTintList(ContextCompat.getColorStateList(getContext(), R.color._01d_background));
-                    syncButton.setTextColor(Color.WHITE);
+                    setNowSafeToProceed();
                 }
             }, null));
         }
-        mBinding.preferenceSlideValidatingProgressBar.setVisibility(View.GONE);
     }
 
     @Override
     public void onLoaderReset(@NonNull Loader<String> loader) {
+    }
+
+    @Override
+    public void onSlideSelected() {
+        setUpInteractions();
+    }
+
+    @Override
+    public void onSlideDeselected() {
+
     }
 
     private static class SettingsValidator extends AsyncTaskLoader<String> {
