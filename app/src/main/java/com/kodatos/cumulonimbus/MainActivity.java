@@ -112,6 +112,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     private static final int PERMISSION_REQUEST_ID = 140;
     private static final int ENABLE_LOCATION_REQUEST_ID = 2043;
     private static final int WELCOME_ACTIVITY_REQUEST_ID = 230;
+    private static final int SETTINGS_ACTIVITY_REQUEST_ID = 1201;
     private static final String LOG_TAG = "Main Activity";
 
     private ActivityMainBinding mBinding;
@@ -153,21 +154,21 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     @Override
     protected void onResume() {
-        super.onResume();
         LocalBroadcastManager.getInstance(this).registerReceiver(mErrorReceiver, new IntentFilter(ServiceErrorContract.BROADCAST_INTENT_FILTER));
+        super.onResume();
     }
 
     @Override
     protected void onPause() {
-        super.onPause();
         LocalBroadcastManager.getInstance(this).unregisterReceiver(mErrorReceiver);
+        super.onPause();
     }
 
     @Override
     protected void onDestroy() {
-        super.onDestroy();
         if(forecastAdapter != null)
             forecastAdapter.unregisterCallback();
+        super.onDestroy();
     }
 
     @Override
@@ -200,6 +201,11 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 initialize();
             else
                 finish();
+        else if (requestCode == SETTINGS_ACTIVITY_REQUEST_ID)
+            if (resultCode == RESULT_OK) {
+                mBinding.mainUISwipeRefreshLayout.setRefreshing(true);
+                startSync(1);
+            }
     }
 
     private void initialize() {
@@ -226,7 +232,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         getWindow().setSharedElementReenterTransition(sharedElementTransition);
         //endregion
 
-        previousBackgroundColor = MiscUtils.getBackgroundColorForIconID(this, weatherSharedPreferences.getString(KeyConstants.CURRENT_WEATHER_ICON_ID_KEY, ""));
+        //previousBackgroundColor = MiscUtils.getBackgroundColorForIconID(this, weatherSharedPreferences.getString(KeyConstants.CURRENT_WEATHER_ICON_ID_KEY, ""));
 
         mDataPresenter = new DBModelsAndDataPresenter();
 
@@ -237,11 +243,16 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
         LinearLayoutManager hlm = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
         mBinding.forecastLayout.currentTimelineRecyclerView.setLayoutManager(hlm);
-        currentTimelineAdapter = new TimelineRecyclerViewAdapter(this, null, null, Integer.MIN_VALUE);
+        currentTimelineAdapter = new TimelineRecyclerViewAdapter(null, null, Integer.MIN_VALUE, null);
         mBinding.forecastLayout.currentTimelineRecyclerView.setAdapter(currentTimelineAdapter);
 
         mErrorReceiver = new ServiceErrorBroadcastReceiver();
         LocalBroadcastManager.getInstance(this).registerReceiver(mErrorReceiver, new IntentFilter(ServiceErrorContract.BROADCAST_INTENT_FILTER));
+
+        GradientDrawable gradientDrawable = new GradientDrawable(GradientDrawable.Orientation.BR_TL, new int[]{0, 0});
+        float px = getResources().getDimension(R.dimen.common_card_corner_radius) * (getResources().getDisplayMetrics().density);
+        gradientDrawable.setCornerRadii(new float[]{px, px, px, px, 0, 0, 0, 0});
+        mBinding.forecastCard.setBackground(gradientDrawable);
 
         getSupportLoaderManager().initLoader(LOADER_ID, null, this);
 
@@ -290,6 +301,11 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         });
 
         View.OnClickListener infoDialogEnabledViewListener = v -> {
+            if (v.getId() == R.id.locationTextView && !defaultSharedPreferences.getBoolean(getString(R.string.pref_curr_location_key), false)) {
+                Intent locationPickerIntent = new Intent(this, LocationPickerActivity.class);
+                startActivity(locationPickerIntent);
+                return;
+            }
             InfoDialogFragment infoDialogFragment = createInfoDialog(v.getId());
             if (infoDialogFragment != null)
                 infoDialogFragment.show(getSupportFragmentManager(), "INFO_DIALOG_FRAGMENT");
@@ -408,7 +424,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     private void openSettingsActivity() {
         Intent intent = new Intent(this, SettingsActivity.class);
-        startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(this).toBundle());
+        ActivityCompat.startActivityForResult(this, intent, SETTINGS_ACTIVITY_REQUEST_ID, ActivityOptions.makeSceneTransitionAnimation(this).toBundle());
     }
 
     //region Region : Data Binding
@@ -436,9 +452,11 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         MainActivityDataModel layoutDataModel = MiscUtils.getCurrentWeatherDataFromDBModel(this, intermediateModel, mIsMetric, currentWeatherExtraData);
         mBinding.setCurrentWeatherData(layoutDataModel);
 
-        int updatedBackgroundColor = MiscUtils.getBackgroundColorForIconID(this, weatherSharedPreferences.getString(KeyConstants.CURRENT_WEATHER_ICON_ID_KEY, "01d"));
-        if (!justOpened)
+        int updatedBackgroundColor = MiscUtils.getBackgroundColorForIconID(this, intermediateModel.getIcon_id());
+        if (!justOpened) {
             changeBackgroundColorWithAnimation(updatedBackgroundColor);
+            previousBackgroundColor = updatedBackgroundColor;
+        }
         else {
             //If just opened, do not animate
             changeBackgroundColor(updatedBackgroundColor);
@@ -494,10 +512,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         getWindow().setNavigationBarColor(updatedBackgroundColor);
         int cardLighterColor = Color.rgb(Color.red(updatedBackgroundColor) + 25, Color.green(updatedBackgroundColor) + 25, Color.blue(updatedBackgroundColor) + 25);
         int cardDarkerColor = Color.rgb(Color.red(updatedBackgroundColor) + 5, Color.green(updatedBackgroundColor) + 5, Color.blue(updatedBackgroundColor) + 5);
-        GradientDrawable gradientDrawable = new GradientDrawable(GradientDrawable.Orientation.BR_TL, new int[]{cardDarkerColor, cardLighterColor});
-        float px = getResources().getDimension(R.dimen.common_card_corner_radius) * (getResources().getDisplayMetrics().density);
-        gradientDrawable.setCornerRadius(px);
-        mBinding.forecastCard.setBackground(gradientDrawable);
+        ((GradientDrawable) mBinding.forecastCard.getBackground()).setColors(new int[]{cardDarkerColor, cardLighterColor});
     }
 
     private void changeBackgroundColorWithAnimation(int updatedBackgroundColor) {
