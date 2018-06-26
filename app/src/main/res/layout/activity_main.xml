@@ -25,7 +25,6 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:bind="http://schemas.android.com/apk/res-auto"
-    xmlns:card_view="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:ignore="ContentDescription">
 
@@ -101,15 +100,16 @@
                     android:id="@+id/forecast_card"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_margin="@dimen/common_card_margin_bottom"
+                    android:layout_marginEnd="@dimen/common_card_margin_bottom"
+                    android:layout_marginStart="@dimen/common_card_margin_bottom"
+                    android:layout_marginTop="@dimen/common_card_margin_bottom"
                     android:transitionName="@string/cardview_transition_name"
                     app:cardElevation="4dp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintHorizontal_bias="0.0"
-                    app:layout_constraintLeft_toLeftOf="parent"
-                    app:layout_constraintRight_toRightOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/currentLayout"
-                    card_view:cardCornerRadius="4dp">
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/currentLayout">
 
                     <include
                         android:id="@+id/forecastLayout"

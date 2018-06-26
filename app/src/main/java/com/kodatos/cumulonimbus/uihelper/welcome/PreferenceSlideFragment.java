@@ -283,8 +283,8 @@ public class PreferenceSlideFragment extends Fragment implements ISlideBackgroun
             Log.d(LOG_TAG, "internet_fine");
             //If user entered custom location, validate it.
             if (isCustomLocationEnabled) {
-                int city_validity = CityValidatorUtil.checkIfStringValid(custom_location, api_key);
-                if(city_validity == CityValidatorUtil.INVALID)
+                String[] city_validity = CityValidatorUtil.checkIfStringValid(custom_location, api_key);
+                if (city_validity == null)
                     return "invalid";
                 else
                     return "valid";

@@ -31,7 +31,6 @@ import android.animation.ValueAnimator;
 import android.app.ActivityManager;
 import android.content.SharedPreferences;
 import android.databinding.DataBindingUtil;
-import android.databinding.OnRebindCallback;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
@@ -39,8 +38,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.transition.Fade;
 import android.transition.Transition;
 import android.transition.TransitionInflater;
-import android.transition.TransitionManager;
-import android.view.ViewGroup;
 
 import com.kodatos.cumulonimbus.apihelper.DBModel;
 import com.kodatos.cumulonimbus.databinding.ActivityWeatherDetailBinding;
@@ -58,7 +55,7 @@ import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.TimeZone;
 
-public class WeatherDetailActivity extends AppCompatActivity implements TimelineRecyclerViewAdapter.TimelineItemClickListener {
+public class WeatherDetailActivity extends AppCompatActivity {
 
     private ActivityWeatherDetailBinding mBinding;
     private ArrayList<DBModel> mModels;
@@ -129,7 +126,7 @@ public class WeatherDetailActivity extends AppCompatActivity implements Timeline
             //Carry over UV Index data available from one model to all 8 models
             model.setUvIndex(mModels.get(initialExpandedPosition).getUvIndex());
         }
-        TimelineRecyclerViewAdapter adapter = new TimelineRecyclerViewAdapter(this, iconIds, temperatures, initialExpandedPosition);
+        TimelineRecyclerViewAdapter adapter = new TimelineRecyclerViewAdapter(iconIds, temperatures, initialExpandedPosition, this::onTimelineItemClick);
         mBinding.timelineRecyclerView.setAdapter(adapter);
 
         startPostponedEnterTransition();
@@ -172,7 +169,6 @@ public class WeatherDetailActivity extends AppCompatActivity implements Timeline
     }
 
     //Click listener for timeline recyclerview
-    @Override
     public void onTimelineItemClick(int position) {
         //The wind direction icon is rotated through the shortest angle before binding new data
         float fromAngle = mBinding.windDirectionImageView.getRotation();

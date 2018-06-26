@@ -33,7 +33,6 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 
 import com.kodatos.cumulonimbus.R;
@@ -54,17 +53,15 @@ public class TimelineRecyclerViewAdapter extends RecyclerView.Adapter<TimelineRe
     private List<String> iconIds;
     private List<String> temperatures;
 
-    private Context mContext;
-    private TimelineItemClickListener timelineItemClickListener;
+    private TimelineItemClickListener timelineItemClickListener = null;
 
     private int expandedPosition;
 
-    public TimelineRecyclerViewAdapter(Context context, List<String> iconIds, List<String> temperatures, int expandedPosition) {
+    public TimelineRecyclerViewAdapter(List<String> iconIds, List<String> temperatures, int expandedPosition, TimelineItemClickListener timelineItemClickListener) {
         this.iconIds = iconIds;
         this.temperatures = temperatures;
-        mContext = context;
         if (expandedPosition != Integer.MIN_VALUE)
-            this.timelineItemClickListener = (TimelineItemClickListener) context;
+            this.timelineItemClickListener = timelineItemClickListener;
         this.expandedPosition = expandedPosition;
     }
 
@@ -73,19 +70,33 @@ public class TimelineRecyclerViewAdapter extends RecyclerView.Adapter<TimelineRe
     public TimelineRecyclerViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         ForecastTimelineRecyclerviewItemBinding binding = ForecastTimelineRecyclerviewItemBinding.inflate(inflater, parent, false);
-        return new TimelineRecyclerViewHolder(binding);
+        TimelineRecyclerViewHolder holder = new TimelineRecyclerViewHolder(binding);
+        if (timelineItemClickListener != null) {
+            holder.binding.getRoot().setOnClickListener(v -> updateExpandedPosition(holder.getAdapterPosition()));
+        }
+        return holder;
+    }
+
+    private void updateExpandedPosition(int newPosition) {
+        if (newPosition == expandedPosition)
+            return;
+        int previousExpandedPosition = expandedPosition;
+        expandedPosition = newPosition;
+        timelineItemClickListener.onTimelineItemClick(newPosition);
+        notifyItemChanged(previousExpandedPosition);
+        notifyItemChanged(expandedPosition);
     }
 
     @Override
     public void onBindViewHolder(@NonNull TimelineRecyclerViewHolder holder, int position) {
         String iconIdAtPosition = iconIds.get(position);
         String temperatureAtPosition = temperatures.get(position);
-        int imageId = MiscUtils.getResourceIDForIconID(mContext, iconIdAtPosition);
         String displayTemperature = temperatureAtPosition + "\u00B0";
         SimpleDateFormat sdf = new SimpleDateFormat("HH:mm", Locale.getDefault());
         sdf.setTimeZone(TimeZone.getDefault());
         String time = sdf.format(getCalendarHour(position));
-        holder.bind(time, displayTemperature, imageId, position == expandedPosition);
+
+        holder.bind(time, displayTemperature, iconIdAtPosition, position == expandedPosition);
     }
 
     @Override
@@ -93,18 +104,18 @@ public class TimelineRecyclerViewAdapter extends RecyclerView.Adapter<TimelineRe
         if(payloads.isEmpty())
             super.onBindViewHolder(holder, position, payloads);
         else {
-            int imageId = Integer.MIN_VALUE;
+            String iconID = null;
             String temperature = null;
             Bundle payload = (Bundle) payloads.get(0);
             for(String key : payload.keySet()){
                 if("icon_id".equals(key)){
-                    imageId = MiscUtils.getResourceIDForIconID(mContext, payload.getString(key));
+                    iconID = payload.getString(key);
                 }
                 else if("temperature".equals(key)){
                     temperature = payload.getString(key) + "\u00B0";
                 }
             }
-            holder.partialBind(imageId, temperature);
+            holder.partialBind(iconID, temperature);
         }
     }
 
@@ -135,43 +146,36 @@ public class TimelineRecyclerViewAdapter extends RecyclerView.Adapter<TimelineRe
         void onTimelineItemClick(int position);
     }
 
-    public class TimelineRecyclerViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    static class TimelineRecyclerViewHolder extends RecyclerView.ViewHolder {
 
         ForecastTimelineRecyclerviewItemBinding binding;
 
         TimelineRecyclerViewHolder(ForecastTimelineRecyclerviewItemBinding binding) {
             super(binding.getRoot());
             this.binding = binding;
-            if (expandedPosition != Integer.MIN_VALUE)
-                binding.getRoot().setOnClickListener(this);
         }
 
-        public void bind(String time, String temperature, int imageID, boolean isCurrentlyExpanded) {
+        public void bind(String time, String temperature, String iconID, boolean isCurrentlyExpanded) {
             binding.timelineTimeView.setText(time);
             binding.timelineTemperatureView.setText(temperature);
-            binding.timelineWeatherImageView.setImageDrawable(mContext.getDrawable(imageID));
+            Context context = binding.getRoot().getContext();
+            binding.timelineWeatherImageView.setImageDrawable(context.getDrawable(MiscUtils.getResourceIDForIconID(context, iconID)));
             if (isCurrentlyExpanded) {
-                binding.getRoot().setBackgroundColor(ContextCompat.getColor(mContext, R.color.whiteOneShadeDarker));
+                binding.getRoot().setBackgroundColor(ContextCompat.getColor(binding.getRoot().getContext(), R.color.whiteOneShadeDarker));
             } else {
                 binding.getRoot().setBackgroundColor(Color.WHITE);
             }
         }
 
-        void partialBind(int imageID, String temperature){
-            if(imageID != Integer.MIN_VALUE)
-                binding.timelineWeatherImageView.setImageDrawable(mContext.getDrawable(imageID));
+        void partialBind(String iconID, String temperature) {
+            if (iconID != null) {
+                Context context = binding.getRoot().getContext();
+                binding.timelineWeatherImageView.setImageDrawable(context.getDrawable(MiscUtils.getResourceIDForIconID(context, iconID)));
+            }
             if(temperature != null)
                 binding.timelineTemperatureView.setText(temperature);
         }
 
-        @Override
-        public void onClick(View v) {
-            int previousExpandedPosition = expandedPosition;
-            expandedPosition = getAdapterPosition();
-            timelineItemClickListener.onTimelineItemClick(getAdapterPosition());
-            notifyItemChanged(previousExpandedPosition);
-            notifyItemChanged(expandedPosition);
-        }
     }
 
 }

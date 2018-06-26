@@ -29,7 +29,6 @@ import android.support.annotation.NonNull;
 import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
@@ -53,7 +52,7 @@ public class MainRecyclerViewAdapter extends RecyclerView.Adapter<MainRecyclerVi
     public MainRecyclerViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater layoutInflater = LayoutInflater.from(parent.getContext());
         ForecastRecyclerviewItemBinding recycleItemBinding = ForecastRecyclerviewItemBinding.inflate(layoutInflater, parent, false);
-        return new MainRecyclerViewHolder(recycleItemBinding);
+        return new MainRecyclerViewHolder(recycleItemBinding, parentCallback);
     }
 
     @Override
@@ -83,25 +82,20 @@ public class MainRecyclerViewAdapter extends RecyclerView.Adapter<MainRecyclerVi
         void onForecastItemClick(int position, ImageView forecastImageView);
     }
 
-    public class MainRecyclerViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    static class MainRecyclerViewHolder extends RecyclerView.ViewHolder {
 
         private final ForecastRecyclerviewItemBinding binding;
 
-        MainRecyclerViewHolder(ForecastRecyclerviewItemBinding recycleItemBinding) {
+        MainRecyclerViewHolder(ForecastRecyclerviewItemBinding recycleItemBinding, ParentCallback parentCallback) {
             super(recycleItemBinding.getRoot());
             this.binding = recycleItemBinding;
-            binding.getRoot().setOnClickListener(this);
+            binding.getRoot().setOnClickListener(v -> parentCallback.onForecastItemClick(getAdapterPosition(), binding.forecastImage));
         }
 
         // Method to create a calculated data model and bind it to the layout
         public void bind(ForecastCalculatedData model) {
             binding.setCalculateddata(model);
             binding.executePendingBindings();
-        }
-
-        @Override
-        public void onClick(View view) {
-            parentCallback.onForecastItemClick(getAdapterPosition(), binding.forecastImage);
         }
     }
 }

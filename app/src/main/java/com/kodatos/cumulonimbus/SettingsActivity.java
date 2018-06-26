@@ -26,8 +26,10 @@ package com.kodatos.cumulonimbus;
 
 import android.app.ActivityOptions;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.transition.Slide;
@@ -36,7 +38,9 @@ import android.view.MenuItem;
 
 import com.kodatos.cumulonimbus.databinding.ActivitySettingsBinding;
 
-public class SettingsActivity extends AppCompatActivity {
+public class SettingsActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
+
+    private boolean hasCustomLocationChanged = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,10 +68,29 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        PreferenceManager.getDefaultSharedPreferences(this).registerOnSharedPreferenceChangeListener(this);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        PreferenceManager.getDefaultSharedPreferences(this).unregisterOnSharedPreferenceChangeListener(this);
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if(id==android.R.id.home)
             NavUtils.navigateUpFromSameTask(this);
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        if (hasCustomLocationChanged) return;
+        hasCustomLocationChanged = true;
+        setResult(RESULT_OK);
     }
 }

@@ -58,4 +58,8 @@
     <string name="welcome_screen_custom_location_hint">Enter the name of your city</string>
     <string name="welcome_screen_validation_button">VALIDATE SETTINGS</string>
     <string name="permission_required">I don\'t want to use my current location</string>
+
+    <string name="location_search_failed">Search Failed</string>
+    <string name="location_search_failed_desc">Sorry, the location you entered could\'nt be found using device resources.
+        Please enter a city level name and try again</string>
 </resources>

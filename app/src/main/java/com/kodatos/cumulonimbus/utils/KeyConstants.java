@@ -50,4 +50,8 @@ public class KeyConstants {
     //First time run preference key
     public static final String FIRST_TIME_RUN = "boolean_first_time";
 
+    //Strings for Location List Preferences
+    public static final String LOCATION_PREFERENCES_NAME = "location_shared_pref";
+    public static final String CHOSEN_CUSTOM_LOCATION = "chosen_custom_location";
+    public static final String CHOSEN_COORDINATES = "custom_location_coordinate";
 }

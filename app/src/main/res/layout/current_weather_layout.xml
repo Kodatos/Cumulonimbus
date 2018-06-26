@@ -210,7 +210,6 @@
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:layout_marginTop="8dp"
-            android:background="@drawable/ripple_drawable"
             android:src="@drawable/ic_keyboard_arrow_down_black_24dp"
             android:tint="#FFFFFFFF"
             app:layout_constraintEnd_toEndOf="parent"

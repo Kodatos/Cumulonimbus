@@ -24,7 +24,6 @@
 
 package com.kodatos.cumulonimbus.uihelper;
 
-import android.app.Dialog;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -33,7 +32,6 @@ import android.support.v4.app.DialogFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 
 import com.kodatos.cumulonimbus.R;
 import com.kodatos.cumulonimbus.databinding.InfoDialogLayoutBinding;
@@ -85,10 +83,10 @@ public class InfoDialogFragment extends DialogFragment {
             //Perform provided action and dismiss the dialog as well
             if(positiveTextClickListener!=null)
                 positiveTextClickListener.onClick(v);
-            getDialog().dismiss();
+            dismiss();
         });
         //Negative action is always dismiss the dialog
-        mBinding.negativeActionText.setOnClickListener(v -> getDialog().dismiss());
+        mBinding.negativeActionText.setOnClickListener(v -> dismiss());
         return mBinding.getRoot();
     }
 
@@ -104,8 +102,4 @@ public class InfoDialogFragment extends DialogFragment {
         this.positiveTextClickListener = positiveTextClickListener;
     }
 
-    //Enable negative action if using positive action for something other than dismiss.
-    public void showNegativeDismissAction() {
-
-    }
 }
