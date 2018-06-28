@@ -22,8 +22,8 @@ public class LocationRecyclerViewAdapter extends RecyclerView.Adapter<LocationRe
         this.locationClickListener = locationClickListener;
     }
 
-    private void updateSelectedPosition(int newPosition) {
-        if (selectedPosition == newPosition)
+    private void updateSelectedPosition(int newPosition, boolean forceUpdate) {
+        if (selectedPosition == newPosition && !forceUpdate)
             return;
         int previous = selectedPosition;
         selectedPosition = newPosition;
@@ -38,14 +38,27 @@ public class LocationRecyclerViewAdapter extends RecyclerView.Adapter<LocationRe
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         LocationRecyclerviewItemBinding binding = LocationRecyclerviewItemBinding.inflate(inflater, parent, false);
         LocationRecyclerViewHolder holder = new LocationRecyclerViewHolder(binding);
-        holder.mBinding.getRoot().setOnClickListener(v -> updateSelectedPosition(holder.getAdapterPosition()));
+        holder.mBinding.getRoot().setOnClickListener(v -> updateSelectedPosition(holder.getAdapterPosition(), false));
         return holder;
     }
 
-    public void removeLocation(int position) {
-        locationList.remove(position);
-        notifyItemRemoved(position);
+    public String removeLocation(int removedPosition) {
+        if (removedPosition == selectedPosition && removedPosition == locationList.size() - 1) {
+            //Handle case if last location was selected and is removed
+            updateSelectedPosition(selectedPosition - 1, true);
+        }
+        String removedLocation = locationList.remove(removedPosition);
+        notifyItemRemoved(removedPosition);
+        if (!locationList.isEmpty() && removedPosition <= selectedPosition) {
+            int newSelectedPosition = selectedPosition;
+            if (removedPosition < selectedPosition) {
+                newSelectedPosition--;
+            }
+            updateSelectedPosition(newSelectedPosition, true);
+        }
+        return removedLocation;
     }
+
 
     public void unregisterCallback() {
         locationClickListener = null;
@@ -80,10 +93,13 @@ public class LocationRecyclerViewAdapter extends RecyclerView.Adapter<LocationRe
         }
 
         void bind(String location, boolean isCurrentlySelected) {
-            String[] locationLevels = location.split(",");
+            String[] locationLevels = location.split(", ", 2);
             mBinding.level1TextView.setText(locationLevels[0]);
             mBinding.level2TextView.setText(locationLevels[1]);
-            if (isCurrentlySelected) mBinding.checkedImageView.setVisibility(View.VISIBLE);
+            if (isCurrentlySelected)
+                mBinding.checkedImageView.setVisibility(View.VISIBLE);
+            else
+                mBinding.checkedImageView.setVisibility(View.GONE);
         }
     }
 }

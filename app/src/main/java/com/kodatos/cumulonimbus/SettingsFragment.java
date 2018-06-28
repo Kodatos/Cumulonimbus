@@ -25,12 +25,15 @@
 package com.kodatos.cumulonimbus;
 
 
+import android.app.Activity;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceFragment;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.widget.Toast;
+
+import com.kodatos.cumulonimbus.utils.KeyConstants;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -47,24 +50,39 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         currentLocationKey = getString(R.string.pref_curr_location_key);
         customLocationKey = getString(R.string.pref_custom_location_key);
         getPreferenceScreen().getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
-        findPreference(customLocationKey).setSummary(getPreferenceScreen().getSharedPreferences().getString(getString(R.string.pref_custom_location_key), ""));
+        findPreference(customLocationKey).setOnPreferenceClickListener(preference -> {
+            Intent intent = new Intent(getActivity(), LocationPickerActivity.class);
+            startActivityForResult(intent, 9110);
+            return true;
+        });
+        findPreference(customLocationKey).setSummary(getPreferenceScreen().getSharedPreferences().getString(KeyConstants.CHOSEN_CUSTOM_LOCATION, getString(R.string.pref_custom_location_def)));
         findPreference(customLocationKey).setEnabled(!getPreferenceScreen().getSharedPreferences().getBoolean(currentLocationKey, true));
     }
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        if (key.equals(customLocationKey)) {
-            findPreference(key).setSummary(sharedPreferences.getString(key, ""));
-            if (!getPreferenceScreen().getSharedPreferences().getBoolean(currentLocationKey, true))
-                Toast.makeText(getActivity(), "Updated location. Please refresh at main screen", Toast.LENGTH_SHORT).show();
-        } else if (key.equals(currentLocationKey)) {
+        if (key.equals(currentLocationKey)) {
             findPreference(customLocationKey).setEnabled(!getPreferenceScreen().getSharedPreferences().getBoolean(currentLocationKey, true));
         }
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == 9110 && resultCode == Activity.RESULT_OK) {
+            findPreference(customLocationKey).setSummary(getPreferenceScreen().getSharedPreferences().getString(KeyConstants.CHOSEN_CUSTOM_LOCATION, getString(R.string.pref_custom_location_def)));
+            getActivity().setResult(Activity.RESULT_OK);
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
         getPreferenceScreen().getSharedPreferences().unregisterOnSharedPreferenceChangeListener(this);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        getPreferenceScreen().getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
     }
 }

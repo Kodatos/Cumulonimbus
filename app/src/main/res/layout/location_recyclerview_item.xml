@@ -7,6 +7,7 @@
         android:id="@+id/locationForegroundLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="#FFF"
         android:animateLayoutChanges="true">
 
         <ImageView
@@ -14,7 +15,7 @@
             android:layout_width="36dp"
             android:layout_height="36dp"
             android:layout_marginStart="16dp"
-            android:src="@drawable/ic_01d"
+            android:src="@drawable/ic_selected"
             android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"

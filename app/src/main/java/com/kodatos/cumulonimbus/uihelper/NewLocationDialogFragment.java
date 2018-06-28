@@ -1,7 +1,6 @@
 package com.kodatos.cumulonimbus.uihelper;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.databinding.DataBindingUtil;
 import android.location.Address;
 import android.location.Geocoder;
@@ -20,9 +19,9 @@ import android.view.ViewGroup;
 import com.kodatos.cumulonimbus.R;
 import com.kodatos.cumulonimbus.databinding.NewLocationDialogLayoutBinding;
 import com.kodatos.cumulonimbus.utils.CityValidatorUtil;
-import com.kodatos.cumulonimbus.utils.KeyConstants;
 
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.Locale;
 import java.util.Objects;
 
@@ -33,6 +32,8 @@ public class NewLocationDialogFragment extends DialogFragment implements LoaderM
     private boolean isInVerifyMode = false;
     private String verifiedLocation;
     private String verifiedCoordinates;
+
+    private LocationVerifiedListener listener;
 
     @Nullable
     @Override
@@ -45,13 +46,46 @@ public class NewLocationDialogFragment extends DialogFragment implements LoaderM
         mBinding.negativeAction.setOnClickListener(v -> dismiss());
         mBinding.positiveAction.setOnClickListener(v -> {
             if (isInVerifyMode) {
-                SharedPreferences locationSharedPreferences = Objects.requireNonNull(getContext()).getSharedPreferences(KeyConstants.LOCATION_PREFERENCES_NAME, Context.MODE_PRIVATE);
-                locationSharedPreferences.edit().putString(verifiedLocation, verifiedCoordinates).apply();
+                listener.onLocationVerified(verifiedLocation, verifiedCoordinates);
                 dismiss();
             } else
-                getLoaderManager().initLoader(LOADER_ID, null, NewLocationDialogFragment.this);
+                getLoaderManager().restartLoader(LOADER_ID, null, NewLocationDialogFragment.this);
         });
         return mBinding.getRoot();
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        listener = null;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Objects.requireNonNull(getDialog().getWindow()).setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+    }
+
+    public void setListener(LocationVerifiedListener listener) {
+        this.listener = listener;
+    }
+
+    @Override
+    public void onLoadFinished(@NonNull Loader<String[]> loader, String[] data) {
+        mBinding.verifyLocationGroup.setVisibility(View.VISIBLE);
+        if (data == null) {
+            mBinding.verifyLocationTitle.setText(R.string.location_search_failed);
+            mBinding.geocodedLocationText.setText(R.string.location_search_failed_desc);
+        } else {
+            mBinding.verifyLocationTitle.setText(R.string.location_verify_title);
+            verifiedLocation = data[0];
+            verifiedCoordinates = data[1] + "/" + data[2];
+            String coordsText = "Coordinates: " + data[1] + ", " + data[2];
+            String displayText = data[0] + "\n" + coordsText;
+            mBinding.geocodedLocationText.setText(displayText);
+            mBinding.positiveAction.setText("Accept");
+            isInVerifyMode = true;
+        }
     }
 
     @NonNull
@@ -63,21 +97,8 @@ public class NewLocationDialogFragment extends DialogFragment implements LoaderM
             throw new UnsupportedOperationException();
     }
 
-    @Override
-    public void onLoadFinished(@NonNull Loader<String[]> loader, String[] data) {
-        mBinding.verifyLocationGroup.setVisibility(View.VISIBLE);
-        if (data == null) {
-            mBinding.verifyLocationTitle.setText(R.string.location_search_failed);
-            mBinding.geocodedLocationText.setText(R.string.location_search_failed_desc);
-        } else {
-            mBinding.verifyLocationTitle.setText("Verify:");
-            verifiedLocation = data[0];
-            verifiedCoordinates = data[1] + "/" + data[2];
-            String coordsText = "Coordinates: " + data[1] + ", " + data[2];
-            String displayText = data[0] + "\n" + coordsText;
-            mBinding.geocodedLocationText.setText(displayText);
-            isInVerifyMode = true;
-        }
+    public interface LocationVerifiedListener {
+        void onLocationVerified(String verifiedLocation, String verifiedCoordinates);
     }
 
     @Override
@@ -86,7 +107,6 @@ public class NewLocationDialogFragment extends DialogFragment implements LoaderM
         verifiedLocation = null;
         isInVerifyMode = false;
     }
-
 
     private static class LocationGeocoder extends AsyncTaskLoader<String[]> {
 
@@ -97,6 +117,18 @@ public class NewLocationDialogFragment extends DialogFragment implements LoaderM
             super(context);
             this.location = location;
             this.api_key = api_key;
+            onContentChanged();
+        }
+
+        @Override
+        protected void onStartLoading() {
+            if (takeContentChanged())
+                forceLoad();
+        }
+
+        @Override
+        protected void onStopLoading() {
+            cancelLoad();
         }
 
         @Override
@@ -107,9 +139,10 @@ public class NewLocationDialogFragment extends DialogFragment implements LoaderM
                 Address address = geocoder.getFromLocationName(location, 1).get(0);
                 if (address == null)
                     throw new IOException();
-                returnData[0] = (address.getLocality() != null ? address.getLocality() + ", " : "") + address.getCountryName();
-                returnData[1] = String.valueOf(address.getLatitude());
-                returnData[2] = String.valueOf(address.getLongitude());
+                returnData[0] = (address.getSubLocality() != null ? address.getSubLocality() + ", " : "") + address.getLocality() + ", " + address.getCountryName();
+                DecimalFormat df = new DecimalFormat("#0.####");
+                returnData[1] = df.format(address.getLatitude());
+                returnData[2] = df.format(address.getLongitude());
                 return returnData;
             } catch (IOException e) {
                 if (!Geocoder.isPresent())

@@ -31,10 +31,10 @@ public class ServiceErrorContract {
 
     public static final String BROADCAST_INTENT_FILTER = "com.kodatos.cumulonimbus.service_error_filter";
     public static final String ERROR_LOCATION = "location_error";
-    public static final String ERROR_GEOCODER = "geocoding_error";
     public static final String ERROR_REVERSE_GEOCODER = "reverse_geocoding_error";
     public static final String ERROR_RESPONSE = "api_response_error";
     public static final String ERROR_NO_PERMISSION = "no_location_permission";
+    public static final String ERROR_NO_LOCATION_CHOSEN = "no_custom_location_chosen";
     public static final String ERROR_GENERIC = "error";
     public static final String ERROR_DETAILS_NULL = "null";
     public static final String ERROR_DETAILS_IO = "io";

@@ -40,8 +40,6 @@ import java.util.Objects;
 
 public class InfoDialogFragment extends DialogFragment {
 
-    private InfoDialogLayoutBinding mBinding;
-
     private static final String INFO_DIALOG_TITLE = "info_dialog_title";
     private static final String INFO_DIALOG_DESC = "info_dialog_desc";
     private static final String INFO_DIALOG_COLOR = "info_dialog_color";
@@ -64,7 +62,11 @@ public class InfoDialogFragment extends DialogFragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        mBinding = DataBindingUtil.inflate(inflater, R.layout.info_dialog_layout, container, false);
+        if (savedInstanceState != null) {
+            dismiss();
+            return null;
+        }
+        InfoDialogLayoutBinding mBinding = DataBindingUtil.inflate(inflater, R.layout.info_dialog_layout, container, false);
         Bundle arguments = Objects.requireNonNull(getArguments());
         mBinding.infoDialogTitle.setText(arguments.getString(INFO_DIALOG_TITLE));
         mBinding.infoDialogDescription.setText(arguments.getString(INFO_DIALOG_DESC));

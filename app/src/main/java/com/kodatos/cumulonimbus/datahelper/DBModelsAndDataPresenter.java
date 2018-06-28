@@ -2,18 +2,21 @@ package com.kodatos.cumulonimbus.datahelper;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.os.Parcelable;
 
 import com.kodatos.cumulonimbus.R;
 import com.kodatos.cumulonimbus.apihelper.DBModel;
 import com.kodatos.cumulonimbus.uihelper.ForecastCalculatedData;
 import com.kodatos.cumulonimbus.utils.MiscUtils;
 
+import org.parceler.Parcels;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class DBModelsAndDataPresenter {
 
-    private List<DBModel> dbModelList;
+    private ArrayList<DBModel> dbModelList;
 
     public DBModelsAndDataPresenter(){
         dbModelList = new ArrayList<>();
@@ -29,6 +32,14 @@ public class DBModelsAndDataPresenter {
         }
     }
 
+    public Parcelable getParcelableForSaveInstance() {
+        return Parcels.wrap(dbModelList);
+    }
+
+    public void populateModelsFromParcel(Parcelable dataBundle) {
+        dbModelList = Parcels.unwrap(dataBundle);
+    }
+
     public DBModel getCurrentWeatherModel(){
         return dbModelList.get(0);
     }
@@ -41,9 +52,9 @@ public class DBModelsAndDataPresenter {
         return returnList;
     }
 
-    public ArrayList<DBModel> getAllModelsForOneForecastDay(int day, int currentDayModelsOffset){
+    public Parcelable getParcelForOneForecastDay(int day, int currentDayModelsOffset) {
         int startingRow = currentDayModelsOffset + (day * 8);
-        return new ArrayList<>(dbModelList.subList(startingRow, startingRow + 8));
+        return Parcels.wrap(new ArrayList<>(dbModelList.subList(startingRow, startingRow + 8)));
     }
 
     public List<DBModel> getAllAvailableModelsForToday(int currentDayModelOffset){

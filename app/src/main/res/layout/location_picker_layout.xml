@@ -7,6 +7,7 @@
         android:id="@+id/locationPickerCoordinatorLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="@color/_09d_background"
         tools:context=".LocationPickerActivity">
 
         <android.support.design.widget.AppBarLayout
@@ -21,7 +22,7 @@
                 android:id="@+id/toolbar_location_picker"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="?attr/colorPrimary"
+                android:background="@color/_09d_background"
                 app:popupTheme="@style/AppTheme.PopupOverlay">
 
                 <TextView
@@ -30,7 +31,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
                     android:gravity="center_horizontal"
-                    android:text="Your Locations"
+                    android:text="@string/custom_locations_title"
                     android:textColor="#FFFFFFFF"
                     android:textSize="@dimen/mainui_title_text_size"
                     app:fontFamily="@font/pacifico" />
@@ -43,6 +44,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_margin="32dp"
+            android:layout_marginBottom="48dp"
             app:cardCornerRadius="4dp"
             app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
@@ -58,7 +60,7 @@
                 android:layout_height="match_parent"
                 android:fontFamily="@font/poppins_medium"
                 android:gravity="center"
-                android:text="No locations are present. Add one!"
+                android:text="@string/locations_empty_text"
                 android:textColor="@color/textColorTertiary"
                 android:textSize="36sp"
                 android:visibility="gone" />
@@ -70,6 +72,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_add"
+            app:backgroundTint="@color/_01d_icon_tint"
             app:elevation="8dp"
             app:fabSize="normal"
             app:layout_anchor="@id/locationPickerCard"

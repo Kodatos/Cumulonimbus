@@ -6,11 +6,9 @@
         android:summaryOff="Using Custom Location"
         android:summaryOn="Using Current Location"
         android:title="@string/pref_curr_location_title" />
-    <EditTextPreference
-        android:defaultValue="@string/pref_custom_location_def"
+    <Preference
         android:key="@string/pref_custom_location_key"
-        android:title="@string/pref_custom_location_title"
-    />
+        android:title="@string/pref_custom_location_title"></Preference>
     <CheckBoxPreference
         android:defaultValue="true"
         android:key="@string/pref_metrics_key"
