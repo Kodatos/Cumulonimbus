@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package com.kodatos.cumulonimbus.uihelper;
+package com.kodatos.cumulonimbus.uihelper.adapters;
 
 
 import android.support.annotation.NonNull;
@@ -33,6 +33,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.kodatos.cumulonimbus.databinding.ForecastRecyclerviewItemBinding;
+import com.kodatos.cumulonimbus.uihelper.ForecastCalculatedData;
 import com.kodatos.cumulonimbus.utils.AdapterDiffUtils;
 
 import java.util.List;

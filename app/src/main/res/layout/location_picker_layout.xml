@@ -11,11 +11,10 @@
         tools:context=".LocationPickerActivity">
 
         <android.support.design.widget.AppBarLayout
-            android:id="@+id/appBarMain"
+            android:id="@+id/appBarLocationPicker"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:theme="@style/AppTheme.AppBarOverlay"
-            android:transitionName="APP_BAR"
             app:elevation="0dp">
 
             <android.support.v7.widget.Toolbar

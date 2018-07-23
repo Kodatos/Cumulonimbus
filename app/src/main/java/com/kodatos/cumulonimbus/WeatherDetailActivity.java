@@ -42,7 +42,7 @@ import android.transition.TransitionInflater;
 import com.kodatos.cumulonimbus.apihelper.DBModel;
 import com.kodatos.cumulonimbus.databinding.ActivityWeatherDetailBinding;
 import com.kodatos.cumulonimbus.uihelper.DetailActivityDataModel;
-import com.kodatos.cumulonimbus.uihelper.TimelineRecyclerViewAdapter;
+import com.kodatos.cumulonimbus.uihelper.adapters.TimelineRecyclerViewAdapter;
 import com.kodatos.cumulonimbus.utils.KeyConstants;
 import com.kodatos.cumulonimbus.utils.MiscUtils;
 

@@ -61,6 +61,24 @@ public class DBModelsAndDataPresenter {
         return new ArrayList<>(dbModelList.subList(1, currentDayModelOffset));
     }
 
+    public int[] getTemperatureChartData() {
+        int[] temperatures = new int[8];
+        for (int i = 0; i < 8; i++) {
+            temperatures[i] = Integer.parseInt(dbModelList.get(i + 1).getTemp());
+        }
+        return temperatures;
+    }
+
+    public int[] getWindChartData(boolean metric) {
+        int[] winds = new int[8];
+        float currentWind;
+        for (int i = 0; i < 8; i++) {
+            currentWind = Float.parseFloat(dbModelList.get(i + 1).getWind().split("/")[0]);
+            winds[i] = (int) (metric ? currentWind * 3.6 : currentWind);
+        }
+        return winds;
+    }
+
     public String getFeelsLikeTemperatureDescription(Context context, boolean metric){
         String description;
         DBModel currentDBModel = dbModelList.get(0);

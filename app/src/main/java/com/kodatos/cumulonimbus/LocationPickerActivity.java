@@ -15,9 +15,9 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.kodatos.cumulonimbus.databinding.LocationPickerLayoutBinding;
-import com.kodatos.cumulonimbus.uihelper.LocationRecyclerViewAdapter;
 import com.kodatos.cumulonimbus.uihelper.NewLocationDialogFragment;
 import com.kodatos.cumulonimbus.uihelper.SwipeToDeleteHelper;
+import com.kodatos.cumulonimbus.uihelper.adapters.LocationRecyclerViewAdapter;
 import com.kodatos.cumulonimbus.utils.KeyConstants;
 
 import java.util.ArrayList;

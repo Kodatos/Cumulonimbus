@@ -97,7 +97,7 @@
                     app:fontFamily="@font/pacifico"
                     app:layout_constraintBottom_toBottomOf="@id/aboutIcon"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintLeft_toRightOf="@id/aboutIcon"
+                    app:layout_constraintStart_toEndOf="@id/aboutIcon"
                     app:layout_constraintTop_toTopOf="@id/aboutIcon" />
 
                 <TextView
@@ -112,8 +112,8 @@
                     android:textColor="@color/textColorSecondaryInverse"
                     android:textSize="16sp"
                     app:fontFamily="@font/poppins_bold"
-                    app:layout_constraintEnd_toEndOf="@id/aboutAppName"
-                    app:layout_constraintStart_toStartOf="@id/aboutIcon"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/aboutIcon" />
 
                 <android.support.v7.widget.CardView

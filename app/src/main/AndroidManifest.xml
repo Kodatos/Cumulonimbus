@@ -78,6 +78,12 @@
             android:parentActivityName=".SettingsActivity"
             android:theme="@style/AppTheme.NoActionBar.ColouredBackground" />
 
+        <activity
+            android:name=".GraphsActivity"
+            android:launchMode="singleTop"
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/AppTheme.NoActionBar.ColouredBackground" />
+
         <meta-data
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />

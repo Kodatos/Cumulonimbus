@@ -34,7 +34,7 @@ dependencies {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
     implementation 'com.android.support:appcompat-v7:27.1.1'
-    implementation 'com.android.support.constraint:constraint-layout:1.1.1'
+    implementation 'com.android.support.constraint:constraint-layout:1.1.2'
     implementation 'com.android.support:design:27.1.1'
     implementation 'com.google.code.gson:gson:2.8.1'
     implementation 'com.squareup.retrofit2:retrofit:2.3.0'
@@ -46,6 +46,7 @@ dependencies {
     implementation 'org.parceler:parceler-api:1.1.9'
     implementation 'de.psdev.licensesdialog:licensesdialog:1.8.3'
     implementation 'com.github.apl-devs:appintro:v4.2.3'
+    implementation 'com.github.PhilJay:MPAndroidChart:v3.0.3'
     annotationProcessor 'org.parceler:parceler:1.1.9'
     testImplementation 'junit:junit:4.12'
     testImplementation 'org.robolectric:robolectric:3.3.2'

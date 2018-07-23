@@ -88,8 +88,8 @@ import com.kodatos.cumulonimbus.datahelper.DBModelsAndDataPresenter;
 import com.kodatos.cumulonimbus.datahelper.WeatherDBContract;
 import com.kodatos.cumulonimbus.uihelper.InfoDialogFragment;
 import com.kodatos.cumulonimbus.uihelper.MainActivityDataModel;
-import com.kodatos.cumulonimbus.uihelper.MainRecyclerViewAdapter;
-import com.kodatos.cumulonimbus.uihelper.TimelineRecyclerViewAdapter;
+import com.kodatos.cumulonimbus.uihelper.adapters.MainRecyclerViewAdapter;
+import com.kodatos.cumulonimbus.uihelper.adapters.TimelineRecyclerViewAdapter;
 import com.kodatos.cumulonimbus.utils.KeyConstants;
 import com.kodatos.cumulonimbus.utils.MiscUtils;
 import com.kodatos.cumulonimbus.utils.ServiceLocator;
@@ -326,6 +326,13 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 mBinding.currentLayout.currentWindImageView, mBinding.currentLayout.currentShadesImageView}) {
             view.setOnClickListener(infoDialogEnabledViewListener);
         }
+
+        mBinding.currentLayout.currentMeterImageView.setOnClickListener(v -> {
+            Intent graphIntent = new Intent(this, GraphsActivity.class);
+            graphIntent.putExtra("temperature_chart_data", mDataPresenter.getTemperatureChartData());
+            graphIntent.putExtra("wind_chart_data", mDataPresenter.getWindChartData(mIsMetric));
+            startActivity(graphIntent);
+        });
 
     }
 
