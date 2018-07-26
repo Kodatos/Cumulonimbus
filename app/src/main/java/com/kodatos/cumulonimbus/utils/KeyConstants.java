@@ -36,9 +36,6 @@ public class KeyConstants {
     public static final String LOCATION_NAME_KEY = "location_name_key";
     public static final String LAST_UPDATE_DATE_KEY = "LUDOH4F";
 
-    //Geocoded cached data keys
-    public static final String CACHED_CUSTOM_LOCATION_KEY = "from_custom_location";
-    public static final String CACHED_CUSTOM_LOCATION_COORDS_KEY = "to_custom_coords";
     public static final String CACHED_COORDS_KEY = "from_coords";
     public static final String CACHED_ADDRESS_KEY = "to_address";
 
@@ -54,4 +51,9 @@ public class KeyConstants {
     public static final String LOCATION_PREFERENCES_NAME = "location_shared_pref";
     public static final String CHOSEN_CUSTOM_LOCATION = "chosen_custom_location";
     public static final String CHOSEN_COORDINATES = "custom_location_coordinate";
+
+    //Graphs Activity bundle keys
+    public static final String TEMPERATURE_CHART_DATA = "temperature_chart_data";
+    public static final String WIND_CHART_DATA = "wind_chart_data";
+    public static final String RAIN_CHART_DATA = "rain_chart_data";
 }

@@ -29,6 +29,12 @@
     <color name="_04d_background">#424242</color>
     <color name="_09d_background">#283593</color>
     <color name="_11d_background">#000020</color>
-    <color name="_13d_background">#7986CB</color>
+    <color name="_13d_background">#5c6bc0</color>
     <color name="_50d_background">#757575</color>
+
+    <color name="charts_background">#172126</color>
+
+    <color name="first_slide_background">#121968</color>
+    <color name="second_slide_background">#123255</color>
+    <color name="third_slide_background">#12463c</color>
 </resources>

@@ -19,12 +19,6 @@
         <license>Apache Software License 2.0</license>
     </notice>
     <notice>
-        <name>Parceler</name>
-        <url>https://github.com/johncarl81/parceler</url>
-        <copyright>Copyright 2011-2015 John Ericksen</copyright>
-        <license>Apache Software License 2.0</license>
-    </notice>
-    <notice>
         <name>Material Design Icons</name>
         <url>https://github.com/Templarian/MaterialDesign/blob/master/license.txt</url>
         <copyright>Copyright 2014, Austin Andrews&lt;br/&gt;Copyright 2014, Google</copyright>
@@ -34,6 +28,12 @@
         <name>AppIntro</name>
         <url>https://github.com/apl-devs/AppIntro</url>
         <copyright>Copyright 2015 Paolo Rotolo&lt;br/&gt;Copyright 2018 APL Devs</copyright>
+        <license>Apache Software License 2.0</license>
+    </notice>
+    <notice>
+        <name>MPAndroidChart</name>
+        <url>https://github.com/PhilJay/MPAndroidChart</url>
+        <copyright>Copyright 2018 Philipp Jahoda</copyright>
         <license>Apache Software License 2.0</license>
     </notice>
 </notices>

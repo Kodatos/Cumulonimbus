@@ -39,10 +39,10 @@ public class WelcomeActivity extends AppIntro {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        addSlide(SimpleSlideFragment.newInstance(getString(R.string.welcome_title_1), getString(R.string.welcome_description_1), R.drawable.ic_launcher_foreground, ContextCompat.getColor(this, R.color._01n_background)));
-        addSlide(SimpleSlideFragment.newInstance(getString(R.string.welcome_title_2), getString(R.string.welcome_description_2), R.drawable.ic_location_permission, ContextCompat.getColor(this, R.color._04d_background)));
+        addSlide(SimpleSlideFragment.newInstance(getString(R.string.welcome_title_1), getString(R.string.welcome_description_1), R.drawable.ic_launcher_foreground, ContextCompat.getColor(this, R.color.first_slide_background)));
+        addSlide(SimpleSlideFragment.newInstance(getString(R.string.welcome_title_2), getString(R.string.welcome_description_2), R.drawable.ic_location_permission, ContextCompat.getColor(this, R.color.second_slide_background)));
 
-        addSlide(PreferenceSlideFragment.newInstance(ContextCompat.getColor(this, R.color._11d_background)));
+        addSlide(PreferenceSlideFragment.newInstance(ContextCompat.getColor(this, R.color.third_slide_background)));
 
         addSlide(SimpleSlideFragment.newInstance(getString(R.string.welcome_title_4), getString(R.string.welcome_description_4), R.drawable.ic_sun_emoticon, ContextCompat.getColor(this, R.color._01d_background)));
         //askForPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 2);

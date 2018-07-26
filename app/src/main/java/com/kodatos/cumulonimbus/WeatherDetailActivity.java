@@ -46,8 +46,6 @@ import com.kodatos.cumulonimbus.uihelper.adapters.TimelineRecyclerViewAdapter;
 import com.kodatos.cumulonimbus.utils.KeyConstants;
 import com.kodatos.cumulonimbus.utils.MiscUtils;
 
-import org.parceler.Parcels;
-
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -102,7 +100,7 @@ public class WeatherDetailActivity extends AppCompatActivity {
         });*/
 
         mBinding.weatherImageView.setTransitionName(getIntent().getStringExtra(KeyConstants.FORECAST_IMAGE_TRANSITION_KEY));
-        mModels = Parcels.unwrap(getIntent().getParcelableExtra(KeyConstants.WEATHER_DETAIL_PARCEL_NAME));
+        mModels = getIntent().getParcelableArrayListExtra(KeyConstants.WEATHER_DETAIL_PARCEL_NAME);
         LinearLayoutManager lm = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
         mBinding.timelineRecyclerView.setLayoutManager(lm);
         initialize();

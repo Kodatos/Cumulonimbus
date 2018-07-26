@@ -67,4 +67,6 @@
     <string name="enter_your_location_hint">Enter your location here</string>
     <string name="locations_empty_text">No locations are present. Add one!</string>
     <string name="custom_locations_title">Your Locations</string>
+    <string name="charts_title">NEXT 24 HOURS</string>
+    <string name="graphs_activity_title">Graphs</string>
 </resources>

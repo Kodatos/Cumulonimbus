@@ -25,15 +25,13 @@
 package com.kodatos.cumulonimbus.apihelper;
 
 
-import org.parceler.Parcel;
-import org.parceler.ParcelConstructor;
+import android.os.Parcelable;
 
 /*
     A model class that contains data for transactions with the database. This class holds all the columns in the database.
     The object will be populated with data from Cursors.
  */
-@Parcel(Parcel.Serialization.BEAN)
-public class DBModel {
+public class DBModel implements Parcelable {
 
     private long id;
     private String weather_main;
@@ -51,7 +49,6 @@ public class DBModel {
 
     public DBModel() {}
 
-    @ParcelConstructor
     public DBModel(long id, String weather_main, String weather_desc, String temp, float temp_min, float temp_max, float pressure, long humidity, String wind, long clouds, String icon_id, double uvIndex, double rain_3h) {
         this.id = id;
         this.weather_main = weather_main;
@@ -73,6 +70,56 @@ public class DBModel {
         this.icon_id = icon_id;
         this.uvIndex = uvIndex;
         this.rain_3h = rain_3h;
+    }
+
+    public static final Creator<DBModel> CREATOR = new Creator<DBModel>() {
+        @Override
+        public DBModel createFromParcel(android.os.Parcel in) {
+            return new DBModel(in);
+        }
+
+        @Override
+        public DBModel[] newArray(int size) {
+            return new DBModel[size];
+        }
+    };
+
+    protected DBModel(android.os.Parcel in) {
+        id = in.readLong();
+        weather_main = in.readString();
+        weather_desc = in.readString();
+        temp = in.readString();
+        temp_min = in.readFloat();
+        temp_max = in.readFloat();
+        pressure = in.readFloat();
+        humidity = in.readLong();
+        wind = in.readString();
+        clouds = in.readLong();
+        icon_id = in.readString();
+        uvIndex = in.readDouble();
+        rain_3h = in.readDouble();
+    }
+
+    @Override
+    public void writeToParcel(android.os.Parcel dest, int flags) {
+        dest.writeLong(id);
+        dest.writeString(weather_main);
+        dest.writeString(weather_desc);
+        dest.writeString(temp);
+        dest.writeFloat(temp_min);
+        dest.writeFloat(temp_max);
+        dest.writeFloat(pressure);
+        dest.writeLong(humidity);
+        dest.writeString(wind);
+        dest.writeLong(clouds);
+        dest.writeString(icon_id);
+        dest.writeDouble(uvIndex);
+        dest.writeDouble(rain_3h);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
     }
 
     public long getId() {
