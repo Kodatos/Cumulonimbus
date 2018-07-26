@@ -144,7 +144,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
         mDataPresenter = new DBModelsAndDataPresenter();
         if (savedInstanceState != null) {
-            mDataPresenter.populateModelsFromParcel(savedInstanceState.getParcelable("bundled_data"));
+            mDataPresenter.populateModelsFromParcel(savedInstanceState.getParcelableArrayList("bundled_data"));
         }
 
         if (defaultSharedPreferences.getBoolean(KeyConstants.FIRST_TIME_RUN, true)) {
@@ -215,7 +215,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putParcelable("bundled_data", mDataPresenter.getParcelableForSaveInstance());
+        outState.putParcelableArrayList("bundled_data", mDataPresenter.getParcelableArrayListForSaveInstance());
     }
 
     private void initialize(boolean isSavedInstanceAvailable) {
@@ -329,8 +329,9 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
         mBinding.currentLayout.currentMeterImageView.setOnClickListener(v -> {
             Intent graphIntent = new Intent(this, GraphsActivity.class);
-            graphIntent.putExtra("temperature_chart_data", mDataPresenter.getTemperatureChartData());
-            graphIntent.putExtra("wind_chart_data", mDataPresenter.getWindChartData(mIsMetric));
+            graphIntent.putExtra(KeyConstants.TEMPERATURE_CHART_DATA, mDataPresenter.getTemperatureChartData());
+            graphIntent.putExtra(KeyConstants.WIND_CHART_DATA, mDataPresenter.getWindChartData(mIsMetric));
+            graphIntent.putExtra(KeyConstants.RAIN_CHART_DATA, mDataPresenter.getRainChartData());
             startActivity(graphIntent);
         });
 
@@ -433,7 +434,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 Pair.create(mBinding.forecastLayout.mainRecyclerview, mBinding.forecastLayout.mainRecyclerview.getTransitionName()),
                 Pair.create(mBinding.forecastLayout.currentTimelineCard, mBinding.forecastLayout.currentTimelineCard.getTransitionName())
         );
-        intent.putExtra(KeyConstants.WEATHER_DETAIL_PARCEL_NAME, mDataPresenter.getParcelForOneForecastDay(position, todayForecastCount));
+        intent.putParcelableArrayListExtra(KeyConstants.WEATHER_DETAIL_PARCEL_NAME, mDataPresenter.getModelsForOneForecastDay(position, todayForecastCount));
         intent.putExtra(KeyConstants.WEATHER_DETAIL_DAY_NAME, position + 1);
         intent.putExtra(KeyConstants.FORECAST_IMAGE_TRANSITION_KEY, imageTransitionName);
         startActivity(intent, options.toBundle());

@@ -6,7 +6,7 @@
         android:id="@+id/locationPickerCoordinatorLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#00695C">
+        android:background="@color/charts_background">
 
         <android.support.design.widget.AppBarLayout
             android:id="@+id/appBarGraphs"
@@ -19,7 +19,8 @@
                 android:id="@+id/toolbar_graphs_activity"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="#00695C"
+                android:background="@color/charts_background"
+                app:layout_scrollFlags="scroll"
                 app:popupTheme="@style/AppTheme.PopupOverlay">
 
                 <TextView
@@ -28,8 +29,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
                     android:gravity="center_horizontal"
-                    android:text="Charts"
-                    android:textColor="#FFFFFFFF"
+                    android:text="@string/graphs_activity_title"
                     android:textSize="@dimen/mainui_title_text_size"
                     app:fontFamily="@font/pacifico" />
 
@@ -41,60 +41,57 @@
             android:layout_height="match_parent"
             app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-            <LinearLayout
+            <android.support.constraint.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_margin="16dp"
-                android:orientation="vertical">
+                android:layout_height="match_parent">
 
-                <android.support.v7.widget.CardView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-                    <!--<TextView
-                        android:id="@+id/temperatureChartTitle"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
-                        android:fontFamily="@font/poppins_medium"
-                        android:layout_gravity="center_horizontal"
-                        android:text="Temperature"
-                        android:textColor="@color/textColorSecondaryAlt"
-                        android:textSize="18sp" />-->
-
-                    <com.github.mikephil.charting.charts.LineChart
-                        android:id="@+id/temperatureChart"
-                        android:layout_width="match_parent"
-                        android:layout_height="256dp"
-                        android:layout_margin="16dp" />
-
-                </android.support.v7.widget.CardView>
-
-                <android.support.v7.widget.CardView
-                    android:layout_width="match_parent"
+                <TextView
+                    android:id="@+id/chartsTitle"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp">
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="16dp"
+                    android:fontFamily="@font/poppins_medium"
+                    android:text="@string/charts_title"
+                    android:textColor="@color/textColorPrimaryInverse"
+                    android:textSize="24sp"
+                    app:layout_constraintBottom_toTopOf="@id/temperatureChart"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintVertical_chainStyle="packed" />
 
-                    <!--<TextView
-                        android:id="@+id/windChartTitle"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
-                        android:fontFamily="@font/poppins_medium"
-                        android:layout_gravity="center_horizontal"
-                        android:text="Wind"
-                        android:textColor="@color/textColorSecondaryAlt"
-                        android:textSize="18sp" />-->
+                <com.github.mikephil.charting.charts.LineChart
+                    android:id="@+id/temperatureChart"
+                    android:layout_width="match_parent"
+                    android:layout_height="256dp"
+                    android:layout_margin="16dp"
+                    app:layout_constraintBottom_toTopOf="@id/windChart"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/chartsTitle" />
 
-                    <com.github.mikephil.charting.charts.LineChart
-                        android:id="@+id/windChart"
-                        android:layout_width="match_parent"
-                        android:layout_height="256dp"
-                        android:layout_margin="16dp" />
+                <com.github.mikephil.charting.charts.BarChart
+                    android:id="@+id/windChart"
+                    android:layout_width="match_parent"
+                    android:layout_height="256dp"
+                    android:layout_margin="16dp"
+                    app:layout_constraintBottom_toTopOf="@id/rainChart"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/temperatureChart" />
 
-                </android.support.v7.widget.CardView>
+                <com.github.mikephil.charting.charts.LineChart
+                    android:id="@+id/rainChart"
+                    android:layout_width="match_parent"
+                    android:layout_height="256dp"
+                    android:layout_margin="16dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/windChart" />
 
-            </LinearLayout>
+            </android.support.constraint.ConstraintLayout>
 
         </android.support.v4.widget.NestedScrollView>
 
