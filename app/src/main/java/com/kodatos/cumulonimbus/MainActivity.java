@@ -143,15 +143,15 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         weatherSharedPreferences = getSharedPreferences("weather_display_pref", MODE_PRIVATE);
 
         mDataPresenter = new DBModelsAndDataPresenter();
-        if (savedInstanceState != null) {
+        /*if (savedInstanceState != null) {
             mDataPresenter.populateModelsFromParcel(savedInstanceState.getParcelableArrayList("bundled_data"));
-        }
+        }*/
 
         if (defaultSharedPreferences.getBoolean(KeyConstants.FIRST_TIME_RUN, true)) {
             Intent introActivityIntent = new Intent(this, WelcomeActivity.class);
             startActivityForResult(introActivityIntent, WELCOME_ACTIVITY_REQUEST_ID);
         } else {
-            initialize(savedInstanceState != null);
+            initialize();
         }
 
     }
@@ -202,7 +202,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == WELCOME_ACTIVITY_REQUEST_ID)
             if (resultCode == RESULT_OK)
-                initialize(false);
+                initialize();
             else
                 finish();
         else if (requestCode == SETTINGS_ACTIVITY_REQUEST_ID || requestCode == LOCATION_PICKER_ACTIVITY_REQUEST_ID)
@@ -212,13 +212,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             }
     }
 
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putParcelableArrayList("bundled_data", mDataPresenter.getParcelableArrayListForSaveInstance());
-    }
-
-    private void initialize(boolean isSavedInstanceAvailable) {
+    private void initialize() {
         //Calculate height of hidden layout
         mBinding.currentLayout.currentHiddenLayout.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
@@ -263,10 +257,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         mBinding.forecastCard.setBackground(gradientDrawable);
 
         getSupportLoaderManager().initLoader(LOADER_ID, null, this);
-        if (isSavedInstanceAvailable)
-            /*Data retrieved from savedInstanceState. Loader will provide the old cursor and data will
-            not be bound in onLoadFinished(). Hence binding data here */
-            bindCurrentWeatherData();
         setUpUIInteractions();
     }
 
@@ -395,7 +385,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             mBinding.mainUISwipeRefreshLayout.setRefreshing(false);
             //Check if already traversed Cursor is provided again
             if (!data.moveToNext())
-                return;
+                data.moveToFirst();
             data.moveToPrevious();
             mDataPresenter.populateModelsFromCursor(data);
             bindCurrentWeatherData();
