@@ -22,7 +22,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class ServiceLocator {
 
     public static WeatherAPIService getBaseService(){
-        final String WEATHER_BASE_URL = "http://api.openweathermap.org/";
+        final String WEATHER_BASE_URL = "https://api.openweathermap.org/";
         Retrofit weatherRetrofit = new Retrofit.Builder()
                 .baseUrl(WEATHER_BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
