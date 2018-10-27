@@ -25,13 +25,14 @@
 package com.kodatos.cumulonimbus;
 
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
 
 import com.github.paolorotolo.appintro.AppIntro;
 import com.kodatos.cumulonimbus.uihelper.welcome.PreferenceSlideFragment;
 import com.kodatos.cumulonimbus.uihelper.welcome.SimpleSlideFragment;
+
+import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
 
 public class WelcomeActivity extends AppIntro {
 

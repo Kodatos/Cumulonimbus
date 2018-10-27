@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <android.support.constraint.ConstraintLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/locationForegroundLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -47,5 +47,5 @@
             app:layout_constraintTop_toBottomOf="@id/level1TextView"
             tools:text="Delhi, India" />
 
-    </android.support.constraint.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

@@ -34,13 +34,13 @@
             type="com.kodatos.cumulonimbus.uihelper.MainActivityDataModel"/>
     </data>
 
-<android.support.design.widget.CoordinatorLayout
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
     android:id="@+id/mainCoordinatorLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.kodatos.cumulonimbus.MainActivity">
 
-    <android.support.design.widget.AppBarLayout
+        <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBarMain"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -48,7 +48,7 @@
         android:transitionName="APP_BAR"
         app:elevation="0dp">
 
-        <android.support.v7.widget.Toolbar
+            <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar_main"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -66,23 +66,23 @@
                 android:textSize="@dimen/mainui_title_text_size"
                 app:fontFamily="@font/pacifico" />
 
-        </android.support.v7.widget.Toolbar>
+            </androidx.appcompat.widget.Toolbar>
 
-    </android.support.design.widget.AppBarLayout>
+        </com.google.android.material.appbar.AppBarLayout>
 
-    <android.support.v4.widget.SwipeRefreshLayout
+        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/mainUISwipeRefreshLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <android.support.v4.widget.NestedScrollView
+            <androidx.core.widget.NestedScrollView
             android:id="@+id/mainUINestedScrollView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:overScrollMode="never">
 
-            <android.support.constraint.ConstraintLayout
+                <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/background_constaintlayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -94,9 +94,11 @@
                 <include
                     android:id="@+id/currentLayout"
                     layout="@layout/current_weather_layout"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
                     bind:currentWeatherData="@{currentWeatherData}" />
 
-                <android.support.v7.widget.CardView
+                    <androidx.cardview.widget.CardView
                     android:id="@+id/forecast_card"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -115,10 +117,10 @@
                         android:id="@+id/forecastLayout"
                         layout="@layout/forecast_card_layout" />
 
-                </android.support.v7.widget.CardView>
-            </android.support.constraint.ConstraintLayout>
-        </android.support.v4.widget.NestedScrollView>
-    </android.support.v4.widget.SwipeRefreshLayout>
+                    </androidx.cardview.widget.CardView>
+                </androidx.constraintlayout.widget.ConstraintLayout>
+            </androidx.core.widget.NestedScrollView>
+        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
     <ImageView
         android:id="@+id/placeholderImageView"
@@ -126,5 +128,5 @@
         android:layout_height="match_parent"
         android:scaleType="fitXY"
         android:src="@drawable/placeholder_background" />
-</android.support.design.widget.CoordinatorLayout>
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
 </layout>

@@ -34,7 +34,7 @@
             type="com.kodatos.cumulonimbus.uihelper.MainActivityDataModel" />
     </data>
 
-    <android.support.constraint.ConstraintLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/current_layout_always_visible"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -216,7 +216,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/current_hidden_layout" />
 
-        <android.support.constraint.ConstraintLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/current_hidden_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -503,6 +503,6 @@
                 app:layout_constraintBottom_toBottomOf="@id/currentShadesImageView"
                 tools:text="9.1" />
 
-        </android.support.constraint.ConstraintLayout>
-    </android.support.constraint.ConstraintLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

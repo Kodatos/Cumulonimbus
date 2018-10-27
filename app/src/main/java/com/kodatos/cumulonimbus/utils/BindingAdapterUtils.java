@@ -24,12 +24,13 @@
 
 package com.kodatos.cumulonimbus.utils;
 
-import android.databinding.BindingAdapter;
-import android.support.v4.content.ContextCompat;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.kodatos.cumulonimbus.R;
+
+import androidx.core.content.ContextCompat;
+import androidx.databinding.BindingAdapter;
 
 /*
     A utility class that contain custom attribute setters for the Data Binding Library. Kept in a separate

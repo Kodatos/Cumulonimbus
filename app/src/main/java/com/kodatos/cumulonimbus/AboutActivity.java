@@ -24,10 +24,7 @@
 
 package com.kodatos.cumulonimbus;
 
-import android.databinding.DataBindingUtil;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
 import android.transition.Slide;
 import android.view.Gravity;
 import android.view.Window;
@@ -35,6 +32,9 @@ import android.view.WindowManager;
 
 import com.kodatos.cumulonimbus.databinding.ActivityAboutBinding;
 
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.databinding.DataBindingUtil;
 import de.psdev.licensesdialog.LicensesDialogFragment;
 
 public class AboutActivity extends AppCompatActivity {

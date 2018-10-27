@@ -1,19 +1,12 @@
 package com.kodatos.cumulonimbus;
 
 import android.content.SharedPreferences;
-import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.annotation.Nullable;
-import android.support.design.widget.Snackbar;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.View;
 import android.widget.Toast;
 
+import com.google.android.material.snackbar.Snackbar;
 import com.kodatos.cumulonimbus.databinding.LocationPickerLayoutBinding;
 import com.kodatos.cumulonimbus.uihelper.NewLocationDialogFragment;
 import com.kodatos.cumulonimbus.uihelper.SwipeToDeleteHelper;
@@ -22,6 +15,14 @@ import com.kodatos.cumulonimbus.utils.KeyConstants;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
+import androidx.databinding.DataBindingUtil;
+import androidx.recyclerview.widget.ItemTouchHelper;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 public class LocationPickerActivity extends AppCompatActivity implements LocationRecyclerViewAdapter.LocationClickListener {
 
@@ -50,7 +51,7 @@ public class LocationPickerActivity extends AppCompatActivity implements Locatio
         if (adapterData.isEmpty())
             mBinding.listEmptyTextView.setVisibility(View.VISIBLE);
         String chosenCustomLocation = defaultSharedPreferences.getString(KeyConstants.CHOSEN_CUSTOM_LOCATION, null);
-        LinearLayoutManager lm = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+        LinearLayoutManager lm = new LinearLayoutManager(this, RecyclerView.VERTICAL, false);
         mBinding.locationPickerRecyclerView.setLayoutManager(lm);
         adapter = new LocationRecyclerViewAdapter(adapterData, adapterData.indexOf(chosenCustomLocation), this);
         mBinding.locationPickerRecyclerView.setAdapter(adapter);

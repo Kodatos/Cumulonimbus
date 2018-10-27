@@ -1,16 +1,9 @@
 package com.kodatos.cumulonimbus.uihelper;
 
 import android.content.Context;
-import android.databinding.DataBindingUtil;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.DialogFragment;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.AsyncTaskLoader;
-import android.support.v4.content.Loader;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,8 +15,17 @@ import com.kodatos.cumulonimbus.utils.CityValidatorUtil;
 
 import java.io.IOException;
 import java.text.DecimalFormat;
+import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.databinding.DataBindingUtil;
+import androidx.fragment.app.DialogFragment;
+import androidx.loader.app.LoaderManager;
+import androidx.loader.content.AsyncTaskLoader;
+import androidx.loader.content.Loader;
 
 public class NewLocationDialogFragment extends DialogFragment implements LoaderManager.LoaderCallbacks<String[]> {
 
@@ -136,7 +138,10 @@ public class NewLocationDialogFragment extends DialogFragment implements LoaderM
             Geocoder geocoder = new Geocoder(getContext(), Locale.getDefault());
             String[] returnData = new String[3];
             try {
-                Address address = geocoder.getFromLocationName(location, 1).get(0);
+                List<Address> addresses = geocoder.getFromLocationName(location, 1);
+                if (addresses.size() == 0)
+                    throw new IOException();
+                Address address = addresses.get(0);
                 if (address == null)
                     throw new IOException();
                 returnData[0] = (address.getSubLocality() != null ? address.getSubLocality() + ", " : "") + address.getLocality() + ", " + address.getCountryName();

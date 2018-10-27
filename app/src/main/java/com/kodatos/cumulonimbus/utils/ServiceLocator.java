@@ -5,8 +5,6 @@ import android.app.ActivityOptions;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.content.LocalBroadcastManager;
 import android.view.View;
 
 import com.kodatos.cumulonimbus.R;
@@ -16,6 +14,8 @@ import com.kodatos.cumulonimbus.apihelper.SyncOWMService;
 import com.kodatos.cumulonimbus.apihelper.WeatherAPIService;
 import com.kodatos.cumulonimbus.uihelper.InfoDialogFragment;
 
+import androidx.core.content.ContextCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 

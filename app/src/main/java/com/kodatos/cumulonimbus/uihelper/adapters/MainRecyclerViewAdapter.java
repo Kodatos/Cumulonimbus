@@ -25,9 +25,6 @@
 package com.kodatos.cumulonimbus.uihelper.adapters;
 
 
-import android.support.annotation.NonNull;
-import android.support.v7.util.DiffUtil;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -37,6 +34,10 @@ import com.kodatos.cumulonimbus.uihelper.ForecastCalculatedData;
 import com.kodatos.cumulonimbus.utils.AdapterDiffUtils;
 
 import java.util.List;
+
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.DiffUtil;
+import androidx.recyclerview.widget.RecyclerView;
 
 public class MainRecyclerViewAdapter extends RecyclerView.Adapter<MainRecyclerViewAdapter.MainRecyclerViewHolder> {
 

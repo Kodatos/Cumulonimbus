@@ -25,18 +25,12 @@
 package com.kodatos.cumulonimbus.utils;
 
 import android.content.Context;
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.graphics.ColorUtils;
 
 import com.kodatos.cumulonimbus.R;
 import com.kodatos.cumulonimbus.apihelper.DBModel;
-import com.kodatos.cumulonimbus.apihelper.ServiceErrorContract;
+import com.kodatos.cumulonimbus.uihelper.DetailActivityDataModel;
 import com.kodatos.cumulonimbus.uihelper.ForecastCalculatedData;
 import com.kodatos.cumulonimbus.uihelper.MainActivityDataModel;
-import com.kodatos.cumulonimbus.uihelper.DetailActivityDataModel;
 
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
@@ -45,6 +39,9 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Locale;
 import java.util.TimeZone;
+
+import androidx.core.content.ContextCompat;
+import androidx.core.graphics.ColorUtils;
 
 /*
     A utility class containing miscellaneous functions that may be used in other functions.

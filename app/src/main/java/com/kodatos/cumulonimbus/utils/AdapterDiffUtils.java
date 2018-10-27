@@ -1,13 +1,14 @@
 package com.kodatos.cumulonimbus.utils;
 
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v7.util.DiffUtil;
 
 import com.kodatos.cumulonimbus.uihelper.ForecastCalculatedData;
 
 import java.util.List;
 import java.util.Objects;
+
+import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.DiffUtil;
 
 public class AdapterDiffUtils {
 
